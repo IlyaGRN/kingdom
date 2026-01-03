@@ -153,11 +153,6 @@ class SimpleAIPlayer(AIPlayer):
             if action.action_type == ActionType.BUILD_FORTIFICATION:
                 return action
         
-        # Form alliance if available
-        for action in valid_actions:
-            if action.action_type == ActionType.FORM_ALLIANCE:
-                return action
-        
         # End turn
         for action in valid_actions:
             if action.action_type == ActionType.END_TURN:
