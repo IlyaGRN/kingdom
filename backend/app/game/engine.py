@@ -174,10 +174,13 @@ class GameEngine:
         """Add title claiming actions if prerequisites are met."""
         # Claim Count
         for county in ["X", "U", "V", "Q"]:
-            if county not in player.counties and can_claim_count(state, player.id, county):
+            can_claim = can_claim_count(state, player.id, county)
+            print(f"[CLAIM CHECK] County {county}: already_count={county in player.counties}, can_claim={can_claim}")
+            if county not in player.counties and can_claim:
                 # Check if castle is already claimed by someone else
                 castle_id = get_county_castle(county)
                 castle = next((h for h in state.holdings if h.id == castle_id), None)
+                print(f"[CLAIM CHECK] Castle {castle_id}: exists={castle is not None}, owner={castle.owner_id if castle else 'N/A'}, gold={player.gold}")
                 if castle and castle.owner_id is None:  # Not taken yet
                     if player.gold >= 25:
                         actions.append(Action(
@@ -200,8 +203,12 @@ class GameEngine:
                         ))
         
         # Claim King
-        if not player.is_king and can_claim_king(state, player.id):
+        can_king = can_claim_king(state, player.id)
+        player_towns = [h.id for h in state.holdings if h.owner_id == player.id and h.holding_type == HoldingType.TOWN]
+        print(f"[CLAIM CHECK] King: is_king={player.is_king}, can_claim={can_king}, duchies={player.duchies}, towns_owned={player_towns}")
+        if not player.is_king and can_king:
             king_castle = next((h for h in state.holdings if h.id == "king_castle"), None)
+            print(f"[CLAIM CHECK] King castle: exists={king_castle is not None}, owner={king_castle.owner_id if king_castle else 'N/A'}, gold={player.gold}")
             if king_castle and king_castle.owner_id is None:
                 if player.gold >= 75:
                     actions.append(Action(
@@ -766,6 +773,8 @@ class GameEngine:
                 return False, "Not enough gold (need 25)", None
             player.gold -= 25
             player.soldiers += 500
+            # Cap soldiers at army capacity
+            player.soldiers = min(player.soldiers, player.army_cap)
             return True, "Hired 500 adventurer soldiers!", None
         
         elif effect == CardEffect.EXCALIBUR:

@@ -255,6 +255,8 @@ def apply_income(state: GameState) -> GameState:
         player_income = income.get(player.id, {"gold": 0, "soldiers": 0})
         player.gold += player_income["gold"]
         player.soldiers += player_income["soldiers"]
+        # Cap soldiers at army capacity (excess lost)
+        player.soldiers = min(player.soldiers, player.army_cap)
     
     # Move to player turn phase
     state.phase = GamePhase.PLAYER_TURN
@@ -290,12 +292,9 @@ def next_player_turn(state: GameState) -> GameState:
 
 def process_upkeep(state: GameState) -> GameState:
     """Process end-of-round upkeep."""
-    # Pay supply costs for over-cap armies: 2 Gold per 100 soldiers above cap
+    # Cap soldiers at army capacity (no hoarding above cap)
     for player in state.players:
-        excess = player.soldiers - player.army_cap
-        if excess > 0:
-            supply_cost = (excess // 100) * 2  # 2 Gold per 100 excess soldiers
-            player.gold = max(0, player.gold - supply_cost)
+        player.soldiers = min(player.soldiers, player.army_cap)
     
     # Award prestige to current king
     for player in state.players:
@@ -386,25 +385,48 @@ def can_claim_duke(state: GameState, player_id: str, duchy: str) -> bool:
     return False
 
 
+def has_town_in_duchy(state: GameState, player_id: str, duchy: str) -> bool:
+    """Check if player owns any town in the specified duchy."""
+    # Counties in each duchy
+    duchy_counties = {
+        "XU": ["X", "U"],
+        "QV": ["Q", "V"]
+    }
+    counties = duchy_counties.get(duchy, [])
+    
+    for holding in state.holdings:
+        if holding.owner_id == player_id and holding.holding_type == HoldingType.TOWN:
+            if holding.county in counties:
+                return True
+    return False
+
+
 def can_claim_king(state: GameState, player_id: str) -> bool:
-    """Check if a player can claim King."""
+    """Check if a player can claim King.
+    
+    Requirement: Duke in one duchy + own a town in the other duchy.
+    """
     player = next((p for p in state.players if p.id == player_id), None)
     if not player:
         return False
     
-    # Need Duke in one duchy + Count in other duchy
-    has_duke = len(player.duchies) >= 1
-    
-    if not has_duke:
+    # Need at least one duchy
+    if len(player.duchies) == 0:
         return False
     
-    # Check for count in the other duchy
+    # If player has both duchies, they can claim king
+    if len(player.duchies) >= 2:
+        return True
+    
+    # Check for a TOWN in the other duchy (not a Count title)
     if "XU" in player.duchies:
-        # Need count in Q or V
-        return "Q" in player.counties or "V" in player.counties
+        # Need a town in QV duchy
+        return has_town_in_duchy(state, player_id, "QV")
     elif "QV" in player.duchies:
-        # Need count in X or U
-        return "X" in player.counties or "U" in player.counties
+        # Need a town in XU duchy
+        return has_town_in_duchy(state, player_id, "XU")
+    
+    return False
     
     return False
 
