@@ -8,9 +8,11 @@ export type ActionType =
   | 'move' 
   | 'recruit' 
   | 'build_fortification' 
+  | 'relocate_fortification'  // Move fort when all 4 placed
   | 'claim_title' 
+  | 'claim_town'  // 10 gold to capture unowned town with valid claim
   | 'attack' 
-  | 'fake_claim'
+  | 'fake_claim'  // 35 gold to fabricate a claim
   | 'play_card' 
   | 'draw_card' 
   | 'end_turn'
@@ -105,7 +107,8 @@ export interface Player {
   holdings: string[]
   hand: string[]
   prestige: number
-  fortifications_placed: number  // Max 2 per player
+  fortifications_placed: number  // Max 4 per player
+  claims: string[]               // Territory IDs player has valid claims on
   active_effects: CardEffect[]   // Combat effects ready to use
   has_big_war_effect: boolean    // Doubled army cap until next war
 }

@@ -34,7 +34,9 @@ export default function ActionPanel({ onPerformAction, selectedHolding }: Action
       move: '🚶 Move',
       recruit: '⚔️ Recruit',
       build_fortification: '🏰 Build Fortification (10G)',
+      relocate_fortification: '🔄 Relocate Fortification',
       claim_title: '👑 Claim Title',
+      claim_town: '🏘️ Capture Town (10G)',
       attack: '⚔️ Attack',
       fake_claim: '📝 Fabricate Claim (35G)',
       play_card: '🃏 Play Card',
@@ -68,6 +70,37 @@ export default function ActionPanel({ onPerformAction, selectedHolding }: Action
         a => a.action_type === 'fake_claim' && a.target_holding_id === selectedHolding.id
       )
     : []
+
+  // Get claim town actions for selected holding (10g to capture unowned with claim)
+  const claimTownForSelected = selectedHolding
+    ? validActions.filter(
+        a => a.action_type === 'claim_town' && a.target_holding_id === selectedHolding.id
+      )
+    : []
+
+  // Get claim cards that can be played on the selected holding
+  const claimCardsForSelected = selectedHolding
+    ? (groupedActions.play_card || []).filter(action => {
+        const card = gameState.cards[action.card_id || '']
+        if (!card || card.card_type !== 'claim') return false
+        
+        // Check if the card's county matches the selected holding
+        if (card.effect === 'claim_x' && selectedHolding.county === 'X') return true
+        if (card.effect === 'claim_u' && selectedHolding.county === 'U') return true
+        if (card.effect === 'claim_v' && selectedHolding.county === 'V') return true
+        if (card.effect === 'claim_q' && selectedHolding.county === 'Q') return true
+        if (card.effect === 'ultimate_claim') return true
+        if (card.effect === 'duchy_claim') return true
+        
+        return false
+      })
+    : []
+
+  // Get non-claim play_card actions (bonus cards, etc.)
+  const nonClaimPlayCards = (groupedActions.play_card || []).filter(action => {
+    const card = gameState.cards[action.card_id || '']
+    return card && card.card_type !== 'claim'
+  })
 
   return (
     <div className="card-parchment rounded-lg p-4 h-full flex flex-col">
@@ -148,6 +181,24 @@ export default function ActionPanel({ onPerformAction, selectedHolding }: Action
             </div>
           )}
 
+          {/* Selected holding claim town (10g capture with valid claim) */}
+          {selectedHolding && claimTownForSelected.length > 0 && (
+            <div className="p-3 bg-green-50 rounded border border-green-200">
+              <h3 className="font-medieval text-sm text-green-700 mb-2">
+                Capture {selectedHolding.name}
+              </h3>
+              <p className="text-xs text-medieval-stone mb-2">
+                You have a valid claim on this unowned town!
+              </p>
+              <button
+                onClick={() => handleActionClick(claimTownForSelected[0])}
+                className="w-full py-2 rounded bg-green-600 hover:bg-green-700 text-white font-medieval"
+              >
+                Pay 10 Gold to Capture
+              </button>
+            </div>
+          )}
+
           {/* Selected holding fake claim */}
           {selectedHolding && fakeClaimForSelected.length > 0 && (
             <div className="p-3 bg-yellow-50 rounded border border-yellow-200">
@@ -158,7 +209,7 @@ export default function ActionPanel({ onPerformAction, selectedHolding }: Action
                 onClick={() => handleActionClick(fakeClaimForSelected[0])}
                 className="btn-medieval w-full py-2 rounded"
               >
-                Pay 35 Gold to Claim
+                Pay 35 Gold to Fabricate Claim
               </button>
             </div>
           )}
@@ -180,11 +231,37 @@ export default function ActionPanel({ onPerformAction, selectedHolding }: Action
             </button>
           )}
 
-          {/* Play cards from hand */}
-          {groupedActions.play_card && groupedActions.play_card.length > 0 && (
+          {/* Play claim cards on selected holding */}
+          {selectedHolding && claimCardsForSelected.length > 0 && (
+            <div className="p-3 bg-purple-50 rounded border border-purple-200">
+              <h3 className="font-medieval text-sm text-purple-800 mb-2">
+                Claim {selectedHolding.name}
+              </h3>
+              {claimCardsForSelected.map((action, idx) => {
+                const card = gameState.cards[action.card_id || '']
+                return (
+                  <button
+                    key={idx}
+                    onClick={() => handleActionClick({
+                      ...action,
+                      target_holding_id: selectedHolding.id
+                    })}
+                    className="w-full p-2 mb-1 bg-purple-100 hover:bg-purple-200 rounded transition-colors text-left"
+                  >
+                    <span className="font-medieval text-sm text-purple-800">
+                      🃏 Use {card?.name || 'Claim Card'}
+                    </span>
+                  </button>
+                )
+              })}
+            </div>
+          )}
+
+          {/* Play non-claim cards from hand (bonus cards) */}
+          {nonClaimPlayCards.length > 0 && (
             <div className="space-y-1">
               <span className="text-xs text-medieval-stone">Play Card:</span>
-              {groupedActions.play_card.map((action, idx) => {
+              {nonClaimPlayCards.map((action, idx) => {
                 const card = gameState.cards[action.card_id || '']
                 return (
                   <button
@@ -203,6 +280,18 @@ export default function ActionPanel({ onPerformAction, selectedHolding }: Action
                   </button>
                 )
               })}
+            </div>
+          )}
+
+          {/* Show claim cards in hand (hint to select a town) */}
+          {!selectedHolding && (groupedActions.play_card || []).some(a => {
+            const card = gameState.cards[a.card_id || '']
+            return card && card.card_type === 'claim'
+          }) && (
+            <div className="p-2 bg-purple-50/50 rounded border border-purple-100 text-center">
+              <span className="text-xs text-purple-600">
+                📍 Select a town on the board to use your claim cards
+              </span>
             </div>
           )}
 
@@ -228,7 +317,7 @@ export default function ActionPanel({ onPerformAction, selectedHolding }: Action
           {groupedActions.build_fortification && (
             <div className="space-y-1">
               <span className="text-xs text-medieval-stone">
-                Fortify (10 Gold, {2 - currentPlayer.fortifications_placed} remaining):
+                Fortify (10 Gold, {4 - currentPlayer.fortifications_placed} remaining):
               </span>
               {groupedActions.build_fortification.slice(0, 5).map((action, idx) => {
                 const holding = gameState.holdings.find(h => h.id === action.target_holding_id)
@@ -240,6 +329,30 @@ export default function ActionPanel({ onPerformAction, selectedHolding }: Action
                   >
                     <span className="text-sm text-medieval-bronze">
                       🏰 {holding?.name || action.target_holding_id}
+                    </span>
+                  </button>
+                )
+              })}
+            </div>
+          )}
+
+          {/* Relocate fortification (only when all 4 placed) */}
+          {groupedActions.relocate_fortification && (
+            <div className="space-y-1">
+              <span className="text-xs text-medieval-stone">
+                Relocate Fortification (all 4 placed):
+              </span>
+              {groupedActions.relocate_fortification.slice(0, 5).map((action, idx) => {
+                const source = gameState.holdings.find(h => h.id === action.source_holding_id)
+                const target = gameState.holdings.find(h => h.id === action.target_holding_id)
+                return (
+                  <button
+                    key={idx}
+                    onClick={() => handleActionClick(action)}
+                    className="w-full p-2 bg-blue-50 hover:bg-blue-100 rounded transition-colors text-left border border-blue-200"
+                  >
+                    <span className="text-sm text-blue-800">
+                      🔄 {source?.name} → {target?.name}
                     </span>
                   </button>
                 )

@@ -27,11 +27,13 @@ class ActionType(str, Enum):
     MOVE = "move"
     RECRUIT = "recruit"
     BUILD_FORTIFICATION = "build_fortification"
+    RELOCATE_FORTIFICATION = "relocate_fortification"  # Move fort when all 4 placed
     CLAIM_TITLE = "claim_title"
+    CLAIM_TOWN = "claim_town"  # 10 gold to capture unowned town with valid claim
     ATTACK = "attack"
     PLAY_CARD = "play_card"
     DRAW_CARD = "draw_card"
-    FAKE_CLAIM = "fake_claim"  # 35 gold for any town
+    FAKE_CLAIM = "fake_claim"  # 35 gold to fabricate a claim
     END_TURN = "end_turn"
 
 
@@ -163,8 +165,11 @@ class Player(BaseModel):
     # Victory points
     prestige: int = Field(default=0, ge=0)
     
-    # Fortification tracking (max 2 per player across board)
-    fortifications_placed: int = Field(default=0, ge=0, le=2)
+    # Fortification tracking (max 4 per player across board)
+    fortifications_placed: int = Field(default=0, ge=0, le=4)
+    
+    # Claims - town/territory IDs that this player has valid claims on
+    claims: list[str] = Field(default_factory=list)
     
     # Active effects (card effects currently active)
     active_effects: list[CardEffect] = Field(default_factory=list)

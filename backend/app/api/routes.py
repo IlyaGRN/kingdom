@@ -118,6 +118,7 @@ async def get_valid_actions(game_id: str, player_id: str):
     
     engine = GameEngine(game_id)
     actions = engine.get_valid_actions(player_id)
+    
     return GetValidActionsResponse(actions=actions)
 
 

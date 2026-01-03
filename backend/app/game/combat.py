@@ -253,6 +253,47 @@ def apply_combat_result(state: GameState, result: CombatResult) -> GameState:
         holding.owner_id = result.attacker_id
         if result.target_holding_id not in attacker.holdings:
             attacker.holdings.append(result.target_holding_id)
+        
+        # Handle title transfer for castles
+        if holding.holding_type == HoldingType.COUNTY_CASTLE:
+            county = result.target_holding_id[0].upper()  # e.g., "x_castle" -> "X"
+            # Remove county from defender
+            if defender and county in defender.counties:
+                defender.counties.remove(county)
+                # Downgrade defender's title if needed
+                if not defender.counties and not defender.duchies and not defender.is_king:
+                    defender.title = TitleType.BARON
+            # Add county to attacker
+            if county not in attacker.counties:
+                attacker.counties.append(county)
+            if attacker.title == TitleType.BARON:
+                attacker.title = TitleType.COUNT
+                
+        elif holding.holding_type == HoldingType.DUCHY_CASTLE:
+            duchy = result.target_holding_id[:2].upper()  # e.g., "xu_castle" -> "XU"
+            # Remove duchy from defender
+            if defender and duchy in defender.duchies:
+                defender.duchies.remove(duchy)
+                # Downgrade defender's title if needed
+                if not defender.duchies and not defender.is_king:
+                    defender.title = TitleType.COUNT if defender.counties else TitleType.BARON
+            # Add duchy to attacker
+            if duchy not in attacker.duchies:
+                attacker.duchies.append(duchy)
+            if attacker.title in [TitleType.BARON, TitleType.COUNT]:
+                attacker.title = TitleType.DUKE
+                
+        elif holding.holding_type == HoldingType.KING_CASTLE:
+            # Remove king status from defender
+            if defender and defender.is_king:
+                defender.is_king = False
+                defender.title = TitleType.DUKE if defender.duchies else (
+                    TitleType.COUNT if defender.counties else TitleType.BARON
+                )
+            # Make attacker king
+            attacker.is_king = True
+            attacker.title = TitleType.KING
+            attacker.prestige += 6  # Bonus for conquering the crown
     
     # Log combat
     state.combat_log.append(result)

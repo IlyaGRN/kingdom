@@ -90,17 +90,36 @@ class GameEngine:
                 player_id=player_id,
             ))
         
-        # Build fortification (costs 10 gold, max 2 per player, max 3 per town)
-        if player.gold >= 10 and player.fortifications_placed < 2:
+        # Build fortification (costs 10 gold, max 4 per player total, max 2 per player per town, max 3 per town)
+        if player.gold >= 10 and player.fortifications_placed < 4:
             for holding in state.holdings:
                 if holding.holding_type == HoldingType.TOWN:
                     if holding.fortification_count < 3:
-                        # Can build on own holdings or others' holdings
-                        actions.append(Action(
-                            action_type=ActionType.BUILD_FORTIFICATION,
-                            player_id=player_id,
-                            target_holding_id=holding.id,
-                        ))
+                        # Check max 2 per player on this town
+                        player_forts_here = holding.fortifications_by_player.get(player_id, 0)
+                        if player_forts_here < 2:
+                            actions.append(Action(
+                                action_type=ActionType.BUILD_FORTIFICATION,
+                                player_id=player_id,
+                                target_holding_id=holding.id,
+                            ))
+        
+        # Relocate fortification (only when all 4 are placed)
+        if player.fortifications_placed >= 4:
+            for source in state.holdings:
+                player_forts_here = source.fortifications_by_player.get(player_id, 0)
+                if player_forts_here > 0:
+                    for target in state.holdings:
+                        if target.id != source.id and target.holding_type == HoldingType.TOWN:
+                            if target.fortification_count < 3:
+                                target_player_forts = target.fortifications_by_player.get(player_id, 0)
+                                if target_player_forts < 2:
+                                    actions.append(Action(
+                                        action_type=ActionType.RELOCATE_FORTIFICATION,
+                                        player_id=player_id,
+                                        source_holding_id=source.id,
+                                        target_holding_id=target.id,
+                                    ))
         
         # Claim titles
         self._add_title_claim_actions(actions, player, state)
@@ -110,10 +129,23 @@ class GameEngine:
             if not state.enforce_peace_active:  # Enforce Peace card blocks wars
                 self._add_attack_actions(actions, player, state)
         
-        # Fake Claim (costs 35 gold for any unowned town)
+        # Claim Town (10 gold to peacefully capture unowned town with valid claim)
+        if player.gold >= 10:
+            for holding in state.holdings:
+                if (holding.holding_type == HoldingType.TOWN and 
+                    holding.owner_id is None and 
+                    holding.id in player.claims):
+                    actions.append(Action(
+                        action_type=ActionType.CLAIM_TOWN,
+                        player_id=player_id,
+                        target_holding_id=holding.id,
+                    ))
+        
+        # Fake Claim (costs 35 gold to fabricate a claim on any territory)
         if player.gold >= 35:
             for holding in state.holdings:
-                if holding.holding_type == HoldingType.TOWN and holding.owner_id is None:
+                # Can fabricate claim on any territory not already claimed
+                if holding.id not in player.claims:
                     actions.append(Action(
                         action_type=ActionType.FAKE_CLAIM,
                         player_id=player_id,
@@ -179,21 +211,83 @@ class GameEngine:
                     ))
     
     def _add_attack_actions(self, actions: list[Action], player, state: GameState):
-        """Add attack actions for reachable enemy holdings."""
-        player_holdings = [h.id for h in state.holdings if h.owner_id == player.id]
+        """Add attack actions for holdings the player can attack.
         
+        Attack requires a valid claim on the target territory.
+        Player can attack ANY holding they have a claim on (not just adjacent).
+        """
+        player_holdings = [h.id for h in state.holdings if h.owner_id == player.id]
+        added_targets = set()  # Track to avoid duplicates
+        
+        # First, add attacks for adjacent holdings (if player has claim)
         for holding_id in player_holdings:
             adjacent = get_adjacent_holdings(holding_id)
             for adj_id in adjacent:
                 adj_holding = next((h for h in state.holdings if h.id == adj_id), None)
                 if adj_holding and adj_holding.owner_id != player.id:
-                    # Can attack if not owned by player
+                    has_claim = self._has_valid_claim(player, adj_holding)
+                    if has_claim and adj_id not in added_targets:
+                        actions.append(Action(
+                            action_type=ActionType.ATTACK,
+                            player_id=player.id,
+                            source_holding_id=holding_id,
+                            target_holding_id=adj_id,
+                        ))
+                        added_targets.add(adj_id)
+        
+        # Second, add attacks for ANY holding the player has a direct claim on
+        for claim_id in player.claims:
+            if claim_id in added_targets:
+                continue
+            claim_holding = next((h for h in state.holdings if h.id == claim_id), None)
+            if claim_holding and claim_holding.owner_id != player.id:
+                # Use any player holding as source (they're "projecting power")
+                source_holding = player_holdings[0] if player_holdings else None
+                if source_holding:
                     actions.append(Action(
                         action_type=ActionType.ATTACK,
                         player_id=player.id,
-                        source_holding_id=holding_id,
-                        target_holding_id=adj_id,
+                        source_holding_id=source_holding,
+                        target_holding_id=claim_id,
                     ))
+                    added_targets.add(claim_id)
+    
+    def _has_valid_claim(self, player, holding) -> bool:
+        """Check if player has a valid claim on a holding.
+        
+        Claims come from:
+        - Played claim cards (stored in player.claims list)
+        - Fabricated claims (also in player.claims list)
+        """
+        # Check if holding ID is in player's claims list
+        if holding.id in player.claims:
+            return True
+        
+        # Check if player has a claim for the holding's county (for towns)
+        if holding.county and f"county_{holding.county}" in player.claims:
+            return True
+        
+        # Check for "all" claims (ultimate/duchy)
+        if "all" in player.claims:
+            return True
+        
+        return False
+    
+    def _consume_claim(self, player, holding) -> None:
+        """Remove the claim used for attack/capture."""
+        # Remove specific holding claim first
+        if holding.id in player.claims:
+            player.claims.remove(holding.id)
+            return
+        
+        # Remove county claim
+        if holding.county and f"county_{holding.county}" in player.claims:
+            player.claims.remove(f"county_{holding.county}")
+            return
+        
+        # Remove universal claim last
+        if "all" in player.claims:
+            player.claims.remove("all")
     
     def perform_action(self, action: Action) -> tuple[bool, str, Optional[CombatResult]]:
         """Perform a game action.
@@ -217,7 +311,9 @@ class GameEngine:
             ActionType.MOVE: self._handle_move,
             ActionType.RECRUIT: self._handle_recruit,
             ActionType.BUILD_FORTIFICATION: self._handle_build_fortification,
+            ActionType.RELOCATE_FORTIFICATION: self._handle_relocate_fortification,
             ActionType.CLAIM_TITLE: self._handle_claim_title,
+            ActionType.CLAIM_TOWN: self._handle_claim_town,
             ActionType.ATTACK: self._handle_attack,
             ActionType.FAKE_CLAIM: self._handle_fake_claim,
             ActionType.PLAY_CARD: self._handle_play_card,
@@ -344,7 +440,13 @@ class GameEngine:
         return True, "Soldiers recruited", None
     
     def _handle_build_fortification(self, action: Action) -> tuple[bool, str, None]:
-        """Handle building a fortification."""
+        """Handle building a fortification.
+        
+        Rules:
+        - Max 4 per player total
+        - Max 2 per player per town
+        - Max 3 per town total
+        """
         state = self.state
         player = next((p for p in state.players if p.id == action.player_id), None)
         holding = next((h for h in state.holdings if h.id == action.target_holding_id), None)
@@ -352,11 +454,19 @@ class GameEngine:
         if player.gold < 10:
             return False, "Not enough gold (need 10)", None
         
-        if player.fortifications_placed >= 2:
-            return False, "Maximum fortifications placed (2)", None
+        if player.fortifications_placed >= 4:
+            return False, "Maximum fortifications placed (4)", None
+        
+        if holding.holding_type != HoldingType.TOWN:
+            return False, "Can only fortify towns", None
         
         if holding.fortification_count >= 3:
-            return False, "Maximum fortifications on this holding (3)", None
+            return False, "Maximum fortifications on this town (3)", None
+        
+        # Check max 2 per player on this town
+        player_forts_here = holding.fortifications_by_player.get(player.id, 0)
+        if player_forts_here >= 2:
+            return False, "You already have 2 fortifications on this town", None
         
         player.gold -= 10
         holding.fortification_count += 1
@@ -444,7 +554,11 @@ class GameEngine:
         return False, "Invalid title claim", None
     
     def _handle_fake_claim(self, action: Action) -> tuple[bool, str, None]:
-        """Handle fabricating a claim on a town (35 gold)."""
+        """Handle fabricating a claim on any territory (35 gold).
+        
+        This establishes a claim that allows attacking or capturing the territory.
+        Does not immediately take the territory.
+        """
         state = self.state
         player = next((p for p in state.players if p.id == action.player_id), None)
         holding = next((h for h in state.holdings if h.id == action.target_holding_id), None)
@@ -452,31 +566,121 @@ class GameEngine:
         if player.gold < 35:
             return False, "Not enough gold (need 35)", None
         
-        if not holding or holding.holding_type != HoldingType.TOWN:
-            return False, "Can only fake claim towns", None
+        if not holding:
+            return False, "Holding not found", None
         
-        if holding.owner_id is not None:
-            return False, "Town is already owned", None
+        # Check if player already has a claim on this holding
+        if holding.id in player.claims:
+            return False, "You already have a claim on this territory", None
         
         player.gold -= 35
+        player.claims.append(holding.id)
+        
+        state.action_log.append(action)
+        save_game(state)
+        
+        return True, f"Fabricated claim on {holding.name}! You can now attack or capture it.", None
+    
+    def _handle_claim_town(self, action: Action) -> tuple[bool, str, None]:
+        """Handle peacefully capturing an unowned town with a valid claim (10 gold)."""
+        state = self.state
+        player = next((p for p in state.players if p.id == action.player_id), None)
+        holding = next((h for h in state.holdings if h.id == action.target_holding_id), None)
+        
+        if player.gold < 10:
+            return False, "Not enough gold (need 10)", None
+        
+        if not holding:
+            return False, "Holding not found", None
+        
+        if holding.holding_type != HoldingType.TOWN:
+            return False, "Can only claim towns this way", None
+        
+        if holding.owner_id is not None:
+            return False, "Town is occupied - you must attack to take it", None
+        
+        # Must have a valid claim
+        if holding.id not in player.claims:
+            return False, "You need a valid claim to capture this town", None
+        
+        # Consume the claim
+        player.claims.remove(holding.id)
+        
+        # Capture the town
+        player.gold -= 10
         holding.owner_id = player.id
         player.holdings.append(holding.id)
         
         state.action_log.append(action)
         save_game(state)
         
-        return True, f"Fabricated claim on {holding.name}", None
+        return True, f"Captured {holding.name}!", None
     
-    def _handle_attack(self, action: Action) -> tuple[bool, str, Optional[CombatResult]]:
-        """Handle attacking a holding."""
+    def _handle_relocate_fortification(self, action: Action) -> tuple[bool, str, None]:
+        """Handle relocating a fortification when all 4 are placed."""
         state = self.state
         player = next((p for p in state.players if p.id == action.player_id), None)
+        
+        source = next((h for h in state.holdings if h.id == action.source_holding_id), None)
+        target = next((h for h in state.holdings if h.id == action.target_holding_id), None)
+        
+        if not source or not target:
+            return False, "Invalid holdings", None
+        
+        if player.fortifications_placed < 4:
+            return False, "Can only relocate when all 4 fortifications are placed", None
+        
+        # Check source has player's fortification
+        if player.id not in source.fortifications_by_player or source.fortifications_by_player[player.id] <= 0:
+            return False, "No fortification to move from this holding", None
+        
+        # Check target can receive fortification
+        if target.holding_type != HoldingType.TOWN:
+            return False, "Can only fortify towns", None
+        
+        if target.fortification_count >= 3:
+            return False, "Target already has maximum fortifications", None
+        
+        # Check player's limit on target (max 2 per player per town)
+        player_forts_on_target = target.fortifications_by_player.get(player.id, 0)
+        if player_forts_on_target >= 2:
+            return False, "You already have 2 fortifications on this town", None
+        
+        # Relocate the fortification
+        source.fortifications_by_player[player.id] -= 1
+        source.fortification_count -= 1
+        
+        if player.id not in target.fortifications_by_player:
+            target.fortifications_by_player[player.id] = 0
+        target.fortifications_by_player[player.id] += 1
+        target.fortification_count += 1
+        
+        state.action_log.append(action)
+        save_game(state)
+        
+        return True, f"Relocated fortification from {source.name} to {target.name}", None
+    
+    def _handle_attack(self, action: Action) -> tuple[bool, str, Optional[CombatResult]]:
+        """Handle attacking a holding.
+        
+        Requires a valid claim on the target territory.
+        """
+        state = self.state
+        player = next((p for p in state.players if p.id == action.player_id), None)
+        target = next((h for h in state.holdings if h.id == action.target_holding_id), None)
+        
+        if not target:
+            return False, "Target holding not found", None
         
         if state.war_fought_this_turn:
             return False, "Already fought a war this turn", None
         
         if state.enforce_peace_active:
             return False, "Wars are forbidden this turn", None
+        
+        # Validate claim
+        if not self._has_valid_claim(player, target):
+            return False, "You need a valid claim to attack this territory", None
         
         soldiers = action.soldiers_count or 200  # Default to minimum
         
@@ -485,6 +689,9 @@ class GameEngine:
         
         if soldiers < 200:
             return False, "Must commit at least 200 soldiers", None
+        
+        # Consume the claim (regardless of combat outcome)
+        self._consume_claim(player, target)
         
         # Resolve combat
         result = resolve_combat(
@@ -590,7 +797,12 @@ class GameEngine:
         return False, "Unknown bonus card effect", None
     
     def _play_claim_card(self, player, card, action: Action, state: GameState) -> tuple[bool, str, None]:
-        """Play a claim card to take a town."""
+        """Play a claim card to establish a claim on a territory.
+        
+        Claims allow the player to:
+        - Attack a territory (if occupied by another player)
+        - Capture an unowned territory for 10 gold (via CLAIM_TOWN action)
+        """
         effect = card.effect
         target_id = action.target_holding_id
         
@@ -607,31 +819,25 @@ class GameEngine:
             if holding.county != required_county:
                 return False, f"This claim only works in County {required_county}", None
             if holding.holding_type != HoldingType.TOWN:
-                return False, "Can only claim towns", None
-            if holding.owner_id is not None:
-                return False, "Town is already owned", None
+                return False, "Can only claim towns with county claim cards", None
         
         elif effect == CardEffect.DUCHY_CLAIM:
             # Can claim any town or Duke+ title
             if holding.holding_type not in [HoldingType.TOWN, HoldingType.DUCHY_CASTLE, HoldingType.KING_CASTLE]:
                 return False, "Invalid target for Duchy Claim", None
-            if holding.owner_id is not None:
-                return False, "Target is already owned", None
         
         elif effect == CardEffect.ULTIMATE_CLAIM:
-            # Can claim anything
-            if holding.owner_id is not None:
-                return False, "Target is already owned", None
+            # Can claim anything - no restrictions
+            pass
         
         else:
             return False, "Unknown claim type", None
         
-        # Apply the claim
-        holding.owner_id = player.id
-        if holding.holding_type == HoldingType.TOWN:
-            player.holdings.append(holding.id)
+        # Add the claim to player's claims list
+        if holding.id not in player.claims:
+            player.claims.append(holding.id)
         
-        return True, f"Claimed {holding.name}!", None
+        return True, f"Established claim on {holding.name}! You can now attack or capture it.", None
     
     def _handle_end_turn(self, action: Action) -> tuple[bool, str, None]:
         """Handle ending the turn."""

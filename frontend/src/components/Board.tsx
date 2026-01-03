@@ -17,6 +17,19 @@ export default function Board({ onHoldingClick }: BoardProps) {
     )
   }
 
+  // Check if a holding can be claimed (unowned town with valid claim)
+  const isClaimable = (holdingId: string) => {
+    return validActions.some(
+      a => a.action_type === 'claim_town' && a.target_holding_id === holdingId
+    )
+  }
+
+  // Format defense modifier for display
+  const formatDefenseModifier = (modifier: number) => {
+    if (modifier === 0) return ''
+    return modifier > 0 ? `+${modifier}` : `${modifier}`
+  }
+
   // Get owner color for a holding
   const getOwnerColor = (holding: Holding) => {
     if (!holding.owner_id) return 'bg-gray-400/50'
@@ -52,13 +65,17 @@ export default function Board({ onHoldingClick }: BoardProps) {
           onClick={() => onHoldingClick(holding)}
           className={`holding-marker ${getOwnerColor(holding)} ${
             selectedHolding?.id === holding.id ? 'selected' : ''
-          } ${isAttackable(holding.id) ? 'attackable' : ''}`}
+          } ${isAttackable(holding.id) ? 'attackable' : ''} ${
+            isClaimable(holding.id) ? 'claimable' : ''
+          }`}
           style={{
             left: `${holding.position_x * 100}%`,
             top: `${holding.position_y * 100}%`,
             ...getOwnerStyle(holding),
           }}
-          title={`${holding.name}${holding.fortified ? ' (Fortified)' : ''}`}
+          title={`${holding.name} | Gold: ${holding.gold_value} | Soldiers: ${holding.soldier_value}${
+            holding.defense_modifier !== 0 ? ` | Defense: ${formatDefenseModifier(holding.defense_modifier)}` : ''
+          }${holding.attack_modifier !== 0 ? ` | Attack: +${holding.attack_modifier}` : ''}`}
         >
           {/* Holding content */}
           <div className="absolute inset-0 flex items-center justify-center transform -rotate-45">
@@ -76,16 +93,36 @@ export default function Board({ onHoldingClick }: BoardProps) {
               </svg>
             )}
             
-            {/* Town icon */}
+            {/* Town icon and stats */}
             {holding.holding_type === 'town' && (
-              <div className="w-3 h-3 bg-white rounded-sm" />
+              <div className="flex flex-col items-center">
+                <div className="w-3 h-3 bg-white rounded-sm" />
+              </div>
             )}
             
-            {/* Fortification indicator */}
-            {holding.fortified && (
-              <div className="absolute -top-1 -right-1 w-3 h-3 bg-yellow-400 rounded-full border border-yellow-600" />
+            {/* Fortification indicator (show count) */}
+            {holding.fortification_count > 0 && (
+              <div className="absolute -top-1 -right-1 w-4 h-4 bg-yellow-400 rounded-full border border-yellow-600 flex items-center justify-center text-[8px] font-bold text-yellow-900">
+                {holding.fortification_count}
+              </div>
             )}
           </div>
+          
+          {/* Town stats overlay - shown below the marker for towns */}
+          {holding.holding_type === 'town' && (
+            <div className="absolute -bottom-5 left-1/2 transform -translate-x-1/2 flex gap-1 text-[9px] font-mono whitespace-nowrap bg-black/70 text-white px-1 rounded">
+              <span className="text-yellow-400" title="Gold income">{holding.gold_value}g</span>
+              <span className="text-red-400" title="Soldier income">{holding.soldier_value}s</span>
+              {holding.defense_modifier !== 0 && (
+                <span className={holding.defense_modifier > 0 ? 'text-green-400' : 'text-orange-400'} title="Defense modifier">
+                  {formatDefenseModifier(holding.defense_modifier)}d
+                </span>
+              )}
+              {holding.attack_modifier !== 0 && (
+                <span className="text-purple-400" title="Attack modifier">+{holding.attack_modifier}a</span>
+              )}
+            </div>
+          )}
         </div>
       ))}
 
