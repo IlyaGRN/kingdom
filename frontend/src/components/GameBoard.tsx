@@ -6,6 +6,7 @@ import Board from './Board'
 import PlayerMat from './PlayerMat'
 import ActionPanel from './ActionPanel'
 import CombatModal from './CombatModal'
+import ClaimActionModal from './ClaimActionModal'
 
 interface GameBoardProps {
   onBack: () => void
@@ -24,6 +25,7 @@ export default function GameBoard({ onBack }: GameBoardProps) {
 
   const [winner, setWinner] = useState<Player | null>(null)
   const [showCombat, setShowCombat] = useState(false)
+  const [claimModalHolding, setClaimModalHolding] = useState<Holding | null>(null)
 
   // Fetch valid actions when turn changes
   const fetchValidActions = useCallback(async () => {
@@ -158,6 +160,17 @@ export default function GameBoard({ onBack }: GameBoardProps) {
   const handlePerformAction = async (action: Action) => {
     if (!gameState) return
     
+    // Check if this is a claim card being played
+    const isClaimCardPlay = action.action_type === 'play_card' && action.card_id && action.target_holding_id
+    let claimCardTargetId: string | null = null
+    
+    if (isClaimCardPlay) {
+      const card = gameState.cards[action.card_id!]
+      if (card?.card_type === 'claim') {
+        claimCardTargetId = action.target_holding_id!
+      }
+    }
+    
     try {
       const result = await performAction(gameState.id, action)
       
@@ -168,6 +181,14 @@ export default function GameBoard({ onBack }: GameBoardProps) {
       
       setGameState(result.state)
       setSelectedHolding(null)
+      
+      // If a claim card was played, show the claim action modal
+      if (claimCardTargetId && result.state) {
+        const targetHolding = result.state.holdings.find((h: Holding) => h.id === claimCardTargetId)
+        if (targetHolding) {
+          setClaimModalHolding(targetHolding)
+        }
+      }
     } catch (error) {
       console.error('Action failed:', error)
     }
@@ -176,6 +197,49 @@ export default function GameBoard({ onBack }: GameBoardProps) {
   const handleCloseCombat = () => {
     setShowCombat(false)
     setLastCombat(null)
+  }
+
+  const handleClaimCapture = async () => {
+    if (!gameState || !claimModalHolding) return
+    
+    const currentPlayer = gameState.players[gameState.current_player_idx]
+    if (!currentPlayer) return
+    
+    // Find the claim_town action for this holding
+    const { actions } = await getValidActions(gameState.id, currentPlayer.id)
+    const captureAction = actions.find(
+      a => a.action_type === 'claim_town' && a.target_holding_id === claimModalHolding.id
+    )
+    
+    if (captureAction) {
+      await handlePerformAction(captureAction)
+    }
+    setClaimModalHolding(null)
+  }
+
+  const handleClaimAttack = async (soldiers: number) => {
+    if (!gameState || !claimModalHolding) return
+    
+    const currentPlayer = gameState.players[gameState.current_player_idx]
+    if (!currentPlayer) return
+    
+    // Find the attack action for this holding
+    const { actions } = await getValidActions(gameState.id, currentPlayer.id)
+    const attackAction = actions.find(
+      a => a.action_type === 'attack' && a.target_holding_id === claimModalHolding.id
+    )
+    
+    if (attackAction) {
+      await handlePerformAction({
+        ...attackAction,
+        soldiers_count: soldiers,
+      })
+    }
+    setClaimModalHolding(null)
+  }
+
+  const handleCloseClaimModal = () => {
+    setClaimModalHolding(null)
   }
 
   if (!gameState) {
@@ -260,6 +324,17 @@ export default function GameBoard({ onBack }: GameBoardProps) {
           players={gameState.players}
           holdings={gameState.holdings}
           onClose={handleCloseCombat}
+        />
+      )}
+
+      {/* Claim action modal */}
+      {claimModalHolding && currentPlayer && (
+        <ClaimActionModal
+          holding={claimModalHolding}
+          currentPlayer={currentPlayer}
+          onCapture={handleClaimCapture}
+          onAttack={handleClaimAttack}
+          onClose={handleCloseClaimModal}
         />
       )}
 

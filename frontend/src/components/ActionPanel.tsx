@@ -199,6 +199,23 @@ export default function ActionPanel({ onPerformAction, selectedHolding }: Action
             </div>
           )}
 
+          {/* Show hint when player has claim on unowned town but not enough gold */}
+          {selectedHolding && 
+           selectedHolding.owner_id === null && 
+           (currentPlayer.claims ?? []).includes(selectedHolding.id) && 
+           claimTownForSelected.length === 0 && 
+           currentPlayer.gold < 10 && (
+            <div className="p-3 bg-yellow-50 rounded border border-yellow-200">
+              <h3 className="font-medieval text-sm text-yellow-700 mb-2">
+                Cannot Capture {selectedHolding.name}
+              </h3>
+              <p className="text-xs text-medieval-stone">
+                You have a valid claim but need <span className="font-bold text-yellow-700">10 gold</span> to capture. 
+                (Current: {currentPlayer.gold} gold)
+              </p>
+            </div>
+          )}
+
           {/* Selected holding fake claim */}
           {selectedHolding && fakeClaimForSelected.length > 0 && (
             <div className="p-3 bg-yellow-50 rounded border border-yellow-200">

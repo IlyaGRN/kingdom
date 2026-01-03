@@ -220,11 +220,13 @@ class GameEngine:
         added_targets = set()  # Track to avoid duplicates
         
         # First, add attacks for adjacent holdings (if player has claim)
+        # Only attack holdings owned by OTHER players (not unowned, not own)
         for holding_id in player_holdings:
             adjacent = get_adjacent_holdings(holding_id)
             for adj_id in adjacent:
                 adj_holding = next((h for h in state.holdings if h.id == adj_id), None)
-                if adj_holding and adj_holding.owner_id != player.id:
+                # Must be owned by another player (not unowned, not own)
+                if adj_holding and adj_holding.owner_id is not None and adj_holding.owner_id != player.id:
                     has_claim = self._has_valid_claim(player, adj_holding)
                     if has_claim and adj_id not in added_targets:
                         actions.append(Action(
@@ -236,11 +238,13 @@ class GameEngine:
                         added_targets.add(adj_id)
         
         # Second, add attacks for ANY holding the player has a direct claim on
+        # But only if the holding is OWNED by someone else (can't attack unowned)
         for claim_id in player.claims:
             if claim_id in added_targets:
                 continue
             claim_holding = next((h for h in state.holdings if h.id == claim_id), None)
-            if claim_holding and claim_holding.owner_id != player.id:
+            # Must be owned by another player (not unowned, not own)
+            if claim_holding and claim_holding.owner_id is not None and claim_holding.owner_id != player.id:
                 # Use any player holding as source (they're "projecting power")
                 source_holding = player_holdings[0] if player_holdings else None
                 if source_holding:
@@ -258,7 +262,13 @@ class GameEngine:
         Claims come from:
         - Played claim cards (stored in player.claims list)
         - Fabricated claims (also in player.claims list)
+        
+        IMPORTANT: Without any claims, you cannot attack anyone!
         """
+        # If player has no claims at all, return False immediately
+        if not player.claims or len(player.claims) == 0:
+            return False
+        
         # Check if holding ID is in player's claims list
         if holding.id in player.claims:
             return True

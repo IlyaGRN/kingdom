@@ -156,3 +156,5 @@ Respond with ONLY the number of your choice (1-{len(available_towns)})."""
             best = max(available_towns, key=lambda t: t.gold_value + t.soldier_value * 100)
             return best.id
 
+
+
