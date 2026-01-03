@@ -1,0 +1,151 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --color-parchment: #f5f0e8;
+  --color-gold: #c9a227;
+  --color-crimson: #8b0000;
+}
+
+body {
+  font-family: 'Crimson Text', serif;
+  background: linear-gradient(135deg, #2d1b0e 0%, #1a1a1a 50%, #0d1a0d 100%);
+  min-height: 100vh;
+  color: #f5f0e8;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Cinzel', serif;
+}
+
+/* Parchment card style */
+.card-parchment {
+  background: linear-gradient(145deg, #f5f0e8 0%, #e8dcc8 50%, #d9c5a5 100%);
+  border: 2px solid #8b5a2b;
+  box-shadow: 
+    0 4px 6px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.4);
+  color: #2d1b0e;
+}
+
+/* Medieval button style */
+.btn-medieval {
+  @apply px-4 py-2 font-medieval font-semibold transition-all duration-200;
+  background: linear-gradient(180deg, #c9a227 0%, #8b5a2b 100%);
+  border: 2px solid #6d4e35;
+  color: #1a1a1a;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.3);
+  box-shadow: 
+    0 2px 4px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+
+.btn-medieval:hover {
+  background: linear-gradient(180deg, #d4b02e 0%, #9b6a3b 100%);
+  transform: translateY(-1px);
+  box-shadow: 
+    0 4px 8px rgba(0, 0, 0, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+
+.btn-medieval:active {
+  transform: translateY(0);
+  box-shadow: 
+    0 1px 2px rgba(0, 0, 0, 0.3),
+    inset 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+.btn-medieval:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Crimson button variant */
+.btn-crimson {
+  @apply px-4 py-2 font-medieval font-semibold transition-all duration-200;
+  background: linear-gradient(180deg, #a52a2a 0%, #8b0000 100%);
+  border: 2px solid #5a0000;
+  color: #f5f0e8;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+.btn-crimson:hover {
+  background: linear-gradient(180deg, #b53a3a 0%, #9b1010 100%);
+}
+
+/* Board overlay styles */
+.holding-marker {
+  @apply absolute cursor-pointer transition-all duration-200;
+  width: 60px;
+  height: 60px;
+  transform: translate(-50%, -50%) rotate(45deg);
+  border: 3px solid transparent;
+}
+
+.holding-marker:hover {
+  transform: translate(-50%, -50%) rotate(45deg) scale(1.1);
+  z-index: 10;
+}
+
+.holding-marker.selected {
+  border-color: #c9a227;
+  box-shadow: 0 0 20px rgba(201, 162, 39, 0.6);
+}
+
+.holding-marker.attackable {
+  animation: pulse-red 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse-red {
+  0%, 100% { box-shadow: 0 0 10px rgba(139, 0, 0, 0.5); }
+  50% { box-shadow: 0 0 25px rgba(139, 0, 0, 0.8); }
+}
+
+/* Player colors */
+.player-color-0 { background-color: #8b0000; }
+.player-color-1 { background-color: #00008b; }
+.player-color-2 { background-color: #006400; }
+.player-color-3 { background-color: #4b0082; }
+.player-color-4 { background-color: #8b4513; }
+.player-color-5 { background-color: #2f4f4f; }
+
+/* Crown icon animation */
+.crown-pulse {
+  animation: crown-glow 2s ease-in-out infinite;
+}
+
+@keyframes crown-glow {
+  0%, 100% { filter: drop-shadow(0 0 5px #c9a227); }
+  50% { filter: drop-shadow(0 0 15px #c9a227); }
+}
+
+/* Combat animation */
+.combat-flash {
+  animation: flash 0.3s ease-out;
+}
+
+@keyframes flash {
+  0% { opacity: 1; background: white; }
+  100% { opacity: 1; background: transparent; }
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #1a1a1a;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #6d4e35;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #8b5a2b;
+}
+
