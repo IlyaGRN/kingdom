@@ -93,12 +93,12 @@ class AIPlayer(ABC):
             Formatted string describing the game state
         """
         lines = [
-            f"=== Machiavelli's Kingdom - Round {game_state.current_round}/{game_state.max_rounds} ===",
+            f"=== Machiavelli's Kingdom - Round {game_state.current_round} (Victory: {game_state.victory_threshold} VP) ===",
             "",
             f"You are: {player.name} ({player.title.value})",
             f"Your Resources: {player.gold} Gold, {player.soldiers} Soldiers",
             f"Your Prestige: {player.prestige} VP",
-            f"Army Cap: {player.army_cap} (excess costs 1 Gold per 50)",
+            f"Army Cap: {player.army_cap}",
             "",
             "=== Your Holdings ===",
         ]
@@ -106,8 +106,8 @@ class AIPlayer(ABC):
         for holding_id in player.holdings:
             holding = next((h for h in game_state.holdings if h.id == holding_id), None)
             if holding:
-                fort = " [FORTIFIED]" if holding.fortified else ""
-                lines.append(f"  - {holding.name}: {holding.gold_value}G, {holding.soldier_value*100}S{fort}")
+                fort = f" [FORT x{holding.fortification_count}]" if holding.fortification_count > 0 else ""
+                lines.append(f"  - {holding.name}: {holding.gold_value}G, {holding.soldier_value}S{fort}")
         
         if player.counties:
             lines.append(f"\nCounties held: {', '.join(player.counties)}")
@@ -119,9 +119,8 @@ class AIPlayer(ABC):
         lines.append("\n=== Other Players ===")
         for p in game_state.players:
             if p.id != player.id:
-                ally_status = " [YOUR ALLY]" if p.id == player.ally_id else ""
                 title = "KING" if p.is_king else p.title.value.upper()
-                lines.append(f"  {p.name} ({title}): {len(p.holdings)} holdings, ~{p.soldiers}S{ally_status}")
+                lines.append(f"  {p.name} ({title}): {len(p.holdings)} holdings, ~{p.soldiers}S, {p.prestige}VP")
         
         lines.append("\n=== Board State ===")
         for holding in game_state.holdings:
@@ -129,7 +128,7 @@ class AIPlayer(ABC):
             if holding.owner_id:
                 owner_player = next((p for p in game_state.players if p.id == holding.owner_id), None)
                 owner = owner_player.name if owner_player else "Unknown"
-            fort = " [FORT]" if holding.fortified else ""
+            fort = f" [FORT x{holding.fortification_count}]" if holding.fortification_count > 0 else ""
             lines.append(f"  {holding.name}: Owner={owner}{fort}")
         
         lines.append(f"\n=== Your Hand ({len(player.hand)} cards) ===")
@@ -162,31 +161,37 @@ class AIPlayer(ABC):
         """Get the system prompt for the AI."""
         return """You are an AI playing Machiavelli's Kingdom, a medieval strategy board game.
 
-OBJECTIVE: Gain the most Prestige Points (VP) by conquering towns, claiming titles, and holding the crown.
+OBJECTIVE: First to reach 18 Prestige Points (VP) wins!
 
 SCORING:
 - Town = 1 VP
 - County = +2 VP
 - Duchy = +4 VP  
-- King = +6 VP when claimed
-- Each round survived as King = +2 VP
+- King = +6 VP
+- Each round survived as King = +2 VP bonus
 
 TITLES (require prerequisites and gold):
 - Count: Own 2/3 towns in a county. Cost: 25 Gold. Bonus: +2 Gold/round, +1 defense in county.
-- Duke: Be Count in one county + own 1 town in adjacent county. Cost: 50 Gold. Bonus: +4 Gold/round.
-- King: Be Duke in one duchy + Count in other duchy. Cost: 75 Gold. Bonus: +8 Gold/round, Edicts.
+- Duke: Be Count in 2 counties of same duchy. Cost: 50 Gold. Bonus: +4 Gold/round.
+- King: Be Duke in one duchy + own a town in other duchy. Cost: 75 Gold. Bonus: +8 Gold/round.
+
+CLAIMS:
+- You need a valid claim to attack any territory
+- Play claim cards to establish claims on towns
+- Fabricate claims costs 35 Gold
+- Capture unowned towns with a claim for 10 Gold
 
 COMBAT:
 - Commit at least 200 soldiers
 - Strength = 2d6 + (soldiers/100) + modifiers
 - Winner loses half soldiers, loser loses all
-- Defender wins ties (King wins ties at King's Castle)
+- Defender wins ties
 
 STRATEGY TIPS:
-- Balance expansion with defense
-- Build fortifications (+2 defense, +2 Gold) on key holdings
-- Alliances can share soldiers but betrayal costs VP
-- Managing army cap is important (over cap costs gold)
+- Draw cards automatically each turn - play claim cards wisely
+- Build fortifications (+2 Gold income, +defense) on key holdings
+- Prioritize claiming titles for VP and income bonuses
+- Managing army cap is important (excess soldiers lost)
 
 Always respond with just the NUMBER of your chosen action. Nothing else."""
 

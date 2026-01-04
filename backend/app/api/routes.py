@@ -190,6 +190,7 @@ async def create_simulation(config: SimulationConfig):
 async def simulation_step(game_id: str):
     """Execute one turn in a simulation."""
     from app.ai.manager import AIManager
+    import traceback
     
     state = get_game(game_id)
     if not state:
@@ -199,35 +200,57 @@ async def simulation_step(game_id: str):
     manager = AIManager()
     
     if engine.is_game_over():
-        return {"status": "game_over", "state": state}
+        return {"status": "game_over", "state": state, "decision_log": None}
     
     # Get current player
     current_player = state.players[state.current_player_idx]
     
-    # Have AI decide and perform action - use simple fallback AI directly for reliability
+    # Have AI decide and perform action
     try:
         # Get valid actions from engine
         valid_actions = engine.get_valid_actions(current_player.id)
         
-        if not valid_actions:
-            return {"status": "no_action", "state": state}
+        # #region agent log
+        import json as _json
+        with open("/home/ilya/dev/kingdom/.cursor/debug.log", "a") as _f:
+            _f.write(_json.dumps({"location":"routes.py:simulation_step:valid_actions","message":"Valid actions retrieved","data":{"player_id":current_player.id,"player_name":current_player.name,"action_count":len(valid_actions),"action_types":[a.action_type.value for a in valid_actions][:10]},"timestamp":int(__import__('time').time()*1000),"sessionId":"debug-session","hypothesisId":"H1,H2","runId":"500-debug"})+"\n")
+        # #endregion
         
-        # Use simple AI directly for reliable fallback (no external API calls)
-        from app.ai.manager import SimpleAIPlayer
-        simple_ai = SimpleAIPlayer()
-        action = await simple_ai.decide_action(state, current_player, valid_actions)
+        if not valid_actions:
+            return {"status": "no_action", "state": state, "decision_log": None}
+        
+        # Use AI manager to get appropriate AI player (falls back to SimpleAI if no API key)
+        action, decision_log = await manager.get_ai_action(state, current_player)
+        
+        # #region agent log
+        with open("/home/ilya/dev/kingdom/.cursor/debug.log", "a") as _f:
+            _f.write(_json.dumps({"location":"routes.py:simulation_step:ai_action","message":"AI action decided","data":{"player_name":current_player.name,"action_type":action.action_type.value if action else None,"has_decision_log":decision_log is not None},"timestamp":int(__import__('time').time()*1000),"sessionId":"debug-session","hypothesisId":"H3","runId":"500-debug"})+"\n")
+        # #endregion
         
         if action:
             success, message, combat = engine.perform_action(action)
+            
+            # #region agent log
+            with open("/home/ilya/dev/kingdom/.cursor/debug.log", "a") as _f:
+                _f.write(_json.dumps({"location":"routes.py:simulation_step:action_performed","message":"Action performed","data":{"success":success,"message":message,"has_combat":combat is not None},"timestamp":int(__import__('time').time()*1000),"sessionId":"debug-session","hypothesisId":"H4","runId":"500-debug"})+"\n")
+            # #endregion
+            
             return {
                 "status": "action_performed",
                 "action": action.model_dump(),
                 "message": message,
                 "state": engine.state,
+                "combat_result": combat.model_dump() if combat else None,
+                "decision_log": decision_log.model_dump() if decision_log else None,
             }
         else:
-            return {"status": "no_action", "state": state}
+            return {"status": "no_action", "state": state, "decision_log": None}
     except Exception as e:
+        # #region agent log
+        import json as _json
+        with open("/home/ilya/dev/kingdom/.cursor/debug.log", "a") as _f:
+            _f.write(_json.dumps({"location":"routes.py:simulation_step:error","message":"Exception caught","data":{"error":str(e),"traceback":traceback.format_exc()},"timestamp":int(__import__('time').time()*1000),"sessionId":"debug-session","hypothesisId":"H1,H2,H3,H4,H5","runId":"500-debug"})+"\n")
+        # #endregion
         raise HTTPException(status_code=500, detail=str(e))
 
 
@@ -248,7 +271,7 @@ async def run_full_simulation(game_id: str, max_steps: int = 1000):
         current_player = engine.state.players[engine.state.current_player_idx]
         
         try:
-            action = await manager.get_ai_action(engine.state, current_player)
+            action, _ = await manager.get_ai_action(engine.state, current_player)
             if action:
                 engine.perform_action(action)
             steps += 1

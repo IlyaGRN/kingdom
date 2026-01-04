@@ -65,32 +65,56 @@ export default function CombatModal({ combat, players, holdings, onClose }: Comb
         <div className="grid grid-cols-2 gap-4 mb-6">
           {/* Attacker stats */}
           <div className="bg-parchment-100 rounded p-3">
-            <div className="flex justify-between items-center mb-2">
-              <span className="text-sm text-medieval-stone">Dice Roll:</span>
-              <span className="font-medieval text-lg text-medieval-bronze">🎲 {combat.attacker_roll}</span>
+            <div className="flex justify-between items-center mb-1">
+              <span className="text-sm text-medieval-stone">🎲 Dice Roll:</span>
+              <span className="font-medieval text-medieval-bronze">{combat.attacker_roll}</span>
             </div>
-            <div className="flex justify-between items-center mb-2">
-              <span className="text-sm text-medieval-stone">Soldiers:</span>
-              <span className="font-medieval text-lg text-medieval-bronze">{combat.attacker_soldiers_committed}</span>
+            <div className="flex justify-between items-center mb-1">
+              <span className="text-sm text-medieval-stone">⚔️ Soldiers ({combat.attacker_soldiers_committed}):</span>
+              <span className="font-medieval text-medieval-bronze">+{combat.attacker_soldiers_bonus}</span>
             </div>
-            <div className="flex justify-between items-center border-t border-parchment-300 pt-2">
-              <span className="text-sm text-medieval-stone">Total Strength:</span>
+            {combat.attacker_attack_bonus > 0 && (
+              <div className="flex justify-between items-center mb-1">
+                <span className="text-sm text-medieval-stone">🏹 Attack Bonus:</span>
+                <span className="font-medieval text-green-600">+{combat.attacker_attack_bonus}</span>
+              </div>
+            )}
+            {combat.attacker_title_bonus > 0 && (
+              <div className="flex justify-between items-center mb-1">
+                <span className="text-sm text-medieval-stone">👑 Title Bonus:</span>
+                <span className="font-medieval text-green-600">+{combat.attacker_title_bonus}</span>
+              </div>
+            )}
+            <div className="flex justify-between items-center border-t border-parchment-300 pt-2 mt-2">
+              <span className="text-sm font-bold text-medieval-stone">Total:</span>
               <span className="font-medieval text-xl text-medieval-gold">{combat.attacker_strength}</span>
             </div>
           </div>
 
           {/* Defender stats */}
           <div className="bg-parchment-100 rounded p-3">
-            <div className="flex justify-between items-center mb-2">
-              <span className="text-sm text-medieval-stone">Dice Roll:</span>
-              <span className="font-medieval text-lg text-medieval-bronze">🎲 {combat.defender_roll}</span>
+            <div className="flex justify-between items-center mb-1">
+              <span className="text-sm text-medieval-stone">🎲 Dice Roll:</span>
+              <span className="font-medieval text-medieval-bronze">{combat.defender_roll}</span>
             </div>
-            <div className="flex justify-between items-center mb-2">
-              <span className="text-sm text-medieval-stone">Soldiers:</span>
-              <span className="font-medieval text-lg text-medieval-bronze">{combat.defender_soldiers_committed}</span>
+            <div className="flex justify-between items-center mb-1">
+              <span className="text-sm text-medieval-stone">🛡️ Soldiers ({combat.defender_soldiers_committed}):</span>
+              <span className="font-medieval text-medieval-bronze">+{combat.defender_soldiers_bonus}</span>
             </div>
-            <div className="flex justify-between items-center border-t border-parchment-300 pt-2">
-              <span className="text-sm text-medieval-stone">Total Strength:</span>
+            {combat.defender_defense_bonus > 0 && (
+              <div className="flex justify-between items-center mb-1">
+                <span className="text-sm text-medieval-stone">🏰 Defense Bonus:</span>
+                <span className="font-medieval text-green-600">+{combat.defender_defense_bonus}</span>
+              </div>
+            )}
+            {combat.defender_title_bonus > 0 && (
+              <div className="flex justify-between items-center mb-1">
+                <span className="text-sm text-medieval-stone">👑 Title Bonus:</span>
+                <span className="font-medieval text-green-600">+{combat.defender_title_bonus}</span>
+              </div>
+            )}
+            <div className="flex justify-between items-center border-t border-parchment-300 pt-2 mt-2">
+              <span className="text-sm font-bold text-medieval-stone">Total:</span>
               <span className="font-medieval text-xl text-medieval-gold">{combat.defender_strength}</span>
             </div>
           </div>

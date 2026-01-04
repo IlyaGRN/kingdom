@@ -1,16 +1,95 @@
 """Game state management."""
 import uuid
+import random
 from typing import Optional
 from app.models.schemas import (
     GameState, Player, PlayerType, TitleType, GamePhase,
-    Holding, HoldingType, Card, Army
+    Holding, HoldingType, Card, Army, CardType, CardEffect
 )
 from app.game.board import create_board, get_towns_in_county
-from app.game.cards import create_deck, shuffle_deck
+from app.game.cards import create_deck, shuffle_deck, is_instant_card
 
 
 # In-memory game storage
 _games: dict[str, GameState] = {}
+
+
+def auto_draw_card(state: GameState, player: Player) -> Optional[str]:
+    """Auto-draw a card for a player at the beginning of their turn.
+    
+    Returns the name of the drawn card, or None if deck is empty.
+    Handles instant cards (applied immediately) and regular cards (added to hand).
+    """
+    try:
+        if not state.deck:
+            # Reshuffle discard pile if needed
+            if state.discard_pile:
+                state.deck = state.discard_pile.copy()
+                random.shuffle(state.deck)
+                state.discard_pile = []
+            else:
+                return None  # No cards available
+        
+        card_id = state.deck.pop(0)
+        card = state.cards.get(card_id)
+        
+        if not card:
+            return None
+        
+        # Check if instant card (personal/global events)
+        if is_instant_card(card):
+            # Apply instant effect
+            _apply_instant_card_effect(state, player, card)
+            state.discard_pile.append(card_id)
+            return f"{card.name} (instant effect applied)"
+        
+        # Non-instant cards go to hand
+        player.hand.append(card_id)
+        state.card_drawn_this_turn = True
+        
+        return card.name
+    except Exception as e:
+        # #region agent log
+        import json as _json
+        import traceback
+        with open("/home/ilya/dev/kingdom/.cursor/debug.log", "a") as _f:
+            _f.write(_json.dumps({"location":"state.py:auto_draw_card:error","message":"Exception in auto_draw_card","data":{"error":str(e),"traceback":traceback.format_exc(),"player_id":player.id},"timestamp":int(__import__('time').time()*1000),"sessionId":"debug-session","hypothesisId":"H1","runId":"500-debug"})+"\n")
+        # #endregion
+        raise
+
+
+def _apply_instant_card_effect(state: GameState, player: Player, card: Card) -> None:
+    """Apply effects of instant cards (personal/global events)."""
+    if card.card_type == CardType.PERSONAL_EVENT:
+        # Gold cards
+        if card.effect == CardEffect.GOLD_5:
+            player.gold += 5
+        elif card.effect == CardEffect.GOLD_10:
+            player.gold += 10
+        elif card.effect == CardEffect.GOLD_15:
+            player.gold += 15
+        elif card.effect == CardEffect.GOLD_25:
+            player.gold += 25
+        # Soldier cards
+        elif card.effect == CardEffect.SOLDIERS_100:
+            player.soldiers = min(player.soldiers + 100, player.army_cap)
+        elif card.effect == CardEffect.SOLDIERS_200:
+            player.soldiers = min(player.soldiers + 200, player.army_cap)
+        elif card.effect == CardEffect.SOLDIERS_300:
+            player.soldiers = min(player.soldiers + 300, player.army_cap)
+        # Raiders - lose current turn income (handled at draw time, just mark it)
+        elif card.effect == CardEffect.RAIDERS:
+            # Raiders effect: lose income this turn - simplified, just reduce gold
+            income = calculate_income(state)
+            player_income = income.get(player.id, {"gold": 0})
+            player.gold = max(0, player.gold - player_income["gold"])
+    
+    elif card.card_type == CardType.GLOBAL_EVENT:
+        if card.effect == CardEffect.CRUSADE:
+            # All players lose half gold and soldiers
+            for p in state.players:
+                p.gold = p.gold // 2
+                p.soldiers = p.soldiers // 2
 
 
 def create_game(player_configs: list[dict]) -> GameState:
@@ -72,7 +151,36 @@ def create_game(player_configs: list[dict]) -> GameState:
 
 def get_game(game_id: str) -> Optional[GameState]:
     """Get a game by ID."""
-    return _games.get(game_id)
+    state = _games.get(game_id)
+    if state:
+        # Update prestige values on players so frontend sees current totals
+        update_player_prestige(state)
+    return state
+
+
+def update_player_prestige(state: GameState) -> None:
+    """Update the prestige field on each player with their calculated total.
+    
+    This ensures the frontend sees the correct prestige values.
+    """
+    for player in state.players:
+        vp = 0  # Start from 0, calculate everything
+        
+        # 1 VP per town
+        vp += len([h for h in state.holdings 
+                   if h.owner_id == player.id and h.holding_type == HoldingType.TOWN])
+        
+        # 2 VP per county
+        vp += 2 * len(player.counties)
+        
+        # 4 VP per duchy
+        vp += 4 * len(player.duchies)
+        
+        # 6 VP for being king
+        if player.is_king:
+            vp += 6
+        
+        player.prestige = vp
 
 
 def save_game(state: GameState) -> None:
@@ -261,12 +369,16 @@ def apply_income(state: GameState) -> GameState:
     # Move to player turn phase
     state.phase = GamePhase.PLAYER_TURN
     state.current_player_idx = 0
-    state.card_drawn_this_turn = False
+    state.card_drawn_this_turn = True  # Will be set by auto-draw
     state.war_fought_this_turn = False
     
     # Clear global turn effects
     state.forbid_mercenaries_active = False
     state.enforce_peace_active = False
+    
+    # Auto-draw card for first player at start of round
+    first_player = state.players[0]
+    auto_draw_card(state, first_player)
     
     save_game(state)
     return state
@@ -283,8 +395,12 @@ def next_player_turn(state: GameState) -> GameState:
         state = process_upkeep(state)
     else:
         # Reset for next player (unlimited actions - no counter needed)
-        state.card_drawn_this_turn = False
+        state.card_drawn_this_turn = True  # Will be set by auto-draw
         state.war_fought_this_turn = False
+        
+        # Auto-draw card for the new current player
+        current_player = state.players[state.current_player_idx]
+        auto_draw_card(state, current_player)
     
     save_game(state)
     return state
@@ -432,11 +548,18 @@ def can_claim_king(state: GameState, player_id: str) -> bool:
 
 
 def calculate_prestige(state: GameState) -> dict[str, int]:
-    """Calculate current prestige for all players."""
+    """Calculate current prestige for all players.
+    
+    Prestige is calculated from scratch based on current holdings/titles:
+    - 1 VP per town
+    - 2 VP per county
+    - 4 VP per duchy
+    - 6 VP for being king
+    """
     prestige = {}
     
     for player in state.players:
-        vp = player.prestige  # Base prestige accumulated
+        vp = 0  # Calculate from scratch, not from player.prestige
         
         # 1 VP per town
         vp += len([h for h in state.holdings 
@@ -448,7 +571,7 @@ def calculate_prestige(state: GameState) -> dict[str, int]:
         # 4 VP per duchy
         vp += 4 * len(player.duchies)
         
-        # 6 VP for being king (one-time claim bonus already in prestige)
+        # 6 VP for being king
         if player.is_king:
             vp += 6
         

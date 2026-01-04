@@ -28,23 +28,6 @@ export default function ActionPanel({ onPerformAction, selectedHolding }: Action
     return acc
   }, {} as Record<string, Action[]>)
 
-  const getActionLabel = (actionType: string): string => {
-    const labels: Record<string, string> = {
-      draw_card: '📜 Draw Card',
-      move: '🚶 Move',
-      recruit: '⚔️ Recruit',
-      build_fortification: '🏰 Build Fortification (10G)',
-      relocate_fortification: '🔄 Relocate Fortification',
-      claim_title: '👑 Claim Title',
-      claim_town: '🏘️ Capture Town (10G)',
-      attack: '⚔️ Attack',
-      fake_claim: '📝 Fabricate Claim (35G)',
-      play_card: '🃏 Play Card',
-      end_turn: '⏭️ End Turn',
-    }
-    return labels[actionType] || actionType
-  }
-
   const handleActionClick = (action: Action) => {
     // For attack actions, add soldier count
     if (action.action_type === 'attack') {
@@ -231,22 +214,7 @@ export default function ActionPanel({ onPerformAction, selectedHolding }: Action
             </div>
           )}
 
-          {/* Draw card */}
-          {groupedActions.draw_card && (
-            <button
-              onClick={() => handleActionClick(groupedActions.draw_card[0])}
-              className="w-full p-3 bg-parchment-100 hover:bg-parchment-200 rounded transition-colors text-left"
-            >
-              <span className="font-medieval text-medieval-bronze">
-                {getActionLabel('draw_card')}
-              </span>
-              {!gameState.card_drawn_this_turn && (
-                <span className="text-xs text-medieval-stone block">
-                  Once per turn (max 4 towns to draw)
-                </span>
-              )}
-            </button>
-          )}
+          {/* Cards are now auto-drawn at the beginning of each turn */}
 
           {/* Play claim cards on selected holding */}
           {selectedHolding && claimCardsForSelected.length > 0 && (
@@ -334,22 +302,24 @@ export default function ActionPanel({ onPerformAction, selectedHolding }: Action
           {groupedActions.build_fortification && (
             <div className="space-y-1">
               <span className="text-xs text-medieval-stone">
-                Fortify (10 Gold, {4 - currentPlayer.fortifications_placed} remaining):
+                Fortify (10 Gold, {4 - (currentPlayer.fortifications_placed || 0)} remaining):
               </span>
-              {groupedActions.build_fortification.slice(0, 5).map((action, idx) => {
-                const holding = gameState.holdings.find(h => h.id === action.target_holding_id)
-                return (
-                  <button
-                    key={idx}
-                    onClick={() => handleActionClick(action)}
-                    className="w-full p-2 bg-parchment-100 hover:bg-parchment-200 rounded transition-colors text-left"
-                  >
-                    <span className="text-sm text-medieval-bronze">
-                      🏰 {holding?.name || action.target_holding_id}
-                    </span>
-                  </button>
-                )
-              })}
+              <div className="max-h-40 overflow-y-auto space-y-1">
+                {groupedActions.build_fortification.map((action, idx) => {
+                  const holding = gameState.holdings.find(h => h.id === action.target_holding_id)
+                  return (
+                    <button
+                      key={idx}
+                      onClick={() => handleActionClick(action)}
+                      className="w-full p-2 bg-parchment-100 hover:bg-parchment-200 rounded transition-colors text-left"
+                    >
+                      <span className="text-sm text-medieval-bronze">
+                        🏰 {holding?.name || action.target_holding_id}
+                      </span>
+                    </button>
+                  )
+                })}
+              </div>
             </div>
           )}
 
@@ -359,21 +329,23 @@ export default function ActionPanel({ onPerformAction, selectedHolding }: Action
               <span className="text-xs text-medieval-stone">
                 Relocate Fortification (all 4 placed):
               </span>
-              {groupedActions.relocate_fortification.slice(0, 5).map((action, idx) => {
-                const source = gameState.holdings.find(h => h.id === action.source_holding_id)
-                const target = gameState.holdings.find(h => h.id === action.target_holding_id)
-                return (
-                  <button
-                    key={idx}
-                    onClick={() => handleActionClick(action)}
-                    className="w-full p-2 bg-blue-50 hover:bg-blue-100 rounded transition-colors text-left border border-blue-200"
-                  >
-                    <span className="text-sm text-blue-800">
-                      🔄 {source?.name} → {target?.name}
-                    </span>
-                  </button>
-                )
-              })}
+              <div className="max-h-40 overflow-y-auto space-y-1">
+                {groupedActions.relocate_fortification.map((action, idx) => {
+                  const source = gameState.holdings.find(h => h.id === action.source_holding_id)
+                  const target = gameState.holdings.find(h => h.id === action.target_holding_id)
+                  return (
+                    <button
+                      key={idx}
+                      onClick={() => handleActionClick(action)}
+                      className="w-full p-2 bg-blue-50 hover:bg-blue-100 rounded transition-colors text-left border border-blue-200"
+                    >
+                      <span className="text-sm text-blue-800">
+                        🔄 {source?.name} → {target?.name}
+                      </span>
+                    </button>
+                  )
+                })}
+              </div>
             </div>
           )}
 

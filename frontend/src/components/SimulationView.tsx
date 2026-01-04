@@ -19,10 +19,10 @@ export default function SimulationView({ onBack }: SimulationViewProps) {
   const [isConfiguring, setIsConfiguring] = useState(true)
   const [playerCount, setPlayerCount] = useState(4)
   const [players, setPlayers] = useState<PlayerConfig[]>([
-    { name: 'Baron GPT', player_type: 'ai_openai', color: PLAYER_COLORS[0] },
-    { name: 'Baron Claude', player_type: 'ai_anthropic', color: PLAYER_COLORS[1] },
-    { name: 'Baron Gemini', player_type: 'ai_gemini', color: PLAYER_COLORS[2] },
-    { name: 'Baron Grok', player_type: 'ai_grok', color: PLAYER_COLORS[3] },
+    { name: 'Baron Alpha', player_type: 'ai_openai', color: PLAYER_COLORS[0] },
+    { name: 'Baron Beta', player_type: 'ai_openai', color: PLAYER_COLORS[1] },
+    { name: 'Baron Gamma', player_type: 'ai_openai', color: PLAYER_COLORS[2] },
+    { name: 'Baron Delta', player_type: 'ai_openai', color: PLAYER_COLORS[3] },
   ])
   const [speed, setSpeed] = useState(1000)
   
@@ -46,7 +46,7 @@ export default function SimulationView({ onBack }: SimulationViewProps) {
     setPlayerCount(count)
     const newPlayers = [...players]
     
-    const aiTypes: PlayerType[] = ['ai_openai', 'ai_anthropic', 'ai_gemini', 'ai_grok', 'ai_openai', 'ai_anthropic']
+    const aiTypes: PlayerType[] = ['ai_openai', 'ai_openai', 'ai_openai', 'ai_openai', 'ai_openai', 'ai_openai']  // All GPT by default
     const names = ['Baron GPT', 'Baron Claude', 'Baron Gemini', 'Baron Grok', 'Baron GPT-2', 'Baron Claude-2']
     
     while (newPlayers.length < count) {

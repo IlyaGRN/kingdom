@@ -232,6 +232,14 @@ class CombatResult(BaseModel):
     attacker_soldiers_committed: int
     defender_soldiers_committed: int
     
+    # Bonus breakdowns for UI display
+    attacker_soldiers_bonus: int = 0
+    attacker_attack_bonus: int = 0
+    attacker_title_bonus: int = 0
+    defender_soldiers_bonus: int = 0
+    defender_defense_bonus: int = 0
+    defender_title_bonus: int = 0
+    
     attacker_won: bool
     attacker_losses: int
     defender_losses: int
@@ -239,6 +247,25 @@ class CombatResult(BaseModel):
     # Card effects used
     attacker_effects: list[CardEffect] = Field(default_factory=list)
     defender_effects: list[CardEffect] = Field(default_factory=list)
+
+
+# ============ AI Decision Log ============
+
+class AIDecisionLogEntry(BaseModel):
+    """A single action consideration in the AI decision process."""
+    action: str
+    status: str  # "chosen", "skipped", "unavailable"
+    reason: str
+
+
+class AIDecisionLog(BaseModel):
+    """Full log of an AI decision for one action."""
+    player_name: str
+    timestamp: str
+    valid_actions: list[str]  # e.g., ["draw_card", "play_card", "end_turn"]
+    considered: list[AIDecisionLogEntry]
+    chosen_action: str
+    reason: str
 
 
 # ============ Game State ============

@@ -134,11 +134,35 @@ export interface CombatResult {
   defender_roll: number
   attacker_soldiers_committed: number
   defender_soldiers_committed: number
+  // Bonus breakdowns
+  attacker_soldiers_bonus: number
+  attacker_attack_bonus: number
+  attacker_title_bonus: number
+  defender_soldiers_bonus: number
+  defender_defense_bonus: number
+  defender_title_bonus: number
+  // Result
   attacker_won: boolean
   attacker_losses: number
   defender_losses: number
   attacker_effects: CardEffect[]
   defender_effects: CardEffect[]
+}
+
+// AI Decision Logging
+export interface AIDecisionLogEntry {
+  action: string
+  status: 'chosen' | 'skipped' | 'unavailable'
+  reason: string
+}
+
+export interface AIDecisionLog {
+  player_name: string
+  timestamp: string
+  valid_actions: string[]
+  considered: AIDecisionLogEntry[]
+  chosen_action: string
+  reason: string
 }
 
 export interface GameState {

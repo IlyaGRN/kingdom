@@ -7,6 +7,7 @@ import PlayerMat from './PlayerMat'
 import ActionPanel from './ActionPanel'
 import CombatModal from './CombatModal'
 import ClaimActionModal from './ClaimActionModal'
+import AIDecisionPanel from './AIDecisionPanel'
 
 interface GameBoardProps {
   onBack: () => void
@@ -21,6 +22,9 @@ export default function GameBoard({ onBack }: GameBoardProps) {
     setValidActions,
     lastCombat,
     setLastCombat,
+    decisionLogs,
+    addDecisionLog,
+    clearDecisionLogs,
   } = useGameStore()
 
   const [winner, setWinner] = useState<Player | null>(null)
@@ -115,6 +119,11 @@ export default function GameBoard({ onBack }: GameBoardProps) {
           }
           
           const result = await response.json()
+          
+          // Capture decision log if present
+          if (result.decision_log) {
+            addDecisionLog(result.decision_log)
+          }
           
           if (result.state) {
             setGameState(result.state)
@@ -297,6 +306,7 @@ export default function GameBoard({ onBack }: GameBoardProps) {
               player={player}
               isCurrentPlayer={idx === gameState.current_player_idx}
               cards={gameState.cards}
+              holdings={gameState.holdings}
             />
           ))}
         </div>
@@ -337,6 +347,12 @@ export default function GameBoard({ onBack }: GameBoardProps) {
           onClose={handleCloseClaimModal}
         />
       )}
+
+      {/* AI Decision Log Panel */}
+      <AIDecisionPanel 
+        logs={decisionLogs} 
+        onClear={clearDecisionLogs} 
+      />
 
       {/* Game over modal */}
       {winner && (

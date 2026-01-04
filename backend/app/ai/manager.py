@@ -1,7 +1,11 @@
 """AI Player Manager - handles AI player creation and action execution."""
-from typing import Optional
+from typing import Optional, Tuple
+from datetime import datetime
 from app.config import get_settings
-from app.models.schemas import GameState, Player, PlayerType, Action, ActionType, HoldingType
+from app.models.schemas import (
+    GameState, Player, PlayerType, Action, ActionType, HoldingType,
+    AIDecisionLog, AIDecisionLogEntry
+)
 from app.ai.base import AIPlayer
 from app.ai.openai_player import OpenAIPlayer
 from app.ai.anthropic_player import AnthropicPlayer
@@ -61,10 +65,10 @@ class AIManager:
         
         return ai_player
     
-    async def get_ai_action(self, state: GameState, player: Player) -> Optional[Action]:
-        """Get the next action for an AI player."""
+    async def get_ai_action(self, state: GameState, player: Player) -> Tuple[Optional[Action], Optional[AIDecisionLog]]:
+        """Get the next action for an AI player, along with decision log."""
         if player.player_type == PlayerType.HUMAN:
-            return None
+            return None, None
         
         ai_player = self.get_ai_player(player.player_type)
         if not ai_player:
@@ -76,10 +80,15 @@ class AIManager:
         valid_actions = engine.get_valid_actions(player.id)
         
         if not valid_actions:
-            return None
+            return None, None
         
-        # Have AI decide
-        return await ai_player.decide_action(state, player, valid_actions)
+        # Have AI decide - SimpleAIPlayer returns (action, log), others just return action
+        result = await ai_player.decide_action(state, player, valid_actions)
+        if isinstance(result, tuple):
+            return result
+        else:
+            # Legacy AI players that don't return logs
+            return result, None
     
     async def get_starting_town(
         self, 
@@ -109,75 +118,139 @@ class SimpleAIPlayer(AIPlayer):
         game_state: GameState,
         player: Player,
         valid_actions: list[Action]
-    ) -> Action:
-        """Choose an action using simple heuristics."""
+    ) -> Tuple[Action, AIDecisionLog]:
+        """Choose an action using simple heuristics, with full decision logging."""
         if not valid_actions:
             raise ValueError("No valid actions available")
         
-        # Priority order:
-        # 1. Draw card if not drawn this turn
-        # 2. Play claim cards to establish claims (with valid target)
-        # 3. Claim title if possible (Count/Duke/King)
-        # 4. Capture unowned towns with claims (10 gold)
-        # 5. Attack enemy targets with claims
-        # 6. Fabricate claims if we have gold and no claims
-        # 7. Build fortifications
-        # 8. End turn
+        # Build list of available action types for the log
+        action_types = list(set(a.action_type.value for a in valid_actions))
+        considered: list[AIDecisionLogEntry] = []
+        chosen_action: Optional[Action] = None
+        chosen_reason = ""
         
-        # 1. Draw card first
-        for action in valid_actions:
-            if action.action_type == ActionType.DRAW_CARD:
-                return action
+        # Priority order (cards are auto-drawn at turn start):
+        # 1. Play claim cards to establish claims (with valid target)
+        # 2. Claim title if possible (Count/Duke/King)
+        # 3. Capture unowned towns with claims (10 gold)
+        # 4. Attack enemy targets with claims
+        # 5. Fabricate claims if we have gold and no claims
+        # 6. Build fortifications
+        # 7. End turn
         
-        # 2. Play claim cards (need to find valid target)
-        play_card_actions = [a for a in valid_actions if a.action_type == ActionType.PLAY_CARD]
-        for action in play_card_actions:
-            card = game_state.cards.get(action.card_id)
-            if card and card.card_type.value == "claim":
-                # Find a valid target for this claim card
-                target = self._find_claim_target(game_state, player, card)
-                if target:
-                    action.target_holding_id = target.id
-                    return action
-            elif card and card.card_type.value == "bonus":
-                # Check if we can actually play this bonus card
-                if self._can_play_bonus_card(player, card):
-                    return action
+        # 1. Play claim cards (need to find valid target)
+        if not chosen_action:
+            play_card_actions = [a for a in valid_actions if a.action_type == ActionType.PLAY_CARD]
+            if play_card_actions:
+                for action in play_card_actions:
+                    card = game_state.cards.get(action.card_id)
+                    if card and card.card_type.value == "claim":
+                        target = self._find_claim_target(game_state, player, card)
+                        if target:
+                            action.target_holding_id = target.id
+                            chosen_action = action
+                            chosen_reason = f"Playing claim card '{card.name}' targeting {target.name}"
+                            considered.append(AIDecisionLogEntry(action="play_card", status="chosen", reason=chosen_reason))
+                            break
+                        else:
+                            considered.append(AIDecisionLogEntry(action="play_card", status="skipped", reason=f"Claim card '{card.name}' has no valid target (already own all towns in that county)"))
+                    elif card and card.card_type.value == "bonus":
+                        if self._can_play_bonus_card(player, card):
+                            chosen_action = action
+                            chosen_reason = f"Playing bonus card '{card.name}'"
+                            considered.append(AIDecisionLogEntry(action="play_card", status="chosen", reason=chosen_reason))
+                            break
+                        else:
+                            considered.append(AIDecisionLogEntry(action="play_card", status="skipped", reason=f"Bonus card '{card.name}' requirements not met (e.g., not enough gold)"))
+                if not chosen_action and play_card_actions:
+                    considered.append(AIDecisionLogEntry(action="play_card", status="skipped", reason="No playable cards with valid targets"))
+            else:
+                if ActionType.PLAY_CARD.value in action_types:
+                    considered.append(AIDecisionLogEntry(action="play_card", status="skipped", reason="No cards in hand"))
         
-        # 3. Claim title if possible
-        for action in valid_actions:
-            if action.action_type == ActionType.CLAIM_TITLE:
-                return action
+        # 2. Claim title if possible
+        if not chosen_action:
+            title_actions = [a for a in valid_actions if a.action_type == ActionType.CLAIM_TITLE]
+            if title_actions:
+                chosen_action = title_actions[0]
+                target_id = chosen_action.target_holding_id
+                chosen_reason = f"Claiming title at {target_id} (prerequisites met, have enough gold)"
+                considered.append(AIDecisionLogEntry(action="claim_title", status="chosen", reason=chosen_reason))
+            else:
+                considered.append(AIDecisionLogEntry(action="claim_title", status="unavailable", reason="Prerequisites not met or not enough gold (Count: 2 towns + 25g, Duke: 2 counties + 50g, King: 1 duchy + town in other duchy + 75g)"))
         
-        # 4. Capture unowned towns (costs 10 gold, requires claim)
-        for action in valid_actions:
-            if action.action_type == ActionType.CLAIM_TOWN:
-                return action
+        # 3. Capture unowned towns (costs 10 gold, requires claim)
+        if not chosen_action:
+            claim_town_actions = [a for a in valid_actions if a.action_type == ActionType.CLAIM_TOWN]
+            if claim_town_actions:
+                chosen_action = claim_town_actions[0]
+                chosen_reason = f"Capturing unowned town {chosen_action.target_holding_id} for 10 gold (have valid claim)"
+                considered.append(AIDecisionLogEntry(action="claim_town", status="chosen", reason=chosen_reason))
+            else:
+                considered.append(AIDecisionLogEntry(action="claim_town", status="unavailable", reason="No unowned towns with valid claims, or not enough gold (10g)"))
         
-        # 5. Attack if we have enough soldiers and a claim
-        attack_actions = [a for a in valid_actions if a.action_type == ActionType.ATTACK]
-        if attack_actions and player.soldiers >= 400:
-            # Attack first available if we have enough force
-            attack_actions[0].soldiers_count = min(player.soldiers // 2, 600)
-            return attack_actions[0]
+        # 4. Attack if we have enough soldiers and a claim
+        if not chosen_action:
+            attack_actions = [a for a in valid_actions if a.action_type == ActionType.ATTACK]
+            if attack_actions and player.soldiers >= 400:
+                chosen_action = attack_actions[0]
+                chosen_action.soldiers_count = min(player.soldiers // 2, 600)
+                chosen_reason = f"Attacking {chosen_action.target_holding_id} with {chosen_action.soldiers_count} soldiers (have claim and enough force)"
+                considered.append(AIDecisionLogEntry(action="attack", status="chosen", reason=chosen_reason))
+            elif attack_actions:
+                considered.append(AIDecisionLogEntry(action="attack", status="skipped", reason=f"Have claims but not enough soldiers (have {player.soldiers}, need 400+)"))
+            else:
+                considered.append(AIDecisionLogEntry(action="attack", status="unavailable", reason="No valid attack targets (need claim on enemy territory)"))
         
-        # 6. Fabricate claim if we have gold (35g) but no claims
-        if player.gold >= 35 and len(player.claims or []) == 0:
-            for action in valid_actions:
-                if action.action_type == ActionType.FAKE_CLAIM:
-                    return action
+        # 5. Fabricate claim if we have gold (35g) but no claims
+        if not chosen_action:
+            fake_claim_actions = [a for a in valid_actions if a.action_type == ActionType.FAKE_CLAIM]
+            if fake_claim_actions and player.gold >= 35 and len(player.claims or []) == 0:
+                chosen_action = fake_claim_actions[0]
+                chosen_reason = f"Fabricating claim on {chosen_action.target_holding_id} for 35 gold (no existing claims)"
+                considered.append(AIDecisionLogEntry(action="fake_claim", status="chosen", reason=chosen_reason))
+            elif fake_claim_actions:
+                if player.gold < 35:
+                    considered.append(AIDecisionLogEntry(action="fake_claim", status="skipped", reason=f"Not enough gold ({player.gold}/35)"))
+                else:
+                    considered.append(AIDecisionLogEntry(action="fake_claim", status="skipped", reason="Already have claims, saving gold"))
+            else:
+                considered.append(AIDecisionLogEntry(action="fake_claim", status="unavailable", reason="No targets available for fake claims"))
         
-        # 7. Build fortification if we have gold
-        for action in valid_actions:
-            if action.action_type == ActionType.BUILD_FORTIFICATION:
-                return action
+        # 6. Build fortification if we have gold
+        if not chosen_action:
+            fort_actions = [a for a in valid_actions if a.action_type == ActionType.BUILD_FORTIFICATION]
+            if fort_actions:
+                chosen_action = fort_actions[0]
+                chosen_reason = f"Building fortification at {chosen_action.target_holding_id} for 10 gold"
+                considered.append(AIDecisionLogEntry(action="build_fortification", status="chosen", reason=chosen_reason))
+            else:
+                considered.append(AIDecisionLogEntry(action="build_fortification", status="unavailable", reason="No valid locations or not enough gold (10g)"))
         
-        # 8. End turn
-        for action in valid_actions:
-            if action.action_type == ActionType.END_TURN:
-                return action
+        # 7. End turn
+        if not chosen_action:
+            end_actions = [a for a in valid_actions if a.action_type == ActionType.END_TURN]
+            if end_actions:
+                chosen_action = end_actions[0]
+                chosen_reason = "Ending turn (no other beneficial actions available)"
+                considered.append(AIDecisionLogEntry(action="end_turn", status="chosen", reason=chosen_reason))
         
-        return valid_actions[0]
+        # Fallback
+        if not chosen_action:
+            chosen_action = valid_actions[0]
+            chosen_reason = f"Fallback: selecting first available action ({chosen_action.action_type.value})"
+        
+        # Build the decision log
+        decision_log = AIDecisionLog(
+            player_name=player.name,
+            timestamp=datetime.now().isoformat(),
+            valid_actions=action_types,
+            considered=considered,
+            chosen_action=chosen_action.action_type.value,
+            reason=chosen_reason
+        )
+        
+        return chosen_action, decision_log
     
     def _find_claim_target(self, game_state: GameState, player: Player, card) -> Optional[any]:
         """Find a valid target holding for a claim card."""

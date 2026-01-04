@@ -1,13 +1,23 @@
-import { Player, Card, getArmyCap } from '../types/game'
+import { Player, Card, Holding, getArmyCap } from '../types/game'
 
 interface PlayerMatProps {
   player: Player
   isCurrentPlayer: boolean
   cards: Record<string, Card>
+  holdings: Holding[]
   onCardClick?: (cardId: string) => void
 }
 
-export default function PlayerMat({ player, isCurrentPlayer, cards, onCardClick }: PlayerMatProps) {
+interface IncomeBreakdown {
+  goldFromHoldings: number
+  soldiersFromHoldings: number
+  goldFromFortifications: number
+  goldFromTitles: number
+  totalGold: number
+  totalSoldiers: number
+}
+
+export default function PlayerMat({ player, isCurrentPlayer, cards, holdings, onCardClick }: PlayerMatProps) {
   const getTitleDisplay = () => {
     if (player.is_king) return 'King'
     if (player.title === 'duke') return 'Duke'
@@ -17,6 +27,51 @@ export default function PlayerMat({ player, isCurrentPlayer, cards, onCardClick 
 
   const armyCap = getArmyCap(player.title, player.has_big_war_effect)
   const isOverCap = player.soldiers > armyCap
+
+  // Calculate income breakdown
+  const calculateIncome = (): IncomeBreakdown => {
+    let goldFromHoldings = 0
+    let soldiersFromHoldings = 0
+    let goldFromFortifications = 0
+    let goldFromTitles = 0
+
+    // Income from player's holdings
+    for (const holdingId of player.holdings) {
+      const holding = holdings.find(h => h.id === holdingId)
+      if (holding) {
+        goldFromHoldings += holding.gold_value
+        soldiersFromHoldings += holding.soldier_value
+
+        // Fortification bonus: +2 gold per first fort, +5 for second
+        if (holding.fortification_count >= 1) {
+          goldFromFortifications += 2
+        }
+        if (holding.fortification_count >= 2) {
+          goldFromFortifications += 5
+        }
+      }
+    }
+
+    // Title stipends
+    if (player.is_king) {
+      goldFromTitles = 8
+    } else if (player.title === 'duke') {
+      goldFromTitles = 4 * player.duchies.length
+    } else if (player.title === 'count') {
+      goldFromTitles = 2 * player.counties.length
+    }
+
+    return {
+      goldFromHoldings,
+      soldiersFromHoldings,
+      goldFromFortifications,
+      goldFromTitles,
+      totalGold: goldFromHoldings + goldFromFortifications + goldFromTitles,
+      totalSoldiers: soldiersFromHoldings,
+    }
+  }
+
+  const income = calculateIncome()
 
   const getCardTypeIcon = (card: Card): string => {
     switch (card.card_type) {
@@ -92,6 +147,40 @@ export default function PlayerMat({ player, isCurrentPlayer, cards, onCardClick 
         </div>
       </div>
 
+      {/* Income per turn */}
+      <div className="bg-parchment-100 rounded p-2 mb-3">
+        <div className="text-xs font-medieval text-medieval-stone mb-1">Income per turn:</div>
+        <div className="grid grid-cols-2 gap-2 text-xs">
+          <div className="flex justify-between">
+            <span className="text-medieval-stone">💰 Gold:</span>
+            <span className="font-medieval text-medieval-gold">+{income.totalGold}</span>
+          </div>
+          <div className="flex justify-between">
+            <span className="text-medieval-stone">⚔️ Soldiers:</span>
+            <span className="font-medieval text-medieval-bronze">+{income.totalSoldiers}</span>
+          </div>
+        </div>
+        {/* Breakdown (collapsed by default, show on hover) */}
+        <div className="mt-1 pt-1 border-t border-parchment-300 text-xs text-medieval-stone">
+          <div className="flex justify-between">
+            <span>From holdings:</span>
+            <span>+{income.goldFromHoldings}g / +{income.soldiersFromHoldings}s</span>
+          </div>
+          {income.goldFromFortifications > 0 && (
+            <div className="flex justify-between">
+              <span>From fortifications:</span>
+              <span>+{income.goldFromFortifications}g</span>
+            </div>
+          )}
+          {income.goldFromTitles > 0 && (
+            <div className="flex justify-between">
+              <span>From titles:</span>
+              <span>+{income.goldFromTitles}g</span>
+            </div>
+          )}
+        </div>
+      </div>
+
       {/* Holdings & Fortifications */}
       <div className="flex items-center justify-between text-sm mb-3 px-1">
         <span className="text-medieval-stone">Holdings:</span>
@@ -99,7 +188,7 @@ export default function PlayerMat({ player, isCurrentPlayer, cards, onCardClick 
       </div>
       <div className="flex items-center justify-between text-sm mb-3 px-1">
         <span className="text-medieval-stone">Fortifications:</span>
-        <span className="font-medieval text-medieval-bronze">{player.fortifications_placed}/2</span>
+        <span className="font-medieval text-medieval-bronze">{player.fortifications_placed}/4</span>
       </div>
 
       {/* Active effects */}

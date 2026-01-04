@@ -1,5 +1,5 @@
 import { create } from 'zustand'
-import { GameState, Action, CombatResult, Holding } from '../types/game'
+import { GameState, Action, CombatResult, Holding, AIDecisionLog } from '../types/game'
 
 interface GameStore {
   // State
@@ -7,6 +7,7 @@ interface GameStore {
   selectedHolding: Holding | null
   validActions: Action[]
   lastCombat: CombatResult | null
+  decisionLogs: AIDecisionLog[]
   isLoading: boolean
   error: string | null
   
@@ -15,6 +16,8 @@ interface GameStore {
   setSelectedHolding: (holding: Holding | null) => void
   setValidActions: (actions: Action[]) => void
   setLastCombat: (result: CombatResult | null) => void
+  addDecisionLog: (log: AIDecisionLog) => void
+  clearDecisionLogs: () => void
   setLoading: (loading: boolean) => void
   setError: (error: string | null) => void
   resetGame: () => void
@@ -32,6 +35,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
   selectedHolding: null,
   validActions: [],
   lastCombat: null,
+  decisionLogs: [],
   isLoading: false,
   error: null,
   
@@ -40,6 +44,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
   setSelectedHolding: (holding) => set({ selectedHolding: holding }),
   setValidActions: (actions) => set({ validActions: actions }),
   setLastCombat: (result) => set({ lastCombat: result }),
+  addDecisionLog: (log) => set((state) => ({ 
+    decisionLogs: [...state.decisionLogs.slice(-99), log] // Keep last 100 logs
+  })),
+  clearDecisionLogs: () => set({ decisionLogs: [] }),
   setLoading: (loading) => set({ isLoading: loading }),
   setError: (error) => set({ error }),
   
@@ -48,6 +56,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     selectedHolding: null,
     validActions: [],
     lastCombat: null,
+    decisionLogs: [],
     isLoading: false,
     error: null,
   }),

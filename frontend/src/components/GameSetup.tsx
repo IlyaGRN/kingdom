@@ -12,9 +12,9 @@ export default function GameSetup({ onGameCreated, onBack }: GameSetupProps) {
   const [playerCount, setPlayerCount] = useState(4)
   const [players, setPlayers] = useState<PlayerConfig[]>([
     { name: 'You', player_type: 'human', color: PLAYER_COLORS[0] },
-    { name: 'Baron Claude', player_type: 'ai_anthropic', color: PLAYER_COLORS[1] },
-    { name: 'Baron GPT', player_type: 'ai_openai', color: PLAYER_COLORS[2] },
-    { name: 'Baron Gemini', player_type: 'ai_gemini', color: PLAYER_COLORS[3] },
+    { name: 'Baron Alpha', player_type: 'ai_openai', color: PLAYER_COLORS[1] },
+    { name: 'Baron Beta', player_type: 'ai_openai', color: PLAYER_COLORS[2] },
+    { name: 'Baron Gamma', player_type: 'ai_openai', color: PLAYER_COLORS[3] },
   ])
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -29,7 +29,7 @@ export default function GameSetup({ onGameCreated, onBack }: GameSetupProps) {
       const idx = newPlayers.length
       newPlayers.push({
         name: `Baron ${idx + 1}`,
-        player_type: 'ai_openai',
+        player_type: 'ai_openai',  // Default all new AI players to GPT
         color: PLAYER_COLORS[idx],
       })
     }

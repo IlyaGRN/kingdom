@@ -161,21 +161,16 @@ def resolve_combat(
         attacker_roll = attacker_roll // 2
     
     # Calculate attacker strength
-    attacker_strength = (
-        attacker_roll +
-        (attacker_soldiers // 100) +
-        calculate_attack_bonus(state, source_holding_id) +
-        calculate_title_combat_bonus(state, attacker_id, target_holding_id, is_defending=False)
-    )
+    atk_soldiers_bonus = attacker_soldiers // 100
+    atk_attack_bonus = calculate_attack_bonus(state, source_holding_id)
+    atk_title_bonus = calculate_title_combat_bonus(state, attacker_id, target_holding_id, is_defending=False)
+    attacker_strength = attacker_roll + atk_soldiers_bonus + atk_attack_bonus + atk_title_bonus
     
     # Calculate defender strength
-    defender_strength = (
-        defender_roll +
-        (defender_soldiers // 100) +
-        calculate_defense_bonus(state, target_holding_id)
-    )
-    if defender:
-        defender_strength += calculate_title_combat_bonus(state, defender_id, target_holding_id, is_defending=True)
+    def_soldiers_bonus = defender_soldiers // 100
+    def_defense_bonus = calculate_defense_bonus(state, target_holding_id)
+    def_title_bonus = calculate_title_combat_bonus(state, defender_id, target_holding_id, is_defending=True) if defender else 0
+    defender_strength = defender_roll + def_soldiers_bonus + def_defense_bonus + def_title_bonus
     
     # Determine winner (defender wins ties, except King defending King's Castle)
     attacker_won = attacker_strength > defender_strength
@@ -211,6 +206,14 @@ def resolve_combat(
         defender_roll=defender_roll,
         attacker_soldiers_committed=attacker_soldiers,
         defender_soldiers_committed=defender_soldiers,
+        # Bonus breakdowns
+        attacker_soldiers_bonus=atk_soldiers_bonus,
+        attacker_attack_bonus=atk_attack_bonus,
+        attacker_title_bonus=atk_title_bonus,
+        defender_soldiers_bonus=def_soldiers_bonus,
+        defender_defense_bonus=def_defense_bonus,
+        defender_title_bonus=def_title_bonus,
+        # Result
         attacker_won=attacker_won,
         attacker_losses=attacker_losses,
         defender_losses=defender_losses,
@@ -293,7 +296,7 @@ def apply_combat_result(state: GameState, result: CombatResult) -> GameState:
             # Make attacker king
             attacker.is_king = True
             attacker.title = TitleType.KING
-            attacker.prestige += 6  # Bonus for conquering the crown
+            # Note: 6 VP for being king is calculated dynamically in calculate_prestige
     
     # Log combat
     state.combat_log.append(result)

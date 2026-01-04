@@ -58,14 +58,9 @@ class GameEngine:
         
         actions = []
         player_holdings = [h for h in state.holdings if h.owner_id == player_id]
-        player_town_count = count_player_towns(state, player_id)
         
-        # Draw card (once per turn, NOT available if player has > 4 towns)
-        if not state.card_drawn_this_turn and state.deck and player_town_count <= 4:
-            actions.append(Action(
-                action_type=ActionType.DRAW_CARD,
-                player_id=player_id,
-            ))
+        # Cards are now auto-drawn at the beginning of each turn
+        # No manual draw action needed
         
         # All these actions are available (unlimited actions per turn)
         
@@ -351,10 +346,6 @@ class GameEngine:
         if state.card_drawn_this_turn:
             return False, "Already drew a card this turn", None
         
-        # Check town restriction
-        if count_player_towns(state, player.id) > 4:
-            return False, "Cannot draw cards while holding more than 4 towns", None
-        
         if not state.deck:
             # Reshuffle discard pile
             if state.discard_pile:
@@ -554,7 +545,7 @@ class GameEngine:
             player.is_king = True
             player.title = TitleType.KING
             holding.owner_id = player.id
-            player.prestige += 6  # Bonus for claiming king
+            # Note: 6 VP for being king is calculated dynamically in calculate_prestige
             
             state.action_log.append(action)
             save_game(state)
@@ -853,12 +844,7 @@ class GameEngine:
     def _handle_end_turn(self, action: Action) -> tuple[bool, str, None]:
         """Handle ending the turn."""
         state = self.state
-        
-        # Discard to hand limit (7 cards)
         player = next((p for p in state.players if p.id == action.player_id), None)
-        while len(player.hand) > 7:
-            discarded = player.hand.pop()
-            state.discard_pile.append(discarded)
         
         # Clear player's active effects at end of turn
         player.active_effects = []
