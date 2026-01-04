@@ -12,6 +12,7 @@ export type ActionType =
   | 'claim_title' 
   | 'claim_town'  // 10 gold to capture unowned town with valid claim
   | 'attack' 
+  | 'defend'  // Human defender responds to attack
   | 'fake_claim'  // 35 gold to fabricate a claim
   | 'play_card' 
   | 'draw_card' 
@@ -122,6 +123,16 @@ export interface Action {
   card_id?: string
   target_player_id?: string
   target_county?: string  // For claims
+  attack_cards?: string[]  // Card IDs to use when attacking
+  defense_cards?: string[]  // Card IDs to use when defending
+}
+
+export interface PendingCombat {
+  attacker_id: string
+  defender_id: string
+  target_holding_id: string
+  attacker_soldiers: number
+  attacker_cards: string[]
 }
 
 export interface CombatResult {
@@ -183,7 +194,16 @@ export interface GameState {
   cards: Record<string, Card>
   action_log: Action[]
   combat_log: CombatResult[]
+  pending_combat: PendingCombat | null  // Combat waiting for human defender response
 }
+
+// Combat card effects that can be used in combat selection
+export const COMBAT_CARD_EFFECTS: CardEffect[] = [
+  'excalibur',
+  'poisoned_arrows',
+  'talented_commander',
+  'duel',
+]
 
 export interface PlayerConfig {
   name: string

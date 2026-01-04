@@ -94,6 +94,9 @@ def resolve_combat(
     target_holding_id: str,
     attacker_soldiers: int,
     source_holding_id: str | None = None,
+    attacker_cards: list[str] | None = None,
+    defender_cards: list[str] | None = None,
+    defender_soldiers_override: int | None = None,
 ) -> CombatResult:
     """Resolve a combat between attacker and defender.
     
@@ -106,6 +109,9 @@ def resolve_combat(
         target_holding_id: ID of holding being attacked
         attacker_soldiers: Number of soldiers committed by attacker
         source_holding_id: ID of holding attack originates from (for attack modifiers)
+        attacker_cards: Card IDs the attacker is using in this combat
+        defender_cards: Card IDs the defender is using in this combat
+        defender_soldiers_override: Override for defender's soldier commitment
     
     Returns:
         CombatResult with outcome
@@ -127,13 +133,31 @@ def resolve_combat(
     defender = next((p for p in state.players if p.id == defender_id), None) if defender_id else None
     
     # Calculate defender's committed soldiers
-    defender_soldiers = 0
-    if defender:
+    if defender_soldiers_override is not None:
+        defender_soldiers = min(defender_soldiers_override, defender.soldiers if defender else 0)
+    elif defender:
         defender_soldiers = min(defender.soldiers, attacker_soldiers)
+    else:
+        defender_soldiers = 0
     
-    # Check for card effects
-    attacker_effects = attacker.active_effects.copy() if attacker else []
-    defender_effects = defender.active_effects.copy() if defender else []
+    # Build card effects from selected cards
+    attacker_effects: list[CardEffect] = []
+    defender_effects: list[CardEffect] = []
+    
+    combat_card_effects = {CardEffect.EXCALIBUR, CardEffect.POISONED_ARROWS,
+                           CardEffect.TALENTED_COMMANDER, CardEffect.DUEL}
+    
+    if attacker_cards:
+        for card_id in attacker_cards:
+            card = state.cards.get(card_id)
+            if card and card.effect in combat_card_effects:
+                attacker_effects.append(card.effect)
+    
+    if defender_cards:
+        for card_id in defender_cards:
+            card = state.cards.get(card_id)
+            if card and card.effect in combat_card_effects:
+                defender_effects.append(card.effect)
     
     # Check for Duel effect (army-less fight)
     is_duel = CardEffect.DUEL in attacker_effects

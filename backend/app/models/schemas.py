@@ -31,6 +31,7 @@ class ActionType(str, Enum):
     CLAIM_TITLE = "claim_title"
     CLAIM_TOWN = "claim_town"  # 10 gold to capture unowned town with valid claim
     ATTACK = "attack"
+    DEFEND = "defend"  # Human defender responds to attack
     PLAY_CARD = "play_card"
     DRAW_CARD = "draw_card"
     FAKE_CLAIM = "fake_claim"  # 35 gold to fabricate a claim
@@ -47,11 +48,15 @@ class CardType(str, Enum):
 
 class CardEffect(str, Enum):
     """Specific card effects for gameplay mechanics."""
-    # Personal Events
+    # Personal Events - Gold
     GOLD_5 = "gold_5"
     GOLD_10 = "gold_10"
     GOLD_15 = "gold_15"
     GOLD_25 = "gold_25"
+    # Personal Events - Soldiers
+    SOLDIERS_100 = "soldiers_100"
+    SOLDIERS_200 = "soldiers_200"
+    SOLDIERS_300 = "soldiers_300"
     RAIDERS = "raiders"  # Lose all income this turn
     
     # Global Events
@@ -216,6 +221,10 @@ class Action(BaseModel):
     target_player_id: Optional[str] = None
     edict: Optional[EdictType] = None
     target_county: Optional[str] = None  # For claims
+    
+    # Combat card selection
+    attack_cards: list[str] = Field(default_factory=list)  # Card IDs to use when attacking
+    defense_cards: list[str] = Field(default_factory=list)  # Card IDs to use when defending
 
 
 class CombatResult(BaseModel):
@@ -268,6 +277,17 @@ class AIDecisionLog(BaseModel):
     reason: str
 
 
+# ============ Pending Combat ============
+
+class PendingCombat(BaseModel):
+    """Combat waiting for human defender response."""
+    attacker_id: str
+    defender_id: str
+    target_holding_id: str
+    attacker_soldiers: int
+    attacker_cards: list[str] = Field(default_factory=list)  # Card IDs attacker is using
+
+
 # ============ Game State ============
 
 class GameState(BaseModel):
@@ -304,6 +324,9 @@ class GameState(BaseModel):
     # History
     action_log: list[Action] = Field(default_factory=list)
     combat_log: list[CombatResult] = Field(default_factory=list)
+    
+    # Pending combat (waiting for human defender response)
+    pending_combat: Optional[PendingCombat] = None
     
     @property
     def current_player(self) -> Optional[Player]:

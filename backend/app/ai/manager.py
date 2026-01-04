@@ -67,10 +67,13 @@ class AIManager:
     
     async def get_ai_action(self, state: GameState, player: Player) -> Tuple[Optional[Action], Optional[AIDecisionLog]]:
         """Get the next action for an AI player, along with decision log."""
+        import time
+        
         if player.player_type == PlayerType.HUMAN:
             return None, None
         
         ai_player = self.get_ai_player(player.player_type)
+        
         if not ai_player:
             # Use simple AI as ultimate fallback
             ai_player = SimpleAIPlayer()
@@ -84,6 +87,7 @@ class AIManager:
         
         # Have AI decide - SimpleAIPlayer returns (action, log), others just return action
         result = await ai_player.decide_action(state, player, valid_actions)
+        
         if isinstance(result, tuple):
             return result
         else:

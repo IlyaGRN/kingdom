@@ -20,42 +20,33 @@ def auto_draw_card(state: GameState, player: Player) -> Optional[str]:
     Returns the name of the drawn card, or None if deck is empty.
     Handles instant cards (applied immediately) and regular cards (added to hand).
     """
-    try:
-        if not state.deck:
-            # Reshuffle discard pile if needed
-            if state.discard_pile:
-                state.deck = state.discard_pile.copy()
-                random.shuffle(state.deck)
-                state.discard_pile = []
-            else:
-                return None  # No cards available
-        
-        card_id = state.deck.pop(0)
-        card = state.cards.get(card_id)
-        
-        if not card:
-            return None
-        
-        # Check if instant card (personal/global events)
-        if is_instant_card(card):
-            # Apply instant effect
-            _apply_instant_card_effect(state, player, card)
-            state.discard_pile.append(card_id)
-            return f"{card.name} (instant effect applied)"
-        
-        # Non-instant cards go to hand
-        player.hand.append(card_id)
-        state.card_drawn_this_turn = True
-        
-        return card.name
-    except Exception as e:
-        # #region agent log
-        import json as _json
-        import traceback
-        with open("/home/ilya/dev/kingdom/.cursor/debug.log", "a") as _f:
-            _f.write(_json.dumps({"location":"state.py:auto_draw_card:error","message":"Exception in auto_draw_card","data":{"error":str(e),"traceback":traceback.format_exc(),"player_id":player.id},"timestamp":int(__import__('time').time()*1000),"sessionId":"debug-session","hypothesisId":"H1","runId":"500-debug"})+"\n")
-        # #endregion
-        raise
+    if not state.deck:
+        # Reshuffle discard pile if needed
+        if state.discard_pile:
+            state.deck = state.discard_pile.copy()
+            random.shuffle(state.deck)
+            state.discard_pile = []
+        else:
+            return None  # No cards available
+    
+    card_id = state.deck.pop(0)
+    card = state.cards.get(card_id)
+    
+    if not card:
+        return None
+    
+    # Check if instant card (personal/global events)
+    if is_instant_card(card):
+        # Apply instant effect
+        _apply_instant_card_effect(state, player, card)
+        state.discard_pile.append(card_id)
+        return f"{card.name} (instant effect applied)"
+    
+    # Non-instant cards go to hand
+    player.hand.append(card_id)
+    state.card_drawn_this_turn = True
+    
+    return card.name
 
 
 def _apply_instant_card_effect(state: GameState, player: Player, card: Card) -> None:

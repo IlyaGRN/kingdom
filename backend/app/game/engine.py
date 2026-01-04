@@ -2,7 +2,8 @@
 from typing import Optional
 from app.models.schemas import (
     GameState, Action, ActionType, GamePhase, TitleType,
-    CombatResult, EdictType, HoldingType, CardType, CardEffect
+    CombatResult, EdictType, HoldingType, CardType, CardEffect,
+    PendingCombat, PlayerType
 )
 from app.game.state import (
     get_game, save_game, next_player_turn, apply_income,
@@ -319,6 +320,7 @@ class GameEngine:
             ActionType.CLAIM_TITLE: self._handle_claim_title,
             ActionType.CLAIM_TOWN: self._handle_claim_town,
             ActionType.ATTACK: self._handle_attack,
+            ActionType.DEFEND: self._handle_defend,
             ActionType.FAKE_CLAIM: self._handle_fake_claim,
             ActionType.PLAY_CARD: self._handle_play_card,
             ActionType.END_TURN: self._handle_end_turn,
@@ -664,6 +666,7 @@ class GameEngine:
         """Handle attacking a holding.
         
         Requires a valid claim on the target territory.
+        If defender is human, creates pending_combat for their response.
         """
         state = self.state
         player = next((p for p in state.players if p.id == action.player_id), None)
@@ -690,24 +693,134 @@ class GameEngine:
         if soldiers < 200:
             return False, "Must commit at least 200 soldiers", None
         
+        # Get defender
+        defender = next((p for p in state.players if p.id == target.owner_id), None)
+        
+        # Check if defender is human - if so, create pending combat
+        if defender and defender.player_type == PlayerType.HUMAN:
+            state.pending_combat = PendingCombat(
+                attacker_id=action.player_id,
+                defender_id=defender.id,
+                target_holding_id=action.target_holding_id,
+                attacker_soldiers=soldiers,
+                attacker_cards=action.attack_cards or [],
+            )
+            state.action_log.append(action)
+            save_game(state)
+            return True, "Awaiting defender response", None
+        
+        # Defender is AI or unowned - resolve combat immediately
+        # For AI defender, let them select cards
+        defender_cards: list[str] = []
+        defender_soldiers = 0
+        if defender and defender.player_type != PlayerType.HUMAN:
+            defender_cards = self._ai_select_combat_cards(defender)
+            # AI commits all available soldiers up to what they have
+            defender_soldiers = defender.soldiers
+        
         # Consume the claim (regardless of combat outcome)
         self._consume_claim(player, target)
         
-        # Resolve combat
+        # Resolve combat with card selections
         result = resolve_combat(
             state,
             action.player_id,
             action.target_holding_id,
             soldiers,
+            attacker_cards=action.attack_cards or [],
+            defender_cards=defender_cards,
+            defender_soldiers_override=defender_soldiers if defender else None,
         )
         
         # Apply result
         state = apply_combat_result(state, result)
         
+        # Discard used combat cards
+        self._discard_combat_cards(player, action.attack_cards or [])
+        if defender:
+            self._discard_combat_cards(defender, defender_cards)
+        
         # Clear Big War effect if player used it in combat
         if player.has_big_war_effect:
             player.has_big_war_effect = False
         
+        state.war_fought_this_turn = True
+        state.action_log.append(action)
+        save_game(state)
+        self._state = state
+        
+        return True, "Combat resolved", result
+    
+    def _ai_select_combat_cards(self, player) -> list[str]:
+        """AI selects which combat cards to use from hand."""
+        combat_effects = {CardEffect.EXCALIBUR, CardEffect.POISONED_ARROWS, 
+                          CardEffect.TALENTED_COMMANDER, CardEffect.DUEL}
+        selected = []
+        state = self.state
+        for card_id in player.hand:
+            card = state.cards.get(card_id)
+            if card and card.card_type == CardType.BONUS and card.effect in combat_effects:
+                selected.append(card_id)
+        return selected
+    
+    def _discard_combat_cards(self, player, card_ids: list[str]) -> None:
+        """Remove combat cards from player's hand and add to discard."""
+        state = self.state
+        for card_id in card_ids:
+            if card_id in player.hand:
+                player.hand.remove(card_id)
+                state.discard_pile.append(card_id)
+    
+    def _handle_defend(self, action: Action) -> tuple[bool, str, Optional[CombatResult]]:
+        """Handle human defender's response to an attack."""
+        state = self.state
+        
+        if not state.pending_combat:
+            return False, "No pending combat to defend", None
+        
+        pending = state.pending_combat
+        
+        if action.player_id != pending.defender_id:
+            return False, "You are not the defender in this combat", None
+        
+        defender = next((p for p in state.players if p.id == pending.defender_id), None)
+        attacker = next((p for p in state.players if p.id == pending.attacker_id), None)
+        target = next((h for h in state.holdings if h.id == pending.target_holding_id), None)
+        
+        if not defender or not attacker or not target:
+            return False, "Invalid combat state", None
+        
+        # Get defender's soldier commitment (defaults to all available)
+        defender_soldiers = action.soldiers_count if action.soldiers_count is not None else defender.soldiers
+        defender_soldiers = max(0, min(defender_soldiers, defender.soldiers))
+        
+        # Consume attacker's claim
+        self._consume_claim(attacker, target)
+        
+        # Resolve combat with both sides' card selections
+        result = resolve_combat(
+            state,
+            pending.attacker_id,
+            pending.target_holding_id,
+            pending.attacker_soldiers,
+            attacker_cards=pending.attacker_cards,
+            defender_cards=action.defense_cards or [],
+            defender_soldiers_override=defender_soldiers,
+        )
+        
+        # Apply result
+        state = apply_combat_result(state, result)
+        
+        # Discard used combat cards
+        self._discard_combat_cards(attacker, pending.attacker_cards)
+        self._discard_combat_cards(defender, action.defense_cards or [])
+        
+        # Clear Big War effect if attacker used it
+        if attacker.has_big_war_effect:
+            attacker.has_big_war_effect = False
+        
+        # Clear pending combat
+        state.pending_combat = None
         state.war_fought_this_turn = True
         state.action_log.append(action)
         save_game(state)

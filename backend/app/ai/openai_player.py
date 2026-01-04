@@ -1,11 +1,12 @@
 """OpenAI GPT-based AI player."""
 import json
 import re
-from typing import Optional
+from datetime import datetime
+from typing import Optional, Tuple
 from openai import AsyncOpenAI
 
 from app.ai.base import AIPlayer
-from app.models.schemas import GameState, Player, Action, Holding, ActionType
+from app.models.schemas import GameState, Player, Action, Holding, ActionType, AIDecisionLog, AIDecisionLogEntry
 
 
 class OpenAIPlayer(AIPlayer):
@@ -35,9 +36,19 @@ class OpenAIPlayer(AIPlayer):
         game_state: GameState,
         player: Player,
         valid_actions: list[Action]
-    ) -> Action:
+    ) -> Tuple[Action, AIDecisionLog]:
         """Choose an action using GPT."""
+        action_types = [a.action_type.value for a in valid_actions]
+        
         if not valid_actions:
+            log = AIDecisionLog(
+                player_name=player.name,
+                timestamp=datetime.now().isoformat(),
+                valid_actions=[],
+                considered=[],
+                chosen_action="none",
+                reason="No valid actions available"
+            )
             raise ValueError("No valid actions available")
         
         # Format the game state and actions for the AI
@@ -48,13 +59,18 @@ class OpenAIPlayer(AIPlayer):
 
 {actions_text}
 
-Based on the current game state, choose the best action to maximize your chances of winning.
-Consider:
-- Your current position and resources
-- Expansion opportunities
-- Defensive needs
-- Title claim prerequisites
-- Other players' positions
+Choose the BEST action. Priority order (highest to lowest):
+1. claim_title - ALWAYS do this if available (gives VP and income!)
+2. claim_town - Capture unowned towns for 10 gold (gives VP)
+3. attack - Attack enemy holdings with claims (requires 200+ soldiers)
+4. play_card - Play claim cards to enable attacks/captures
+5. build_fortification - Build defenses on owned towns (10 gold)
+6. fake_claim - Fabricate claims if you have gold (35 gold)
+7. end_turn - END YOUR TURN if no high-priority actions available!
+8. recruit - LOW priority, only if you have very few soldiers
+
+IMPORTANT: Choose end_turn over recruit unless you urgently need soldiers.
+Do NOT keep recruiting - it wastes your turn!
 
 Respond with ONLY the number of your chosen action (1-{len(valid_actions)})."""
         
@@ -67,18 +83,80 @@ Respond with ONLY the number of your chosen action (1-{len(valid_actions)})."""
             if numbers:
                 action_idx = int(numbers[0]) - 1
                 if 0 <= action_idx < len(valid_actions):
-                    return valid_actions[action_idx]
+                    chosen = valid_actions[action_idx]
+                    # Complete the action with any missing fields
+                    completed = self._complete_action(chosen, game_state, player)
+                    if completed:
+                        log = AIDecisionLog(
+                            player_name=player.name,
+                            timestamp=datetime.now().isoformat(),
+                            valid_actions=action_types,
+                            considered=[AIDecisionLogEntry(action=completed.action_type.value, status="chosen", reason=f"GPT selected action #{action_idx+1}")],
+                            chosen_action=completed.action_type.value,
+                            reason=f"GPT response: {response[:50]}"
+                        )
+                        return completed, log
+                    # If action couldn't be completed, fallback to END_TURN
+                    for action in valid_actions:
+                        if action.action_type == ActionType.END_TURN:
+                            log = AIDecisionLog(
+                                player_name=player.name,
+                                timestamp=datetime.now().isoformat(),
+                                valid_actions=action_types,
+                                considered=[AIDecisionLogEntry(action="end_turn", status="chosen", reason="Selected action couldn't be completed, falling back to end_turn")],
+                                chosen_action="end_turn",
+                                reason="Fallback after incomplete action"
+                            )
+                            return action, log
             
-            # Fallback: return first valid action (often draw card or end turn)
-            return valid_actions[0]
+            # Fallback: return end_turn or first valid action
+            for action in valid_actions:
+                if action.action_type == ActionType.END_TURN:
+                    log = AIDecisionLog(
+                        player_name=player.name,
+                        timestamp=datetime.now().isoformat(),
+                        valid_actions=action_types,
+                        considered=[AIDecisionLogEntry(action="end_turn", status="chosen", reason="Fallback to end_turn")],
+                        chosen_action="end_turn",
+                        reason="GPT response parsing failed, defaulting to end_turn"
+                    )
+                    return action, log
+            
+            fallback = valid_actions[0]
+            log = AIDecisionLog(
+                player_name=player.name,
+                timestamp=datetime.now().isoformat(),
+                valid_actions=action_types,
+                considered=[AIDecisionLogEntry(action=fallback.action_type.value, status="chosen", reason="Last resort fallback")],
+                chosen_action=fallback.action_type.value,
+                reason="All fallbacks exhausted"
+            )
+            return fallback, log
             
         except Exception as e:
             # On any error, return a safe default action
             # Prefer end_turn if available, otherwise first action
             for action in valid_actions:
                 if action.action_type == ActionType.END_TURN:
-                    return action
-            return valid_actions[0]
+                    log = AIDecisionLog(
+                        player_name=player.name,
+                        timestamp=datetime.now().isoformat(),
+                        valid_actions=action_types,
+                        considered=[AIDecisionLogEntry(action="end_turn", status="chosen", reason=f"Exception occurred: {str(e)[:50]}")],
+                        chosen_action="end_turn",
+                        reason=f"Error: {str(e)[:100]}"
+                    )
+                    return action, log
+            fallback = valid_actions[0]
+            log = AIDecisionLog(
+                player_name=player.name,
+                timestamp=datetime.now().isoformat(),
+                valid_actions=action_types,
+                considered=[AIDecisionLogEntry(action=fallback.action_type.value, status="chosen", reason=f"Exception fallback: {str(e)[:50]}")],
+                chosen_action=fallback.action_type.value,
+                reason=f"Error fallback: {str(e)[:100]}"
+            )
+            return fallback, log
     
     async def decide_combat_commitment(
         self,

@@ -7,6 +7,8 @@ import PlayerMat from './PlayerMat'
 import ActionPanel from './ActionPanel'
 import CombatModal from './CombatModal'
 import ClaimActionModal from './ClaimActionModal'
+import CombatPrepModal from './CombatPrepModal'
+import DefenseModal from './DefenseModal'
 import AIDecisionPanel from './AIDecisionPanel'
 
 interface GameBoardProps {
@@ -30,6 +32,14 @@ export default function GameBoard({ onBack }: GameBoardProps) {
   const [winner, setWinner] = useState<Player | null>(null)
   const [showCombat, setShowCombat] = useState(false)
   const [claimModalHolding, setClaimModalHolding] = useState<Holding | null>(null)
+  
+  // Combat prep modal state
+  const [combatPrepTarget, setCombatPrepTarget] = useState<{
+    holding: Holding
+    defender: Player | null
+  } | null>(null)
+  
+  // Defense modal shows automatically when pending_combat targets this human player
 
   // Fetch valid actions when turn changes
   const fetchValidActions = useCallback(async () => {
@@ -91,9 +101,10 @@ export default function GameBoard({ onBack }: GameBoardProps) {
     checkWinner()
   }, [gameState?.phase, gameState?.id])
 
-  // AI turn handling - loop until AI ends turn
+  // AI turn handling - loop until AI ends turn (with max actions limit)
   useEffect(() => {
     let isActive = true
+    const MAX_ACTIONS_PER_TURN = 15 // Prevent runaway AI turns
     
     const runAITurn = async () => {
       if (!gameState || gameState.phase !== 'player_turn') return
@@ -101,13 +112,16 @@ export default function GameBoard({ onBack }: GameBoardProps) {
       let currentPlayerIdx = gameState.current_player_idx
       const startingPlayerIdx = currentPlayerIdx
       let currentGameId = gameState.id
+      let actionCount = 0
       
       const currentPlayer = gameState.players[currentPlayerIdx]
       if (!currentPlayer || currentPlayer.player_type === 'human') return
       
-      // Keep taking actions until turn ends or player changes
-      while (isActive) {
+      // Keep taking actions until turn ends, player changes, or max reached
+      while (isActive && actionCount < MAX_ACTIONS_PER_TURN) {
         try {
+          actionCount++
+          
           const response = await fetch(`/api/simulation/${currentGameId}/step`, {
             method: 'POST',
           })
@@ -145,6 +159,29 @@ export default function GameBoard({ onBack }: GameBoardProps) {
         } catch (error) {
           console.error('AI turn failed:', error)
           break
+        }
+      }
+      
+      // If we hit max actions, force end turn
+      if (actionCount >= MAX_ACTIONS_PER_TURN && isActive) {
+        console.log('AI hit max actions limit, forcing end turn')
+        try {
+          await fetch(`/api/games/${currentGameId}/action`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              action_type: 'end_turn',
+              player_id: currentPlayer.id
+            })
+          })
+          // Refresh game state
+          const response = await fetch(`/api/games/${currentGameId}`)
+          if (response.ok) {
+            const { state } = await response.json()
+            setGameState(state)
+          }
+        } catch (error) {
+          console.error('Failed to force end turn:', error)
         }
       }
     }
@@ -251,6 +288,87 @@ export default function GameBoard({ onBack }: GameBoardProps) {
     setClaimModalHolding(null)
   }
 
+  // Open combat prep modal when player wants to attack
+  const handleOpenCombatPrep = (targetHolding: Holding) => {
+    if (!gameState) return
+    const defender = gameState.players.find(p => p.id === targetHolding.owner_id) || null
+    setCombatPrepTarget({ holding: targetHolding, defender })
+  }
+
+  // Execute attack from combat prep modal
+  const handleCombatAttack = async (soldiers: number, cardIds: string[]) => {
+    if (!gameState || !combatPrepTarget) return
+    
+    const currentPlayer = gameState.players[gameState.current_player_idx]
+    if (!currentPlayer) return
+    
+    const attackAction: Action = {
+      action_type: 'attack',
+      player_id: currentPlayer.id,
+      target_holding_id: combatPrepTarget.holding.id,
+      soldiers_count: soldiers,
+      attack_cards: cardIds,
+    }
+    
+    try {
+      const result = await performAction(gameState.id, attackAction)
+      
+      if (result.combat_result) {
+        setLastCombat(result.combat_result)
+        setShowCombat(true)
+      }
+      
+      setGameState(result.state)
+      setCombatPrepTarget(null)
+      setSelectedHolding(null)
+    } catch (error) {
+      console.error('Attack failed:', error)
+    }
+  }
+
+  const handleCloseCombatPrep = () => {
+    setCombatPrepTarget(null)
+  }
+
+  // Handle defend action when human player is attacked
+  const handleDefend = async (soldiers: number, cardIds: string[]) => {
+    if (!gameState?.pending_combat) return
+    
+    const defendAction: Action = {
+      action_type: 'defend',
+      player_id: gameState.pending_combat.defender_id,
+      soldiers_count: soldiers,
+      defense_cards: cardIds,
+    }
+    
+    try {
+      const result = await performAction(gameState.id, defendAction)
+      
+      if (result.combat_result) {
+        setLastCombat(result.combat_result)
+        setShowCombat(true)
+      }
+      
+      setGameState(result.state)
+    } catch (error) {
+      console.error('Defense failed:', error)
+    }
+  }
+
+  // Check if current human player needs to defend
+  const humanPlayer = gameState?.players.find(p => p.player_type === 'human')
+  const showDefenseModal = gameState?.pending_combat && 
+    humanPlayer && 
+    gameState.pending_combat.defender_id === humanPlayer.id
+
+  // Get data for defense modal
+  const defenseModalData = showDefenseModal && gameState?.pending_combat ? {
+    pendingCombat: gameState.pending_combat,
+    targetHolding: gameState.holdings.find(h => h.id === gameState.pending_combat!.target_holding_id)!,
+    attacker: gameState.players.find(p => p.id === gameState.pending_combat!.attacker_id)!,
+    defender: humanPlayer!,
+  } : null
+
   if (!gameState) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -323,6 +441,7 @@ export default function GameBoard({ onBack }: GameBoardProps) {
           <ActionPanel
             onPerformAction={handlePerformAction}
             selectedHolding={selectedHolding}
+            onOpenCombatPrep={handleOpenCombatPrep}
           />
         </div>
       </div>
@@ -345,6 +464,30 @@ export default function GameBoard({ onBack }: GameBoardProps) {
           onCapture={handleClaimCapture}
           onAttack={handleClaimAttack}
           onClose={handleCloseClaimModal}
+        />
+      )}
+
+      {/* Combat prep modal (attacker selecting soldiers + cards) */}
+      {combatPrepTarget && currentPlayer && (
+        <CombatPrepModal
+          targetHolding={combatPrepTarget.holding}
+          defender={combatPrepTarget.defender}
+          currentPlayer={currentPlayer}
+          cards={gameState.cards}
+          onAttack={handleCombatAttack}
+          onCancel={handleCloseCombatPrep}
+        />
+      )}
+
+      {/* Defense modal (human defender responding to attack) */}
+      {defenseModalData && (
+        <DefenseModal
+          pendingCombat={defenseModalData.pendingCombat}
+          targetHolding={defenseModalData.targetHolding}
+          attacker={defenseModalData.attacker}
+          defender={defenseModalData.defender}
+          cards={gameState.cards}
+          onDefend={handleDefend}
         />
       )}
 

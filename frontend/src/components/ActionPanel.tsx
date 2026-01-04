@@ -1,15 +1,14 @@
-import { useState } from 'react'
-import { Action, Holding } from '../types/game'
+import { Action, Holding, COMBAT_CARD_EFFECTS } from '../types/game'
 import { useGameStore } from '../store/gameStore'
 
 interface ActionPanelProps {
   onPerformAction: (action: Action) => void
   selectedHolding: Holding | null
+  onOpenCombatPrep: (holding: Holding) => void
 }
 
-export default function ActionPanel({ onPerformAction, selectedHolding }: ActionPanelProps) {
+export default function ActionPanel({ onPerformAction, selectedHolding, onOpenCombatPrep }: ActionPanelProps) {
   const { gameState, validActions } = useGameStore()
-  const [soldiersToCommit, setSoldiersToCommit] = useState(200)
 
   if (!gameState) return null
 
@@ -29,15 +28,7 @@ export default function ActionPanel({ onPerformAction, selectedHolding }: Action
   }, {} as Record<string, Action[]>)
 
   const handleActionClick = (action: Action) => {
-    // For attack actions, add soldier count
-    if (action.action_type === 'attack') {
-      onPerformAction({
-        ...action,
-        soldiers_count: soldiersToCommit,
-      })
-    } else {
-      onPerformAction(action)
-    }
+    onPerformAction(action)
   }
 
   // Get attack actions for selected holding
@@ -79,10 +70,13 @@ export default function ActionPanel({ onPerformAction, selectedHolding }: Action
       })
     : []
 
-  // Get non-claim play_card actions (bonus cards, etc.)
+  // Get non-claim, non-combat play_card actions (bonus cards that aren't used in combat)
   const nonClaimPlayCards = (groupedActions.play_card || []).filter(action => {
     const card = gameState.cards[action.card_id || '']
-    return card && card.card_type !== 'claim'
+    if (!card || card.card_type === 'claim') return false
+    // Filter out combat cards - they're used in combat prep modal
+    if (COMBAT_CARD_EFFECTS.includes(card.effect)) return false
+    return true
   })
 
   return (
@@ -130,36 +124,20 @@ export default function ActionPanel({ onPerformAction, selectedHolding }: Action
       {/* Action buttons for human player */}
       {isHumanTurn && isPlayerTurn && (
         <div className="flex-1 overflow-y-auto space-y-3">
-          {/* Selected holding attack */}
+          {/* Selected holding attack - opens combat prep modal */}
           {selectedHolding && attackActionsForSelected.length > 0 && (
             <div className="p-3 bg-red-50 rounded border border-red-200">
               <h3 className="font-medieval text-sm text-medieval-crimson mb-2">
                 Attack {selectedHolding.name}
               </h3>
-              
-              <div className="mb-3">
-                <label className="text-xs text-medieval-stone block mb-1">
-                  Soldiers to commit (min 200):
-                </label>
-                <input
-                  type="range"
-                  min={200}
-                  max={currentPlayer.soldiers}
-                  step={100}
-                  value={soldiersToCommit}
-                  onChange={(e) => setSoldiersToCommit(Number(e.target.value))}
-                  className="w-full"
-                />
-                <div className="text-center font-medieval text-lg text-medieval-crimson">
-                  {soldiersToCommit} soldiers
-                </div>
-              </div>
-              
+              <p className="text-xs text-medieval-stone mb-2">
+                You have a valid claim on this territory!
+              </p>
               <button
-                onClick={() => handleActionClick(attackActionsForSelected[0])}
+                onClick={() => onOpenCombatPrep(selectedHolding)}
                 className="btn-crimson w-full py-2 rounded"
               >
-                Launch Attack
+                ⚔️ Prepare Attack
               </button>
             </div>
           )}

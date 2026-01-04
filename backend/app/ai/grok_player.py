@@ -1,10 +1,11 @@
 """xAI Grok-based AI player."""
 import re
-from typing import Optional
+from datetime import datetime
+from typing import Optional, Tuple
 from openai import AsyncOpenAI
 
 from app.ai.base import AIPlayer
-from app.models.schemas import GameState, Player, Action, Holding, ActionType
+from app.models.schemas import GameState, Player, Action, Holding, ActionType, AIDecisionLog, AIDecisionLogEntry
 
 
 class GrokPlayer(AIPlayer):
@@ -41,8 +42,10 @@ class GrokPlayer(AIPlayer):
         game_state: GameState,
         player: Player,
         valid_actions: list[Action]
-    ) -> Action:
+    ) -> Tuple[Action, AIDecisionLog]:
         """Choose an action using Grok."""
+        action_types = [a.action_type.value for a in valid_actions]
+        
         if not valid_actions:
             raise ValueError("No valid actions available")
         
@@ -53,10 +56,30 @@ class GrokPlayer(AIPlayer):
 
 {actions_text}
 
-Time to make a strategic decision in this medieval conquest game.
-Evaluate each option and pick the one that gives you the best advantage.
+Choose the BEST action. Priority order (highest to lowest):
+1. claim_title - ALWAYS do this if available (gives VP and income!)
+2. claim_town - Capture unowned towns for 10 gold (gives VP)
+3. attack - Attack enemy holdings with claims (requires 200+ soldiers)
+4. play_card - Play claim cards to enable attacks/captures
+5. build_fortification - Build defenses on owned towns (10 gold)
+6. fake_claim - Fabricate claims if you have gold (35 gold)
+7. end_turn - END YOUR TURN if no high-priority actions available!
+8. recruit - LOW priority, only if you have very few soldiers
 
-What's your move? Reply with just the action number (1-{len(valid_actions)})."""
+IMPORTANT: Choose end_turn over recruit unless you urgently need soldiers.
+Do NOT keep recruiting - it wastes your turn!
+
+Reply with just the action number (1-{len(valid_actions)})."""
+        
+        def make_log(action: Action, reason: str) -> AIDecisionLog:
+            return AIDecisionLog(
+                player_name=player.name,
+                timestamp=datetime.now().isoformat(),
+                valid_actions=action_types,
+                considered=[AIDecisionLogEntry(action=action.action_type.value, status="chosen", reason=reason)],
+                chosen_action=action.action_type.value,
+                reason=reason
+            )
         
         try:
             response = await self._get_completion(self._get_system_prompt(), prompt)
@@ -65,15 +88,26 @@ What's your move? Reply with just the action number (1-{len(valid_actions)})."""
             if numbers:
                 action_idx = int(numbers[0]) - 1
                 if 0 <= action_idx < len(valid_actions):
-                    return valid_actions[action_idx]
+                    chosen = valid_actions[action_idx]
+                    completed = self._complete_action(chosen, game_state, player)
+                    if completed:
+                        return completed, make_log(completed, f"Grok selected #{action_idx+1}: {response[:50]}")
+                    for action in valid_actions:
+                        if action.action_type == ActionType.END_TURN:
+                            return action, make_log(action, "Fallback after incomplete action")
             
-            return valid_actions[0]
-            
-        except Exception:
             for action in valid_actions:
                 if action.action_type == ActionType.END_TURN:
-                    return action
-            return valid_actions[0]
+                    return action, make_log(action, "Parse failed, defaulting to end_turn")
+            fallback = valid_actions[0]
+            return fallback, make_log(fallback, "All fallbacks exhausted")
+            
+        except Exception as e:
+            for action in valid_actions:
+                if action.action_type == ActionType.END_TURN:
+                    return action, make_log(action, f"Error: {str(e)[:50]}")
+            fallback = valid_actions[0]
+            return fallback, make_log(fallback, f"Error fallback: {str(e)[:50]}")
     
     async def decide_combat_commitment(
         self,

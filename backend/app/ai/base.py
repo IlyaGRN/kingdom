@@ -1,7 +1,7 @@
 """Abstract base class for AI players."""
 from abc import ABC, abstractmethod
 from typing import Optional
-from app.models.schemas import GameState, Player, Action, Holding
+from app.models.schemas import GameState, Player, Action, Holding, ActionType, CardType, HoldingType
 
 
 class AIPlayer(ABC):
@@ -156,6 +156,62 @@ class AIPlayer(ABC):
             lines.append(action_desc)
         
         return "\n".join(lines)
+    
+    def _find_claim_target(self, game_state: GameState, player: Player, card) -> Optional[Holding]:
+        """Find a valid target for a claim card.
+        
+        Claim cards target specific counties. Find a town in that county
+        that the player doesn't already own.
+        """
+        effect = card.effect
+        effect_str = effect.value if hasattr(effect, 'value') else str(effect)
+        
+        # Claim cards target specific counties
+        target_county = None
+        if effect_str.startswith("claim_"):
+            target_county = effect_str.replace("claim_", "").upper()
+        
+        if not target_county:
+            return None
+        
+        # Find towns in the target county that we don't own
+        for holding in game_state.holdings:
+            if holding.holding_type == HoldingType.TOWN and holding.county == target_county:
+                if holding.owner_id != player.id:
+                    return holding
+        
+        return None
+    
+    def _complete_action(self, action: Action, game_state: GameState, player: Player) -> Optional[Action]:
+        """Complete an action with missing fields.
+        
+        Some actions (like PLAY_CARD for claim cards) require additional fields
+        that are not populated by get_valid_actions(). This method fills them in.
+        
+        Returns None if the action cannot be completed (e.g., no valid target).
+        """
+        if action.action_type == ActionType.PLAY_CARD:
+            card = game_state.cards.get(action.card_id)
+            if card and card.card_type == CardType.CLAIM:
+                # Claim cards require a target_holding_id
+                if not action.target_holding_id:
+                    target = self._find_claim_target(game_state, player, card)
+                    if target:
+                        action.target_holding_id = target.id
+                        return action
+                    else:
+                        return None  # No valid target, cannot complete
+            elif card and card.card_type == CardType.BONUS:
+                # Bonus cards don't need extra fields
+                return action
+        
+        elif action.action_type == ActionType.ATTACK:
+            # Attack requires soldiers_count
+            if not action.soldiers_count or action.soldiers_count < 200:
+                action.soldiers_count = min(player.soldiers // 2, max(200, player.soldiers))
+            return action
+        
+        return action
     
     def _get_system_prompt(self) -> str:
         """Get the system prompt for the AI."""
