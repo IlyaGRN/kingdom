@@ -137,11 +137,12 @@ class GameEngine:
                         target_holding_id=holding.id,
                     ))
         
-        # Fake Claim (costs 35 gold to fabricate a claim on any territory)
+        # Fake Claim (costs 35 gold to fabricate a claim on a town only)
+        # Cannot fabricate claims on County, Duchy, or King castles
         if player.gold >= 35:
             for holding in state.holdings:
-                # Can fabricate claim on any territory not already claimed
-                if holding.id not in player.claims:
+                # Can only fabricate claim on TOWNS, not castles
+                if holding.holding_type == HoldingType.TOWN and holding.id not in player.claims:
                     actions.append(Action(
                         action_type=ActionType.FAKE_CLAIM,
                         player_id=player_id,
@@ -556,10 +557,11 @@ class GameEngine:
         return False, "Invalid title claim", None
     
     def _handle_fake_claim(self, action: Action) -> tuple[bool, str, None]:
-        """Handle fabricating a claim on any territory (35 gold).
+        """Handle fabricating a claim on a town (35 gold).
         
         This establishes a claim that allows attacking or capturing the territory.
         Does not immediately take the territory.
+        Cannot fabricate claims on County, Duchy, or King castles.
         """
         state = self.state
         player = next((p for p in state.players if p.id == action.player_id), None)
@@ -570,6 +572,10 @@ class GameEngine:
         
         if not holding:
             return False, "Holding not found", None
+        
+        # Cannot fabricate claims on castles - only towns
+        if holding.holding_type != HoldingType.TOWN:
+            return False, "Cannot fabricate claims on castles. Only towns can be targeted.", None
         
         # Check if player already has a claim on this holding
         if holding.id in player.claims:
