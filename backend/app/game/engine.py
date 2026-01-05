@@ -303,7 +303,14 @@ class GameEngine:
         """
         state = self.state
         
-        # Validate it's the player's turn
+        # Special case: DEFEND action is allowed during COMBAT phase
+        if action.action_type == ActionType.DEFEND:
+            if state.phase != GamePhase.COMBAT:
+                return False, "No combat to defend", None
+            # Defender validation is done in _handle_defend
+            return self._handle_defend(action)
+        
+        # Validate it's the player's turn for all other actions
         if state.phase != GamePhase.PLAYER_TURN:
             return False, "Not in player turn phase", None
         
@@ -711,6 +718,8 @@ class GameEngine:
                 attacker_soldiers=soldiers,
                 attacker_cards=action.attack_cards or [],
             )
+            # Change phase to COMBAT to pause game until human responds
+            state.phase = GamePhase.COMBAT
             state.action_log.append(action)
             save_game(state)
             return True, "Awaiting defender response", None
@@ -825,8 +834,9 @@ class GameEngine:
         if attacker.has_big_war_effect:
             attacker.has_big_war_effect = False
         
-        # Clear pending combat
+        # Clear pending combat and restore player turn phase
         state.pending_combat = None
+        state.phase = GamePhase.PLAYER_TURN
         state.war_fought_this_turn = True
         state.action_log.append(action)
         save_game(state)

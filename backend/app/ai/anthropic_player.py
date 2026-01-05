@@ -48,18 +48,18 @@ class AnthropicPlayer(AIPlayer):
 
 {actions_text}
 
-Choose the BEST action. Priority order (highest to lowest):
-1. claim_title - ALWAYS do this if available (gives VP and income!)
-2. claim_town - Capture unowned towns for 10 gold (gives VP)
-3. attack - Attack enemy holdings with claims (requires 200+ soldiers)
-4. play_card - Play claim cards to enable attacks/captures
-5. build_fortification - Build defenses on owned towns (10 gold)
-6. fake_claim - Fabricate claims if you have gold (35 gold)
-7. end_turn - END YOUR TURN if no high-priority actions available!
-8. recruit - LOW priority, only if you have very few soldiers
+BE AGGRESSIVE! Choose the BEST action. Priority order (highest to lowest):
+1. attack - ATTACK enemies whenever possible! War brings victory! (requires 200+ soldiers)
+2. claim_title - ALWAYS claim titles immediately (gives VP!)
+3. claim_town - Capture unowned towns for 10 gold
+4. play_card - Play claim cards to enable MORE ATTACKS
+5. fake_claim - Fabricate claims on enemy towns to attack them! (35 gold)
+6. build_fortification - Only if no attack options available
+7. end_turn - Only when no aggressive moves remain
+8. recruit - Only to prepare for attacks
 
-IMPORTANT: Choose end_turn over recruit unless you urgently need soldiers.
-Do NOT keep recruiting - it wastes your turn!
+IMPORTANT: You are a WARLORD. Attack first! Every attack weakens your enemies.
+If you can attack, DO IT. Expansion through conquest is the path to victory!
 
 Respond with ONLY the number of your chosen action (1-{len(valid_actions)})."""
         

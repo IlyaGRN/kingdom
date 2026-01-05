@@ -4,6 +4,7 @@ import MainMenu from './components/MainMenu'
 import GameSetup from './components/GameSetup'
 import GameBoard from './components/GameBoard'
 import SimulationView from './components/SimulationView'
+import ErrorBoundary from './components/ErrorBoundary'
 
 type Screen = 'menu' | 'setup' | 'game' | 'simulation'
 
@@ -29,6 +30,7 @@ function App() {
   }
 
   return (
+    <ErrorBoundary>
     <div className="min-h-screen">
       {screen === 'menu' && (
         <MainMenu 
@@ -52,6 +54,7 @@ function App() {
         <SimulationView onBack={handleBackToMenu} />
       )}
     </div>
+    </ErrorBoundary>
   )
 }
 

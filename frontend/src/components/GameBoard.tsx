@@ -193,11 +193,12 @@ export default function GameBoard({ onBack }: GameBoardProps) {
               player_id: currentPlayer.id
             })
           })
+          
           // Refresh game state
           const response = await fetch(`/api/games/${currentGameId}`)
           if (response.ok) {
-            const { state } = await response.json()
-            setGameState(state)
+            const state = await response.json()  // API returns state directly, not {state: ...}
+            if (state) setGameState(state)
           }
         } catch (error) {
           console.error('Failed to force end turn:', error)
@@ -380,13 +381,22 @@ export default function GameBoard({ onBack }: GameBoardProps) {
     humanPlayer && 
     gameState.pending_combat.defender_id === humanPlayer.id
 
-  // Get data for defense modal
-  const defenseModalData = showDefenseModal && gameState?.pending_combat ? {
-    pendingCombat: gameState.pending_combat,
-    targetHolding: gameState.holdings.find(h => h.id === gameState.pending_combat!.target_holding_id)!,
-    attacker: gameState.players.find(p => p.id === gameState.pending_combat!.attacker_id)!,
-    defender: humanPlayer!,
-  } : null
+  // Build defense modal data with null safety
+  const defenseModalData = (() => {
+    if (!showDefenseModal || !gameState?.pending_combat || !humanPlayer) return null
+    
+    const targetHolding = gameState.holdings.find(h => h.id === gameState.pending_combat!.target_holding_id)
+    const attacker = gameState.players.find(p => p.id === gameState.pending_combat!.attacker_id)
+    
+    if (!targetHolding || !attacker) return null
+    
+    return {
+      pendingCombat: gameState.pending_combat,
+      targetHolding,
+      attacker,
+      defender: humanPlayer,
+    }
+  })()
 
   if (!gameState) {
     return (
