@@ -337,7 +337,7 @@ export default function SimulationView({ onBack }: SimulationViewProps) {
           {localGameState && (
             <div className="mt-4 pt-4 border-t border-parchment-300">
               <p className="text-sm text-medieval-stone">
-                Round: {localGameState.current_round}/{localGameState.max_rounds}
+                Round: {localGameState.current_round} | Victory at {localGameState.victory_threshold} VP
               </p>
               <p className="text-sm text-medieval-stone">
                 Phase: {localGameState.phase}

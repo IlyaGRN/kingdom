@@ -27,6 +27,9 @@ export default function GameBoard({ onBack }: GameBoardProps) {
     decisionLogs,
     addDecisionLog,
     clearDecisionLogs,
+    combatLogs,
+    addCombatLog,
+    clearCombatLogs,
   } = useGameStore()
 
   const [winner, setWinner] = useState<Player | null>(null)
@@ -137,6 +140,22 @@ export default function GameBoard({ onBack }: GameBoardProps) {
           // Capture decision log if present
           if (result.decision_log) {
             addDecisionLog(result.decision_log)
+          }
+          
+          // Capture combat result if present (AI wars)
+          if (result.combat_result && result.state) {
+            const combat = result.combat_result
+            const attacker = result.state.players.find((p: Player) => p.id === combat.attacker_id)
+            const defender = result.state.players.find((p: Player) => p.id === combat.defender_id)
+            const holding = result.state.holdings.find((h: Holding) => h.id === combat.target_holding_id)
+            
+            addCombatLog({
+              combat,
+              timestamp: Date.now(),
+              attackerName: attacker?.name || 'Unknown',
+              defenderName: defender?.name || null,
+              holdingName: holding?.name || 'Unknown Territory',
+            })
           }
           
           if (result.state) {
@@ -491,10 +510,12 @@ export default function GameBoard({ onBack }: GameBoardProps) {
         />
       )}
 
-      {/* AI Decision Log Panel */}
+      {/* AI Activity Log Panel */}
       <AIDecisionPanel 
         logs={decisionLogs} 
-        onClear={clearDecisionLogs} 
+        combatLogs={combatLogs}
+        onClear={clearDecisionLogs}
+        onClearCombats={clearCombatLogs}
       />
 
       {/* Game over modal */}

@@ -66,26 +66,13 @@ def calculate_attack_bonus(state: GameState, source_holding_id: str | None) -> i
 
 
 def calculate_title_combat_bonus(state: GameState, player_id: str, holding_id: str, is_defending: bool) -> int:
-    """Calculate title-based combat bonuses."""
-    player = next((p for p in state.players if p.id == player_id), None)
-    holding = next((h for h in state.holdings if h.id == holding_id), None)
+    """Calculate title-based combat bonuses.
     
-    if not player or not holding:
-        return 0
-    
-    bonus = 0
-    
-    # Count gets +1 defense in their county (only when defending)
-    if is_defending and player.title in [TitleType.COUNT, TitleType.DUKE, TitleType.KING]:
-        if holding.county and holding.county in player.counties:
-            bonus += 1
-    
-    # Duke gets combat bonus in their duchy
-    if player.title in [TitleType.DUKE, TitleType.KING]:
-        if holding.duchy and holding.duchy in player.duchies:
-            bonus += 1
-    
-    return bonus
+    NOTE: Title combat bonuses have been removed per game rules update.
+    Counts, Dukes, and Kings no longer get military bonuses in combat.
+    This function is kept for API compatibility but always returns 0.
+    """
+    return 0
 
 
 def resolve_combat(

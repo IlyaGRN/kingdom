@@ -1,6 +1,14 @@
 import { create } from 'zustand'
 import { GameState, Action, CombatResult, Holding, AIDecisionLog } from '../types/game'
 
+interface CombatLogEntry {
+  combat: CombatResult
+  timestamp: number
+  attackerName: string
+  defenderName: string | null
+  holdingName: string
+}
+
 interface GameStore {
   // State
   gameState: GameState | null
@@ -8,6 +16,7 @@ interface GameStore {
   validActions: Action[]
   lastCombat: CombatResult | null
   decisionLogs: AIDecisionLog[]
+  combatLogs: CombatLogEntry[]
   isLoading: boolean
   error: string | null
   
@@ -17,7 +26,9 @@ interface GameStore {
   setValidActions: (actions: Action[]) => void
   setLastCombat: (result: CombatResult | null) => void
   addDecisionLog: (log: AIDecisionLog) => void
+  addCombatLog: (entry: CombatLogEntry) => void
   clearDecisionLogs: () => void
+  clearCombatLogs: () => void
   setLoading: (loading: boolean) => void
   setError: (error: string | null) => void
   resetGame: () => void
@@ -36,6 +47,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
   validActions: [],
   lastCombat: null,
   decisionLogs: [],
+  combatLogs: [],
   isLoading: false,
   error: null,
   
@@ -47,7 +59,11 @@ export const useGameStore = create<GameStore>((set, get) => ({
   addDecisionLog: (log) => set((state) => ({ 
     decisionLogs: [...state.decisionLogs.slice(-99), log] // Keep last 100 logs
   })),
+  addCombatLog: (entry) => set((state) => ({
+    combatLogs: [...state.combatLogs.slice(-49), entry] // Keep last 50 combat logs
+  })),
   clearDecisionLogs: () => set({ decisionLogs: [] }),
+  clearCombatLogs: () => set({ combatLogs: [] }),
   setLoading: (loading) => set({ isLoading: loading }),
   setError: (error) => set({ error }),
   
@@ -57,6 +73,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     validActions: [],
     lastCombat: null,
     decisionLogs: [],
+    combatLogs: [],
     isLoading: false,
     error: null,
   }),

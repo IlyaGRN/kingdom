@@ -116,6 +116,11 @@ class AIPlayer(ABC):
         if player.is_king:
             lines.append("YOU ARE THE KING!")
         
+        if player.claims:
+            lines.append(f"\nYour Claims (can attack/capture): {', '.join(player.claims)}")
+        else:
+            lines.append("\nYour Claims: NONE - you need claims to attack! Play claim cards or fabricate claims (35g, towns only)")
+        
         lines.append("\n=== Other Players ===")
         for p in game_state.players:
             if p.id != player.id:
@@ -221,33 +226,48 @@ OBJECTIVE: First to reach 18 Prestige Points (VP) wins!
 
 SCORING:
 - Town = 1 VP
-- County = +2 VP
-- Duchy = +4 VP  
-- King = +6 VP
-- Each round survived as King = +2 VP bonus
+- County title = +2 VP  
+- Duchy title = +4 VP
+- King title = +6 VP
+
+GAME STRUCTURE:
+- 4 counties (X, U, V, Q), each with 3 towns and 1 county castle
+- 2 duchies: XU (counties X+U) and QV (counties Q+V)
+- 1 King's Castle in the center
 
 TITLES (require prerequisites and gold):
-- Count: Own 2/3 towns in a county. Cost: 25 Gold. Bonus: +2 Gold/round, +1 defense in county.
-- Duke: Be Count in 2 counties of same duchy. Cost: 50 Gold. Bonus: +4 Gold/round.
-- King: Be Duke in one duchy + own a town in other duchy. Cost: 75 Gold. Bonus: +8 Gold/round.
+- Count: Own 2 of 3 towns in a county → can claim County Castle (25 Gold)
+- Duke: Be Count in both counties of a duchy → can claim Duchy Castle (50 Gold)  
+- King: Be Duke + own a town in the OTHER duchy → can claim King's Castle (75 Gold)
 
-CLAIMS:
-- You need a valid claim to attack any territory
-- Play claim cards to establish claims on towns
-- Fabricate claims costs 35 Gold
-- Capture unowned towns with a claim for 10 Gold
+CLAIMS - CRITICAL RULE:
+- You CANNOT attack or capture ANY territory without a valid claim!
+- Get claims by: Playing claim cards from your hand, OR fabricating claims (35 Gold, TOWNS ONLY)
+- Cannot fabricate claims on County/Duchy/King castles - must use claim cards
+- With a claim on an UNOWNED town: pay 10 Gold to capture peacefully (claim_town)
+- With a claim on an ENEMY territory: attack with 200+ soldiers
 
 COMBAT:
-- Commit at least 200 soldiers
+- Must commit at least 200 soldiers
 - Strength = 2d6 + (soldiers/100) + modifiers
-- Winner loses half soldiers, loser loses all
+- Winner loses HALF committed soldiers, loser loses ALL
 - Defender wins ties
+- Fortifications give +2 defense per fortification
 
-STRATEGY TIPS:
-- Draw cards automatically each turn - play claim cards wisely
-- Build fortifications (+2 Gold income, +defense) on key holdings
-- Prioritize claiming titles for VP and income bonuses
-- Managing army cap is important (excess soldiers lost)
+ACTIONS (in priority order):
+1. claim_title - Claim a title castle if you meet prerequisites (ALWAYS DO THIS!)
+2. claim_town - Capture unowned town you have a claim on (10 Gold)
+3. attack - Attack enemy territory you have a claim on (200+ soldiers required)
+4. play_card - Play cards from hand (claim cards establish claims, bonus cards give effects)
+5. build_fortification - Build defense on your town (10 Gold, +2 Gold income, +2 defense)
+6. fake_claim - Fabricate a claim on a TOWN (35 Gold) - cannot target castles!
+7. recruit - Buy soldiers (costs gold) - LOW PRIORITY, don't spam this!
+8. end_turn - End your turn when no valuable actions remain
+
+CARD TYPES:
+- Claim cards (claim_x, claim_u, claim_v, claim_q): Establish claims on towns in that county
+- Bonus cards: Big War (double army cap), Adventurer (buy 500 soldiers for 25g), Excalibur (roll twice), etc.
+- Personal/Global events: Applied automatically when drawn
 
 Always respond with just the NUMBER of your chosen action. Nothing else."""
 
