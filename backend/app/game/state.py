@@ -246,44 +246,80 @@ def assign_starting_town(state: GameState, player_id: str, town_id: str) -> Game
 def auto_assign_starting_towns(state: GameState) -> GameState:
     """Auto-assign starting towns to all players.
     
-    Distributes towns evenly across counties so players start spread out.
+    Mode is controlled by config.starting_town_mode:
+    - "fixed": Each player gets a predetermined 5-gold town (one per county)
+    - "random": Random distribution across counties
     """
     import random
+    from app.config import get_settings
     
     if state.phase != GamePhase.SETUP:
         raise ValueError("Game is not in setup phase")
     
-    # Get all unclaimed towns
-    unclaimed_towns = [
-        h for h in state.holdings 
-        if h.holding_type == HoldingType.TOWN and h.owner_id is None
-    ]
+    settings = get_settings()
     
-    # Shuffle for randomness
-    random.shuffle(unclaimed_towns)
-    
-    # Assign one town per player
-    for player in state.players:
-        if player.holdings:
-            continue  # Already has a town
+    if settings.starting_town_mode == "fixed":
+        # Fixed mode: assign predetermined towns (5-gold towns, one per county)
+        fixed_towns = settings.fixed_starting_towns
         
-        if not unclaimed_towns:
-            raise ValueError("Not enough towns for all players")
+        for idx, player in enumerate(state.players):
+            if player.holdings:
+                continue  # Already has a town
+            
+            if idx >= len(fixed_towns):
+                raise ValueError(f"Not enough fixed starting towns for player {idx + 1}")
+            
+            town_id = fixed_towns[idx]
+            town = next((h for h in state.holdings if h.id == town_id), None)
+            
+            if not town:
+                raise ValueError(f"Fixed starting town '{town_id}' not found")
+            if town.owner_id:
+                raise ValueError(f"Fixed starting town '{town_id}' is already claimed")
+            
+            town.owner_id = player.id
+            player.holdings.append(town.id)
+            
+            # Players start with nothing - they gain resources from income phase
+            player.gold = 0
+            player.soldiers = 0
+            player.hand = []  # No starting cards
+            
+            # Update holding in state
+            for i, h in enumerate(state.holdings):
+                if h.id == town.id:
+                    state.holdings[i] = town
+                    break
+    else:
+        # Random mode: shuffle and assign
+        unclaimed_towns = [
+            h for h in state.holdings 
+            if h.holding_type == HoldingType.TOWN and h.owner_id is None
+        ]
         
-        town = unclaimed_towns.pop(0)
-        town.owner_id = player.id
-        player.holdings.append(town.id)
+        random.shuffle(unclaimed_towns)
         
-        # Players start with nothing - they gain resources from income phase
-        player.gold = 0
-        player.soldiers = 0
-        player.hand = []  # No starting cards
-        
-        # Update holding in state
-        for i, h in enumerate(state.holdings):
-            if h.id == town.id:
-                state.holdings[i] = town
-                break
+        for player in state.players:
+            if player.holdings:
+                continue  # Already has a town
+            
+            if not unclaimed_towns:
+                raise ValueError("Not enough towns for all players")
+            
+            town = unclaimed_towns.pop(0)
+            town.owner_id = player.id
+            player.holdings.append(town.id)
+            
+            # Players start with nothing - they gain resources from income phase
+            player.gold = 0
+            player.soldiers = 0
+            player.hand = []  # No starting cards
+            
+            # Update holding in state
+            for i, h in enumerate(state.holdings):
+                if h.id == town.id:
+                    state.holdings[i] = town
+                    break
     
     save_game(state)
     return state
