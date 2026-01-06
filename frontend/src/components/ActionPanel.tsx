@@ -38,12 +38,46 @@ export default function ActionPanel({ onPerformAction, selectedHolding, onOpenCo
       )
     : []
 
-  // Get fake claim actions for selected holding
+  // Get fake claim actions for selected holding (check if action exists for valid action)
   const fakeClaimForSelected = selectedHolding
     ? validActions.filter(
         a => a.action_type === 'fake_claim' && a.target_holding_id === selectedHolding.id
       )
     : []
+  
+  // Check if player can fabricate claim on this holding (show disabled button if not enough gold)
+  const canFabricateClaimOnSelected = selectedHolding && 
+    selectedHolding.holding_type === 'town' && 
+    !(currentPlayer.claims ?? []).includes(selectedHolding.id)
+  
+  // Get build fortification action for selected holding
+  const buildFortForSelected = selectedHolding
+    ? validActions.filter(
+        a => a.action_type === 'build_fortification' && a.target_holding_id === selectedHolding.id
+      )
+    : []
+  
+  // Check if this is the player's own town (for showing fortify option)
+  const isOwnTown = selectedHolding && 
+    selectedHolding.owner_id === currentPlayer.id && 
+    selectedHolding.holding_type === 'town'
+  
+  // Get relocate fortification actions TO selected holding (from any source)
+  const relocateFortToSelected = selectedHolding
+    ? validActions.filter(
+        a => a.action_type === 'relocate_fortification' && a.target_holding_id === selectedHolding.id
+      )
+    : []
+  
+  // Get relocate fortification actions FROM selected holding (to any target)
+  const relocateFortFromSelected = selectedHolding
+    ? validActions.filter(
+        a => a.action_type === 'relocate_fortification' && a.source_holding_id === selectedHolding.id
+      )
+    : []
+  
+  // Check if player has fortifications on selected holding
+  const playerFortsOnSelected = selectedHolding?.fortifications_by_player?.[currentPlayer.id] ?? 0
 
   // Get claim town actions for selected holding (10g to capture unowned with claim)
   const claimTownForSelected = selectedHolding
@@ -177,18 +211,27 @@ export default function ActionPanel({ onPerformAction, selectedHolding, onOpenCo
             </div>
           )}
 
-          {/* Selected holding fake claim */}
-          {selectedHolding && fakeClaimForSelected.length > 0 && (
+          {/* Selected holding fake claim - always show if it's a valid target, but disable if not enough gold */}
+          {selectedHolding && canFabricateClaimOnSelected && (
             <div className="p-3 bg-yellow-50 rounded border border-yellow-200">
               <h3 className="font-medieval text-sm text-medieval-gold mb-2">
                 Fabricate Claim on {selectedHolding.name}
               </h3>
-              <button
-                onClick={() => handleActionClick(fakeClaimForSelected[0])}
-                className="btn-medieval w-full py-2 rounded"
-              >
-                Pay 35 Gold to Fabricate Claim
-              </button>
+              {fakeClaimForSelected.length > 0 ? (
+                <button
+                  onClick={() => handleActionClick(fakeClaimForSelected[0])}
+                  className="btn-medieval w-full py-2 rounded"
+                >
+                  Pay 35 Gold to Fabricate Claim
+                </button>
+              ) : (
+                <button
+                  disabled
+                  className="w-full py-2 rounded bg-gray-300 text-gray-500 cursor-not-allowed font-medieval"
+                >
+                  Need 35 Gold ({currentPlayer.gold} available)
+                </button>
+              )}
             </div>
           )}
 
@@ -276,54 +319,94 @@ export default function ActionPanel({ onPerformAction, selectedHolding, onOpenCo
             </div>
           )}
 
-          {/* Build fortification */}
-          {groupedActions.build_fortification && (
-            <div className="space-y-1">
-              <span className="text-xs text-medieval-stone">
-                Fortify (10 Gold, {4 - (currentPlayer.fortifications_placed || 0)} remaining):
-              </span>
-              <div className="max-h-40 overflow-y-auto space-y-1">
-                {groupedActions.build_fortification.map((action, idx) => {
-                  const holding = gameState.holdings.find(h => h.id === action.target_holding_id)
-                  return (
-                    <button
-                      key={idx}
-                      onClick={() => handleActionClick(action)}
-                      className="w-full p-2 bg-parchment-100 hover:bg-parchment-200 rounded transition-colors text-left"
-                    >
-                      <span className="text-sm text-medieval-bronze">
-                        🏰 {holding?.name || action.target_holding_id}
-                      </span>
-                    </button>
-                  )
-                })}
-              </div>
+          {/* Build fortification - only show when own town is selected */}
+          {selectedHolding && isOwnTown && (
+            <div className="p-3 bg-amber-50 rounded border border-amber-200">
+              <h3 className="font-medieval text-sm text-amber-800 mb-2">
+                Fortify {selectedHolding.name}
+              </h3>
+              <p className="text-xs text-medieval-stone mb-2">
+                Current fortifications: {selectedHolding.fortification_count}/3 (yours: {playerFortsOnSelected})
+                <br />
+                Your total: {currentPlayer.fortifications_placed || 0}/4
+              </p>
+              
+              {/* Build new fortification */}
+              {buildFortForSelected.length > 0 ? (
+                <button
+                  onClick={() => handleActionClick(buildFortForSelected[0])}
+                  className="w-full py-2 rounded bg-amber-600 hover:bg-amber-700 text-white font-medieval mb-2"
+                >
+                  🏰 Build Fortification (10 Gold)
+                </button>
+              ) : (
+                <button
+                  disabled
+                  className="w-full py-2 rounded bg-gray-300 text-gray-500 cursor-not-allowed font-medieval mb-2"
+                  title={
+                    (currentPlayer.fortifications_placed || 0) >= 4 
+                      ? "Max 4 fortifications placed" 
+                      : currentPlayer.gold < 10 
+                        ? "Need 10 gold" 
+                        : selectedHolding.fortification_count >= 3 
+                          ? "Town has max fortifications" 
+                          : "Cannot build here"
+                  }
+                >
+                  🏰 Build Fortification ({currentPlayer.gold < 10 ? `Need 10g, have ${currentPlayer.gold}` : 'Max reached'})
+                </button>
+              )}
+              
+              {/* Move fortification FROM this town */}
+              {playerFortsOnSelected > 0 && relocateFortFromSelected.length > 0 && (
+                <div className="mt-2 pt-2 border-t border-amber-200">
+                  <span className="text-xs text-medieval-stone block mb-1">Move fortification to:</span>
+                  <div className="max-h-24 overflow-y-auto space-y-1">
+                    {relocateFortFromSelected.map((action, idx) => {
+                      const target = gameState.holdings.find(h => h.id === action.target_holding_id)
+                      return (
+                        <button
+                          key={idx}
+                          onClick={() => handleActionClick(action)}
+                          className="w-full p-2 bg-blue-50 hover:bg-blue-100 rounded transition-colors text-left border border-blue-200 text-sm"
+                        >
+                          🔄 → {target?.name} (10 Gold)
+                        </button>
+                      )
+                    })}
+                  </div>
+                </div>
+              )}
+              
+              {/* Move fortification TO this town */}
+              {relocateFortToSelected.length > 0 && (
+                <div className="mt-2 pt-2 border-t border-amber-200">
+                  <span className="text-xs text-medieval-stone block mb-1">Move fortification from:</span>
+                  <div className="max-h-24 overflow-y-auto space-y-1">
+                    {relocateFortToSelected.map((action, idx) => {
+                      const source = gameState.holdings.find(h => h.id === action.source_holding_id)
+                      return (
+                        <button
+                          key={idx}
+                          onClick={() => handleActionClick(action)}
+                          className="w-full p-2 bg-blue-50 hover:bg-blue-100 rounded transition-colors text-left border border-blue-200 text-sm"
+                        >
+                          🔄 {source?.name} → here (10 Gold)
+                        </button>
+                      )
+                    })}
+                  </div>
+                </div>
+              )}
             </div>
           )}
-
-          {/* Relocate fortification (only when all 4 placed) */}
-          {groupedActions.relocate_fortification && (
-            <div className="space-y-1">
-              <span className="text-xs text-medieval-stone">
-                Relocate Fortification (all 4 placed):
+          
+          {/* Hint to select a town for fortification */}
+          {!selectedHolding && (currentPlayer.fortifications_placed || 0) < 4 && currentPlayer.gold >= 10 && groupedActions.build_fortification && (
+            <div className="p-2 bg-amber-50/50 rounded border border-amber-100 text-center">
+              <span className="text-xs text-amber-600">
+                🏰 Select one of your towns to build fortifications
               </span>
-              <div className="max-h-40 overflow-y-auto space-y-1">
-                {groupedActions.relocate_fortification.map((action, idx) => {
-                  const source = gameState.holdings.find(h => h.id === action.source_holding_id)
-                  const target = gameState.holdings.find(h => h.id === action.target_holding_id)
-                  return (
-                    <button
-                      key={idx}
-                      onClick={() => handleActionClick(action)}
-                      className="w-full p-2 bg-blue-50 hover:bg-blue-100 rounded transition-colors text-left border border-blue-200"
-                    >
-                      <span className="text-sm text-blue-800">
-                        🔄 {source?.name} → {target?.name}
-                      </span>
-                    </button>
-                  )
-                })}
-              </div>
             </div>
           )}
 

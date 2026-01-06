@@ -100,8 +100,8 @@ class GameEngine:
                                 target_holding_id=holding.id,
                             ))
         
-        # Relocate fortification (only when all 4 are placed)
-        if player.fortifications_placed >= 4:
+        # Relocate fortification (costs 10 gold, available when player has at least one fortification)
+        if player.gold >= 10:
             for source in state.holdings:
                 player_forts_here = source.fortifications_by_player.get(player_id, 0)
                 if player_forts_here > 0:
@@ -632,7 +632,7 @@ class GameEngine:
         return True, f"Captured {holding.name}!", None
     
     def _handle_relocate_fortification(self, action: Action) -> tuple[bool, str, None]:
-        """Handle relocating a fortification when all 4 are placed."""
+        """Handle relocating a fortification (costs 10 gold)."""
         state = self.state
         player = next((p for p in state.players if p.id == action.player_id), None)
         
@@ -642,8 +642,9 @@ class GameEngine:
         if not source or not target:
             return False, "Invalid holdings", None
         
-        if player.fortifications_placed < 4:
-            return False, "Can only relocate when all 4 fortifications are placed", None
+        # Check player has enough gold
+        if player.gold < 10:
+            return False, "Not enough gold (need 10)", None
         
         # Check source has player's fortification
         if player.id not in source.fortifications_by_player or source.fortifications_by_player[player.id] <= 0:
@@ -661,6 +662,9 @@ class GameEngine:
         if player_forts_on_target >= 2:
             return False, "You already have 2 fortifications on this town", None
         
+        # Charge gold
+        player.gold -= 10
+        
         # Relocate the fortification
         source.fortifications_by_player[player.id] -= 1
         source.fortification_count -= 1
@@ -673,7 +677,7 @@ class GameEngine:
         state.action_log.append(action)
         save_game(state)
         
-        return True, f"Relocated fortification from {source.name} to {target.name}", None
+        return True, f"Relocated fortification from {source.name} to {target.name} (10 gold)", None
     
     def _handle_attack(self, action: Action) -> tuple[bool, str, Optional[CombatResult]]:
         """Handle attacking a holding.
