@@ -73,9 +73,11 @@ export default function Board({ onHoldingClick }: BoardProps) {
             top: `${holding.position_y * 100}%`,
             ...getOwnerStyle(holding),
           }}
-          title={`${holding.name} | Gold: ${holding.gold_value} | Soldiers: ${holding.soldier_value}${
+          title={`${holding.name}${holding.is_capitol ? ' ★ CAPITOL' : ''} | Gold: ${holding.gold_value} | Soldiers: ${holding.soldier_value}${
             holding.defense_modifier !== 0 ? ` | Defense: ${formatDefenseModifier(holding.defense_modifier)}` : ''
-          }${holding.attack_modifier !== 0 ? ` | Attack: +${holding.attack_modifier}` : ''}`}
+          }${holding.attack_modifier !== 0 ? ` | Attack: +${holding.attack_modifier}` : ''}${
+            holding.is_capitol ? ' | Fortify for Count title!' : ''
+          }`}
         >
           {/* Holding content */}
           <div className="absolute inset-0 flex items-center justify-center transform -rotate-45">
@@ -97,6 +99,12 @@ export default function Board({ onHoldingClick }: BoardProps) {
             {holding.holding_type === 'town' && (
               <div className="flex flex-col items-center">
                 <div className="w-3 h-3 bg-white rounded-sm" />
+                {/* Capitol star indicator */}
+                {holding.is_capitol && (
+                  <div className="absolute -top-2 left-1/2 transform -translate-x-1/2 text-yellow-300 text-[10px] font-bold drop-shadow-md" title="Capitol - Fortify for Count title!">
+                    ★
+                  </div>
+                )}
               </div>
             )}
             

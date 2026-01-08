@@ -79,6 +79,7 @@ export interface Holding {
   fortification_count: number  // 0-3
   defense_modifier: number  // Dice modifier for defense
   attack_modifier: number   // Dice modifier for attacking (Umbrith)
+  is_capitol: boolean  // County capitol - fortifying gives Count title prerequisite
   fortifications_by_player: Record<string, number>  // Track who placed forts
   position_x: number
   position_y: number

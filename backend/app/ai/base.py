@@ -238,9 +238,14 @@ GAME STRUCTURE:
 - 1 King's Castle in the center
 
 TITLES (require prerequisites and gold):
-- Count: Own 2 of 3 towns in a county → can claim County Castle (25 Gold)
+- Count: Own 2 of 3 towns in a county OR own a fortified Capitol (1 fort) → claim County Castle (25 Gold)
 - Duke: Be Count in both counties of a duchy → can claim Duchy Castle (50 Gold)  
 - King: Be Duke + own a town in the OTHER duchy → can claim King's Castle (75 Gold)
+
+CAPITOLS - STRATEGIC SHORTCUT TO COUNT:
+- Each county has a Capitol: X=Xythera, U=Umbrith, V=Valoria, Q=Quindara
+- Owning a Capitol with just 1 fortification lets you become Count!
+- This is faster than conquering 2 towns - fortify your Capitol ASAP!
 
 CLAIMS - CRITICAL RULE:
 - You CANNOT attack or capture ANY territory without a valid claim!
@@ -262,7 +267,7 @@ AGGRESSIVE STRATEGY - ACTIONS (in priority order):
 3. claim_town - Capture unowned towns for 10 gold
 4. play_card - Play claim cards to enable MORE ATTACKS, play combat bonus cards aggressively
 5. fake_claim - Fabricate claims on enemy towns to enable attacks (35 Gold) - BE AGGRESSIVE!
-6. build_fortification - Only if you have no attack options
+6. build_fortification - Fortify your CAPITOL first (gives Count title with just 1 fort!)
 7. recruit - Only if you need soldiers to attack
 8. end_turn - End your turn when no attack or expansion options remain
 

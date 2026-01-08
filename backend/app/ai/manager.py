@@ -166,7 +166,7 @@ class SimpleAIPlayer(AIPlayer):
                 chosen_reason = f"Claiming title at {target_id} (prerequisites met, have enough gold)"
                 considered.append(AIDecisionLogEntry(action="claim_title", status="chosen", reason=chosen_reason))
             else:
-                considered.append(AIDecisionLogEntry(action="claim_title", status="unavailable", reason="Prerequisites not met or not enough gold (Count: 2 towns + 25g, Duke: 2 counties + 50g, King: 1 duchy + town in other duchy + 75g)"))
+                considered.append(AIDecisionLogEntry(action="claim_title", status="unavailable", reason="Prerequisites not met or not enough gold (Count: 2 towns OR fortified capitol + 25g, Duke: 2 counties + 50g, King: 1 duchy + town in other duchy + 75g)"))
         
         # 3. Capture unowned towns (costs 10 gold, requires claim)
         if not chosen_action:

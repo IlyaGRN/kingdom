@@ -124,6 +124,7 @@ class Holding(BaseModel):
     fortification_count: int = Field(default=0, ge=0, le=3)  # Max 3 per town
     defense_modifier: int = Field(default=0)  # Dice modifier for defense
     attack_modifier: int = Field(default=0)  # Dice modifier for attacking (Umbrith)
+    is_capitol: bool = False  # County capitol - fortifying gives claim to Count title
     
     # Track who placed fortifications (player_id -> count)
     fortifications_by_player: dict[str, int] = Field(default_factory=dict)

@@ -71,6 +71,7 @@ def create_board() -> list[Holding]:
             gold_value=3,
             soldier_value=300,
             defense_modifier=1,  # +1 dice when defending
+            is_capitol=True,  # Capitol of County X
             position_x=X_CENTER[0] + TOWN_OFFSET_DOWN_TR[0],
             position_y=X_CENTER[1] + TOWN_OFFSET_DOWN_TR[1],
         ),
@@ -127,6 +128,7 @@ def create_board() -> list[Holding]:
             soldier_value=400,
             defense_modifier=0,
             attack_modifier=1,  # +1 dice when attacking FROM this town
+            is_capitol=True,  # Capitol of County U
             position_x=U_CENTER[0] + TOWN_OFFSET_UP_BR[0],
             position_y=U_CENTER[1] + TOWN_OFFSET_UP_BR[1],
         ),
@@ -158,6 +160,7 @@ def create_board() -> list[Holding]:
             gold_value=3,
             soldier_value=300,
             defense_modifier=1,  # +1 dice when defending
+            is_capitol=True,  # Capitol of County V
             position_x=V_CENTER[0] + TOWN_OFFSET_UP_TOP[0],
             position_y=V_CENTER[1] + TOWN_OFFSET_UP_TOP[1],
         ),
@@ -213,6 +216,7 @@ def create_board() -> list[Holding]:
             gold_value=10,
             soldier_value=100,
             defense_modifier=-2,  # -2 dice when defending (weak walls)
+            is_capitol=True,  # Capitol of County Q
             position_x=Q_CENTER[0] + TOWN_OFFSET_DOWN_BOT[0],
             position_y=Q_CENTER[1] + TOWN_OFFSET_DOWN_BOT[1],
         ),
@@ -405,3 +409,17 @@ def get_town_county(town_id: str) -> str | None:
         if town_id in get_towns_in_county(county):
             return county
     return None
+
+
+# Capitol towns for each county
+CAPITOLS: dict[str, str] = {
+    "X": "xythera",
+    "U": "umbrith",
+    "V": "valoria",
+    "Q": "quindara",
+}
+
+
+def get_capitol_for_county(county: str) -> str | None:
+    """Get the capitol town ID for a county."""
+    return CAPITOLS.get(county)

@@ -305,17 +305,26 @@ export default function ActionPanel({ onPerformAction, selectedHolding, onOpenCo
           {groupedActions.claim_title && (
             <div className="space-y-1">
               <span className="text-xs text-medieval-stone">Claim Title:</span>
-              {groupedActions.claim_title.map((action, idx) => (
-                <button
-                  key={idx}
-                  onClick={() => handleActionClick(action)}
-                  className="w-full p-2 bg-yellow-50 hover:bg-yellow-100 rounded transition-colors text-left border border-yellow-200"
-                >
-                  <span className="font-medieval text-sm text-medieval-gold">
-                    👑 {action.target_holding_id}
-                  </span>
-                </button>
-              ))}
+              {groupedActions.claim_title.map((action, idx) => {
+                const holding = gameState.holdings.find(h => h.id === action.target_holding_id)
+                const cost = holding?.holding_type === 'county_castle' ? 25 
+                           : holding?.holding_type === 'duchy_castle' ? 50 
+                           : holding?.holding_type === 'king_castle' ? 75 : 0
+                const titleName = holding?.holding_type === 'county_castle' ? `Count of ${action.target_holding_id?.[0]?.toUpperCase()}`
+                               : holding?.holding_type === 'duchy_castle' ? `Duke of ${action.target_holding_id?.slice(0, 2).toUpperCase()}`
+                               : 'King'
+                return (
+                  <button
+                    key={idx}
+                    onClick={() => handleActionClick(action)}
+                    className="w-full p-2 bg-yellow-50 hover:bg-yellow-100 rounded transition-colors text-left border border-yellow-200"
+                  >
+                    <span className="font-medieval text-sm text-medieval-gold">
+                      👑 Claim {titleName} ({cost} Gold)
+                    </span>
+                  </button>
+                )
+              })}
             </div>
           )}
 
@@ -324,12 +333,71 @@ export default function ActionPanel({ onPerformAction, selectedHolding, onOpenCo
             <div className="p-3 bg-amber-50 rounded border border-amber-200">
               <h3 className="font-medieval text-sm text-amber-800 mb-2">
                 Fortify {selectedHolding.name}
+                {selectedHolding.is_capitol && <span className="text-yellow-600"> ★ Capitol</span>}
               </h3>
               <p className="text-xs text-medieval-stone mb-2">
                 Current fortifications: {selectedHolding.fortification_count}/3 (yours: {playerFortsOnSelected})
                 <br />
                 Your total: {currentPlayer.fortifications_placed || 0}/4
               </p>
+              
+              {/* Capitol hint - show claim title option if fortified */}
+              {selectedHolding.is_capitol && playerFortsOnSelected >= 1 && (() => {
+                // Find the claim_title action for this county's castle
+                const countyId = selectedHolding.county
+                const castleId = `${countyId?.toLowerCase()}_castle`
+                const claimAction = validActions.find(
+                  a => a.action_type === 'claim_title' && a.target_holding_id === castleId
+                )
+                const hasEnoughGold = currentPlayer.gold >= 25
+                const alreadyCount = (currentPlayer.counties ?? []).includes(countyId ?? '')
+                
+                if (alreadyCount) {
+                  return (
+                    <div className="mb-2 p-2 bg-green-100 rounded border border-green-300">
+                      <p className="text-xs text-green-800 font-bold">
+                        ✓ You are Count of {countyId}!
+                      </p>
+                    </div>
+                  )
+                }
+                
+                return (
+                  <div className="mb-2 p-2 bg-yellow-100 rounded border border-yellow-300">
+                    <p className="text-xs text-yellow-800 font-bold mb-2">
+                      ✓ Fortified Capitol! You can claim Count of {countyId}
+                    </p>
+                    {claimAction ? (
+                      <button
+                        onClick={() => handleActionClick(claimAction)}
+                        className="w-full py-2 rounded bg-yellow-500 hover:bg-yellow-600 text-white font-medieval"
+                      >
+                        👑 Claim Count of {countyId} (25 Gold)
+                      </button>
+                    ) : !hasEnoughGold ? (
+                      <button
+                        disabled
+                        className="w-full py-2 rounded bg-gray-300 text-gray-500 cursor-not-allowed font-medieval"
+                      >
+                        👑 Need 25 Gold (have {currentPlayer.gold})
+                      </button>
+                    ) : (
+                      <p className="text-xs text-red-600">
+                        Cannot claim - check if castle is already owned
+                      </p>
+                    )}
+                  </div>
+                )
+              })()}
+              
+              {/* Capitol hint - need fortification */}
+              {selectedHolding.is_capitol && playerFortsOnSelected === 0 && (
+                <div className="mb-2 p-2 bg-blue-50 rounded border border-blue-200">
+                  <p className="text-xs text-blue-800">
+                    💡 Fortify this Capitol to claim Count title!
+                  </p>
+                </div>
+              )}
               
               {/* Build new fortification */}
               {buildFortForSelected.length > 0 ? (

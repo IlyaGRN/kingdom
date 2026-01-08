@@ -57,11 +57,12 @@ BE AGGRESSIVE! Choose the BEST action. Priority order (highest to lowest):
 3. claim_town - Capture unowned towns for 10 gold
 4. play_card - Play claim cards to enable MORE ATTACKS
 5. fake_claim - Fabricate claims on enemy towns to attack them! (35 gold)
-6. build_fortification - Only if no attack options available
+6. build_fortification - FORTIFY YOUR CAPITOL FIRST! (X=Xythera, U=Umbrith, V=Valoria, Q=Quindara)
+   - A fortified Capitol (1 fort) lets you become Count without 2 towns!
 7. end_turn - Only when no aggressive moves remain
 8. recruit - Only to prepare for attacks
 
-IMPORTANT: You are a WARLORD. Attack first! Every attack weakens your enemies.
+IMPORTANT: You are a WARLORD. Attack first! Fortify your Capitol for a fast path to Count title!
 If you can attack, DO IT. Expansion through conquest is the path to victory!
 
 Respond with ONLY the number of your chosen action (1-{len(valid_actions)})."""

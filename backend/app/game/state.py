@@ -496,9 +496,30 @@ def count_towns_in_county(state: GameState, player_id: str, county: str) -> int:
 
 
 def can_claim_count(state: GameState, player_id: str, county: str) -> bool:
-    """Check if a player can claim Count of a county."""
-    # Need 2/3 towns in the county
-    return count_towns_in_county(state, player_id, county) >= 2
+    """Check if a player can claim Count of a county.
+    
+    Prerequisites (either one):
+    - Own 2 of 3 towns in the county, OR
+    - Own the county's Capitol with at least 1 fortification
+    
+    Capitols: X=Xythera, U=Umbrith, V=Valoria, Q=Quindara
+    """
+    # Option 1: Own 2/3 towns in the county
+    if count_towns_in_county(state, player_id, county) >= 2:
+        return True
+    
+    # Option 2: Own a fortified Capitol
+    from app.game.board import get_capitol_for_county
+    capitol_id = get_capitol_for_county(county)
+    if capitol_id:
+        capitol = next((h for h in state.holdings if h.id == capitol_id), None)
+        if capitol and capitol.owner_id == player_id:
+            # Check if player has at least 1 fortification on the capitol
+            player_forts = capitol.fortifications_by_player.get(player_id, 0)
+            if player_forts >= 1:
+                return True
+    
+    return False
 
 
 def can_claim_duke(state: GameState, player_id: str, duchy: str) -> bool:
