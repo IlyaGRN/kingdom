@@ -211,9 +211,16 @@ class AIPlayer(ABC):
                 return action
         
         elif action.action_type == ActionType.ATTACK:
-            # Attack requires soldiers_count
+            # Attack requires soldiers_count - must be multiples of 100
             if not action.soldiers_count or action.soldiers_count < 200:
-                action.soldiers_count = min(player.soldiers // 2, max(200, player.soldiers))
+                raw_count = min(player.soldiers // 2, max(200, player.soldiers))
+                rounded_count = (raw_count // 100) * 100  # Round down to nearest 100
+                rounded_count = max(200, rounded_count)  # Ensure minimum 200
+                action.soldiers_count = rounded_count
+            else:
+                # Ensure existing soldiers_count is also rounded to 100s
+                action.soldiers_count = (action.soldiers_count // 100) * 100
+                action.soldiers_count = max(200, action.soldiers_count)
             return action
         
         return action

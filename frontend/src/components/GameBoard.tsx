@@ -1,7 +1,7 @@
-import { useEffect, useCallback, useState } from 'react'
+import { useEffect, useCallback, useState, useRef } from 'react'
 import { useGameStore } from '../store/gameStore'
 import { getValidActions, performAction, processIncome, getWinner } from '../api/gameApi'
-import { Action, Holding, Player } from '../types/game'
+import { Action, Holding, Player, DrawnCardInfo } from '../types/game'
 import Board from './Board'
 import PlayerMat from './PlayerMat'
 import ActionPanel from './ActionPanel'
@@ -10,6 +10,7 @@ import ClaimActionModal from './ClaimActionModal'
 import CombatPrepModal from './CombatPrepModal'
 import DefenseModal from './DefenseModal'
 import AIDecisionPanel from './AIDecisionPanel'
+import CardDrawModal from './CardDrawModal'
 
 interface GameBoardProps {
   onBack: () => void
@@ -35,6 +36,10 @@ export default function GameBoard({ onBack }: GameBoardProps) {
   const [winner, setWinner] = useState<Player | null>(null)
   const [showCombat, setShowCombat] = useState(false)
   const [claimModalHolding, setClaimModalHolding] = useState<Holding | null>(null)
+  
+  // Card draw modal state
+  const [drawnCardToShow, setDrawnCardToShow] = useState<DrawnCardInfo | null>(null)
+  const lastShownCardRef = useRef<string | null>(null)
   
   // Combat prep modal state
   const [combatPrepTarget, setCombatPrepTarget] = useState<{
@@ -103,6 +108,33 @@ export default function GameBoard({ onBack }: GameBoardProps) {
     
     checkWinner()
   }, [gameState?.phase, gameState?.id])
+
+  // Show card draw popup when a new card is drawn
+  // For AI players, only show popup for global events (Crusade, etc.), otherwise just log
+  useEffect(() => {
+    if (!gameState?.last_drawn_card) return
+    
+    const cardInfo = gameState.last_drawn_card
+    // Use a unique key to track if we've shown this card already
+    const cardKey = `${cardInfo.card_id}-${cardInfo.player_id}-${gameState.current_round}-${gameState.current_player_idx}`
+    
+    if (lastShownCardRef.current !== cardKey) {
+      lastShownCardRef.current = cardKey
+      
+      // Check if this is an AI player draw
+      const player = gameState.players.find(p => p.id === cardInfo.player_id)
+      const isAI = player?.player_type !== 'human'
+      const isGlobalEvent = cardInfo.card_type === 'global_event'
+      
+      if (isAI && !isGlobalEvent) {
+        // For AI non-global cards, just log instead of showing popup
+        console.log(`${cardInfo.player_name} drew ${cardInfo.is_hidden ? 'a hidden card' : cardInfo.card_name}`)
+      } else {
+        // Show popup for human players and AI global events
+        setDrawnCardToShow(cardInfo)
+      }
+    }
+  }, [gameState?.last_drawn_card, gameState?.current_round, gameState?.current_player_idx, gameState?.players])
 
   // AI turn handling - loop until AI ends turn (with max actions limit)
   useEffect(() => {
@@ -516,6 +548,7 @@ export default function GameBoard({ onBack }: GameBoardProps) {
           attacker={defenseModalData.attacker}
           defender={defenseModalData.defender}
           cards={gameState.cards}
+          holdings={gameState.holdings}
           onDefend={handleDefend}
         />
       )}
@@ -527,6 +560,15 @@ export default function GameBoard({ onBack }: GameBoardProps) {
         onClear={clearDecisionLogs}
         onClearCombats={clearCombatLogs}
       />
+
+      {/* Card draw modal */}
+      {drawnCardToShow && (
+        <CardDrawModal
+          drawnCard={drawnCardToShow}
+          card={gameState.cards[drawnCardToShow.card_id]}
+          onClose={() => setDrawnCardToShow(null)}
+        />
+      )}
 
       {/* Game over modal */}
       {winner && (

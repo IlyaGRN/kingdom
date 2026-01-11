@@ -4,7 +4,7 @@ import random
 from typing import Optional
 from app.models.schemas import (
     GameState, Player, PlayerType, TitleType, GamePhase,
-    Holding, HoldingType, Card, Army, CardType, CardEffect
+    Holding, HoldingType, Card, Army, CardType, CardEffect, DrawnCardInfo
 )
 from app.game.board import create_board, get_towns_in_county
 from app.game.cards import create_deck, shuffle_deck, is_instant_card
@@ -19,6 +19,7 @@ def auto_draw_card(state: GameState, player: Player) -> Optional[str]:
     
     Returns the name of the drawn card, or None if deck is empty.
     Handles instant cards (applied immediately) and regular cards (added to hand).
+    Also populates state.last_drawn_card for UI display.
     """
     if not state.deck:
         # Reshuffle discard pile if needed
@@ -27,16 +28,35 @@ def auto_draw_card(state: GameState, player: Player) -> Optional[str]:
             random.shuffle(state.deck)
             state.discard_pile = []
         else:
+            state.last_drawn_card = None
             return None  # No cards available
     
     card_id = state.deck.pop(0)
     card = state.cards.get(card_id)
     
     if not card:
+        state.last_drawn_card = None
         return None
     
+    is_instant = is_instant_card(card)
+    
+    # Determine if card should be hidden (AI player with bonus card)
+    is_ai = player.player_type != PlayerType.HUMAN
+    is_hidden = is_ai and card.card_type == CardType.BONUS
+    
+    # Create drawn card info for UI display
+    state.last_drawn_card = DrawnCardInfo(
+        card_id=card_id,
+        card_name=card.name,
+        card_type=card.card_type.value,
+        player_id=player.id,
+        player_name=player.name,
+        is_instant=is_instant,
+        is_hidden=is_hidden,
+    )
+    
     # Check if instant card (personal/global events)
-    if is_instant_card(card):
+    if is_instant:
         # Apply instant effect
         _apply_instant_card_effect(state, player, card)
         state.discard_pile.append(card_id)
@@ -77,10 +97,10 @@ def _apply_instant_card_effect(state: GameState, player: Player, card: Card) -> 
     
     elif card.card_type == CardType.GLOBAL_EVENT:
         if card.effect == CardEffect.CRUSADE:
-            # All players lose half gold and soldiers
+            # All players lose half gold and soldiers (soldiers rounded down to 100)
             for p in state.players:
                 p.gold = p.gold // 2
-                p.soldiers = p.soldiers // 2
+                p.soldiers = (p.soldiers // 2 // 100) * 100  # Half, then round down to 100
 
 
 def create_game(player_configs: list[dict]) -> GameState:
@@ -346,6 +366,10 @@ def calculate_income(state: GameState) -> dict[str, dict]:
     
     Returns:
         Dict mapping player_id to {gold: int, soldiers: int}
+        
+    Note: Gold bonus from fortifications only comes from the player's OWN 
+    fortifications on their OWN towns. Fortifications on other players' towns
+    only provide combat bonuses.
     """
     income = {}
     
@@ -360,10 +384,12 @@ def calculate_income(state: GameState) -> dict[str, dict]:
                 gold += holding.gold_value
                 soldiers += holding.soldier_value  # Now actual soldiers (100, 200, etc.)
                 
-                # Fortification bonus: +2 gold per fortification, +5 for second
-                if holding.fortification_count >= 1:
+                # Fortification bonus: only from THIS PLAYER'S fortifications on THEIR OWN towns
+                # +2 gold for first fort, +5 for second = +7 total for 2 forts
+                player_forts = holding.fortifications_by_player.get(player.id, 0)
+                if player_forts >= 1:
                     gold += 2
-                if holding.fortification_count >= 2:
+                if player_forts >= 2:
                     gold += 5  # Total +7 for 2 fortifications
         
         # Title stipends

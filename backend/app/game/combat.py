@@ -20,8 +20,14 @@ def roll_dice_with_excalibur() -> tuple[int, int]:
     return roll1, roll2
 
 
-def calculate_defense_bonus(state: GameState, holding_id: str) -> int:
-    """Calculate defense bonuses for a holding."""
+def calculate_defense_bonus(state: GameState, holding_id: str, defender_id: str | None = None) -> int:
+    """Calculate defense bonuses for a holding.
+    
+    Args:
+        state: Current game state
+        holding_id: ID of the holding being defended
+        defender_id: ID of the defending player (for player-specific fortification bonus)
+    """
     holding = next((h for h in state.holdings if h.id == holding_id), None)
     if not holding:
         return 0
@@ -38,13 +44,17 @@ def calculate_defense_bonus(state: GameState, holding_id: str) -> int:
     elif holding.holding_type == HoldingType.KING_CASTLE:
         bonus += 4
     
-    # Fortification bonus: +1 per fortification, +2 for second fortification
-    if holding.fortification_count >= 1:
+    # Fortification bonus: based on THIS PLAYER'S fortifications on the holding
+    # +1 for first, +2 for second = +3 total for 2 forts
+    if defender_id:
+        player_forts = holding.fortifications_by_player.get(defender_id, 0)
+    else:
+        player_forts = 0
+    
+    if player_forts >= 1:
         bonus += 1
-    if holding.fortification_count >= 2:
+    if player_forts >= 2:
         bonus += 2  # Total +3 for 2 forts
-    if holding.fortification_count >= 3:
-        bonus += 2  # Total +5 for 3 forts
     
     # Town-specific defense modifier (e.g., Velthar +2, Quindara -2)
     bonus += holding.defense_modifier
@@ -52,8 +62,18 @@ def calculate_defense_bonus(state: GameState, holding_id: str) -> int:
     return bonus
 
 
-def calculate_attack_bonus(state: GameState, source_holding_id: str | None) -> int:
-    """Calculate attack bonuses from the source holding."""
+def calculate_attack_bonus(state: GameState, source_holding_id: str | None, attacker_id: str | None = None) -> int:
+    """Calculate attack bonuses from the source holding.
+    
+    Includes:
+    - Holding's attack_modifier (e.g., Umbrith +1)
+    - Fortification bonus when attacking FROM a fortified holding (player's own forts only)
+    
+    Args:
+        state: Current game state
+        source_holding_id: ID of the holding the attack originates from
+        attacker_id: ID of the attacking player (for player-specific fortification bonus)
+    """
     if not source_holding_id:
         return 0
     
@@ -61,8 +81,24 @@ def calculate_attack_bonus(state: GameState, source_holding_id: str | None) -> i
     if not holding:
         return 0
     
+    bonus = 0
+    
     # Town-specific attack modifier (e.g., Umbrith +1 when attacking)
-    return holding.attack_modifier
+    bonus += holding.attack_modifier
+    
+    # Fortification bonus when attacking FROM this holding (player's own forts only)
+    # Same formula as defense: +1 for first, +2 for second
+    if attacker_id:
+        player_forts = holding.fortifications_by_player.get(attacker_id, 0)
+    else:
+        player_forts = 0
+    
+    if player_forts >= 1:
+        bonus += 1
+    if player_forts >= 2:
+        bonus += 2  # Total +3 for 2 forts
+    
+    return bonus
 
 
 def calculate_title_combat_bonus(state: GameState, player_id: str, holding_id: str, is_defending: bool) -> int:
@@ -173,13 +209,22 @@ def resolve_combat(
     
     # Calculate attacker strength
     atk_soldiers_bonus = attacker_soldiers // 100
-    atk_attack_bonus = calculate_attack_bonus(state, source_holding_id)
+    atk_attack_bonus = calculate_attack_bonus(state, source_holding_id, attacker_id)
+    
+    # Add bonus from attacker's fortifications on the TARGET holding
+    # (If attacker has forts on the town they're attacking, they get bonus)
+    attacker_forts_on_target = holding.fortifications_by_player.get(attacker_id, 0)
+    if attacker_forts_on_target >= 1:
+        atk_attack_bonus += 1
+    if attacker_forts_on_target >= 2:
+        atk_attack_bonus += 2  # Total +3 for 2 forts
+    
     atk_title_bonus = calculate_title_combat_bonus(state, attacker_id, target_holding_id, is_defending=False)
     attacker_strength = attacker_roll + atk_soldiers_bonus + atk_attack_bonus + atk_title_bonus
     
     # Calculate defender strength
     def_soldiers_bonus = defender_soldiers // 100
-    def_defense_bonus = calculate_defense_bonus(state, target_holding_id)
+    def_defense_bonus = calculate_defense_bonus(state, target_holding_id, defender_id)
     def_title_bonus = calculate_title_combat_bonus(state, defender_id, target_holding_id, is_defending=True) if defender else 0
     defender_strength = defender_roll + def_soldiers_bonus + def_defense_bonus + def_title_bonus
     
@@ -191,13 +236,16 @@ def resolve_combat(
         if attacker_strength == defender_strength:
             attacker_won = False
     
-    # Calculate losses
+    # Calculate losses - winner keeps soldiers rounded DOWN to nearest 100
+    # Example: 300 committed, win -> remaining = 100 (half=150, round down to 100)
     if attacker_won:
         # Check for Talented Commander (no losses on victory)
         if CardEffect.TALENTED_COMMANDER in attacker_effects:
             attacker_losses = 0
         else:
-            attacker_losses = attacker_soldiers // 2  # Winner loses half
+            # Winner keeps half, rounded down to nearest 100
+            remaining = (attacker_soldiers // 2 // 100) * 100  # Half, then round down to 100
+            attacker_losses = attacker_soldiers - remaining
         defender_losses = defender_soldiers  # Loser loses all
     else:
         attacker_losses = attacker_soldiers  # Loser loses all
@@ -205,7 +253,12 @@ def resolve_combat(
         if defender and CardEffect.TALENTED_COMMANDER in defender_effects:
             defender_losses = 0
         else:
-            defender_losses = defender_soldiers // 2 if defender else 0
+            # Winner keeps half, rounded down to nearest 100
+            if defender:
+                remaining = (defender_soldiers // 2 // 100) * 100
+                defender_losses = defender_soldiers - remaining
+            else:
+                defender_losses = 0
     
     result = CombatResult(
         attacker_id=attacker_id,
@@ -308,6 +361,18 @@ def apply_combat_result(state: GameState, result: CombatResult) -> GameState:
             attacker.is_king = True
             attacker.title = TitleType.KING
             # Note: 6 VP for being king is calculated dynamically in calculate_prestige
+    
+    # Remove all fortifications from the town after combat
+    if holding.holding_type == HoldingType.TOWN and holding.fortification_count > 0:
+        # Decrement each player's fortifications_placed count
+        for player_id, fort_count in holding.fortifications_by_player.items():
+            player = next((p for p in state.players if p.id == player_id), None)
+            if player:
+                player.fortifications_placed = max(0, player.fortifications_placed - fort_count)
+        
+        # Clear fortifications from the holding
+        holding.fortification_count = 0
+        holding.fortifications_by_player = {}
     
     # Log combat
     state.combat_log.append(result)

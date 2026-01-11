@@ -287,9 +287,21 @@ class PendingCombat(BaseModel):
     target_holding_id: str
     attacker_soldiers: int
     attacker_cards: list[str] = Field(default_factory=list)  # Card IDs attacker is using
+    source_holding_id: str | None = None  # Where attacker is attacking from (for attack bonus)
 
 
 # ============ Game State ============
+
+class DrawnCardInfo(BaseModel):
+    """Information about a drawn card for display purposes."""
+    card_id: str
+    card_name: str
+    card_type: str
+    player_id: str
+    player_name: str
+    is_instant: bool = False
+    is_hidden: bool = False  # True if should show "hidden card" (e.g. AI bonus cards)
+
 
 class GameState(BaseModel):
     """Complete game state."""
@@ -305,6 +317,9 @@ class GameState(BaseModel):
     phase: GamePhase = GamePhase.SETUP
     card_drawn_this_turn: bool = False
     war_fought_this_turn: bool = False  # Only one war per turn
+    
+    # Last drawn card (for popup display)
+    last_drawn_card: Optional[DrawnCardInfo] = None
     
     # Global effects active this turn
     forbid_mercenaries_active: bool = False

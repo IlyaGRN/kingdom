@@ -1,307 +1,118 @@
 """Card deck definitions and logic."""
 import random
 from app.models.schemas import Card, CardType, CardEffect
+from app.config import get_settings
 
 
 def create_deck() -> list[Card]:
-    """Create the 34-card game deck.
+    """Create the game card deck based on configuration.
     
-    Deck composition per new rules:
-    
-    Personal Events (instant, 19 cards):
-    - Gold Chest 5 (x4), Gold Chest 10 (x4), Gold Chest 15 (x3), Gold Chest 25 (x3)
-    - Raiders (x5)
-    
-    Global Events (instant, 4 cards):
-    - Crusade (x4)
-    
-    Bonus Cards (player chooses when to use, 35 cards):
-    - Big War (x5), Adventurer (x5), Excalibur (x5), Poisoned Arrows (x5)
-    - Forbid Mercenaries (x3), Talented Commander (x4), Vassal Revolt (x3)
-    - Enforce Peace (x3), Duel (x1), Spy (x1)
-    
-    Claims (player chooses when to use, 30 cards):
-    - Claim X (x7), Claim U (x7), Claim V (x7), Claim Q (x7)
-    - Ultimate Claim (x1), Duchy Claim (x1)
-    
-    Total: 88 cards (but we'll use the 34 specified in original plan)
-    
-    Actually recounting from the rules:
-    - Gold chests: 4+4+3+3 = 14
-    - Raiders: 5
-    - Crusade: 4
-    - Big War: 5
-    - Adventurer: 5
-    - Excalibur: 5
-    - Poisoned Arrows: 5
-    - Forbid Mercenaries: 3
-    - Talented Commander: 4
-    - Vassal Revolt: 3
-    - Enforce Peace: 3
-    - Duel: 1 (implied)
-    - Spy: 1 (implied)
-    - Claims per county: 7 each = 28
-    - Ultimate Claim: 1
-    - Duchy Claim: 1
-    
-    This exceeds 34. Using exact counts from rules.
+    Card quantities are configurable via settings (config.py or .env).
     """
+    settings = get_settings()
     cards = []
     card_id = 0
     
+    def add_cards(count: int, name: str, card_type: CardType, effect: CardEffect, 
+                  description: str, effect_value: int = None, target_county: str = None):
+        nonlocal card_id
+        for _ in range(count):
+            card = Card(
+                id=f"card_{card_id}",
+                name=name,
+                card_type=card_type,
+                effect=effect,
+                description=description,
+            )
+            if effect_value is not None:
+                card.effect_value = effect_value
+            if target_county is not None:
+                card.target_county = target_county
+            cards.append(card)
+            card_id += 1
+    
     # ============ Personal Events (instant) ============
     
-    # Gold Chest 5 (x4)
-    for _ in range(4):
-        cards.append(Card(
-            id=f"card_{card_id}",
-            name="Gold Chest (5)",
-            card_type=CardType.PERSONAL_EVENT,
-            effect=CardEffect.GOLD_5,
-            description="A small treasure! Gain 5 Gold immediately.",
-            effect_value=5,
-        ))
-        card_id += 1
+    add_cards(settings.card_gold_5, "Gold Chest (5)", CardType.PERSONAL_EVENT, 
+              CardEffect.GOLD_5, "A small treasure! Gain 5 Gold immediately.", effect_value=5)
     
-    # Gold Chest 10 (x4)
-    for _ in range(4):
-        cards.append(Card(
-            id=f"card_{card_id}",
-            name="Gold Chest (10)",
-            card_type=CardType.PERSONAL_EVENT,
-            effect=CardEffect.GOLD_10,
-            description="A modest treasure! Gain 10 Gold immediately.",
-            effect_value=10,
-        ))
-        card_id += 1
+    add_cards(settings.card_gold_10, "Gold Chest (10)", CardType.PERSONAL_EVENT,
+              CardEffect.GOLD_10, "A modest treasure! Gain 10 Gold immediately.", effect_value=10)
     
-    # Gold Chest 15 (x3)
-    for _ in range(3):
-        cards.append(Card(
-            id=f"card_{card_id}",
-            name="Gold Chest (15)",
-            card_type=CardType.PERSONAL_EVENT,
-            effect=CardEffect.GOLD_15,
-            description="A fine treasure! Gain 15 Gold immediately.",
-            effect_value=15,
-        ))
-        card_id += 1
+    add_cards(settings.card_gold_15, "Gold Chest (15)", CardType.PERSONAL_EVENT,
+              CardEffect.GOLD_15, "A fine treasure! Gain 15 Gold immediately.", effect_value=15)
     
-    # Gold Chest 25 (x3)
-    for _ in range(3):
-        cards.append(Card(
-            id=f"card_{card_id}",
-            name="Gold Chest (25)",
-            card_type=CardType.PERSONAL_EVENT,
-            effect=CardEffect.GOLD_25,
-            description="A grand treasure! Gain 25 Gold immediately.",
-            effect_value=25,
-        ))
-        card_id += 1
+    add_cards(settings.card_gold_25, "Gold Chest (25)", CardType.PERSONAL_EVENT,
+              CardEffect.GOLD_25, "A grand treasure! Gain 25 Gold immediately.", effect_value=25)
     
-    # Raiders (x5)
-    for _ in range(5):
-        cards.append(Card(
-            id=f"card_{card_id}",
-            name="Raiders",
-            card_type=CardType.PERSONAL_EVENT,
-            effect=CardEffect.RAIDERS,
-            description="Raiders attack! Lose all collected taxes from this turn. Sacrifice a fortification to cancel.",
-        ))
-        card_id += 1
+    add_cards(settings.card_soldiers_100, "Soldiers (100)", CardType.PERSONAL_EVENT,
+              CardEffect.SOLDIERS_100, "Reinforcements arrive! Gain 100 soldiers immediately.", effect_value=100)
+    
+    add_cards(settings.card_soldiers_200, "Soldiers (200)", CardType.PERSONAL_EVENT,
+              CardEffect.SOLDIERS_200, "A warband joins you! Gain 200 soldiers immediately.", effect_value=200)
+    
+    add_cards(settings.card_soldiers_300, "Soldiers (300)", CardType.PERSONAL_EVENT,
+              CardEffect.SOLDIERS_300, "An army rallies! Gain 300 soldiers immediately.", effect_value=300)
+    
+    add_cards(settings.card_raiders, "Raiders", CardType.PERSONAL_EVENT,
+              CardEffect.RAIDERS, "Raiders attack! Lose all collected taxes from this turn.")
     
     # ============ Global Events (instant) ============
     
-    # Crusade (x4)
-    for _ in range(4):
-        cards.append(Card(
-            id=f"card_{card_id}",
-            name="Crusade",
-            card_type=CardType.GLOBAL_EVENT,
-            effect=CardEffect.CRUSADE,
-            description="A holy crusade is called! All players lose half their Gold and half their soldiers.",
-        ))
-        card_id += 1
+    add_cards(settings.card_crusade, "Crusade", CardType.GLOBAL_EVENT,
+              CardEffect.CRUSADE, "A holy crusade is called! All players lose half their Gold and soldiers.")
     
     # ============ Bonus Cards (player chooses when to use) ============
     
-    # Big War (x5)
-    for _ in range(5):
-        cards.append(Card(
-            id=f"card_{card_id}",
-            name="Big War",
-            card_type=CardType.BONUS,
-            effect=CardEffect.BIG_WAR,
-            description="Military expansion! Double your army cap until your next war.",
-        ))
-        card_id += 1
+    add_cards(settings.card_big_war, "Big War", CardType.BONUS,
+              CardEffect.BIG_WAR, "Military expansion! Double your army cap until your next war.")
     
-    # Adventurer (x5)
-    for _ in range(5):
-        cards.append(Card(
-            id=f"card_{card_id}",
-            name="Adventurer",
-            card_type=CardType.BONUS,
-            effect=CardEffect.ADVENTURER,
-            description="A wandering hero! Buy 500 soldiers for 25 Gold (above your cap limit).",
-        ))
-        card_id += 1
+    add_cards(settings.card_adventurer, "Adventurer", CardType.BONUS,
+              CardEffect.ADVENTURER, "A wandering hero! Buy 500 soldiers for 25 Gold (above your cap limit).")
     
-    # Excalibur (x5)
-    for _ in range(5):
-        cards.append(Card(
-            id=f"card_{card_id}",
-            name="Excalibur",
-            card_type=CardType.BONUS,
-            effect=CardEffect.EXCALIBUR,
-            description="Legendary sword! Roll dice twice in combat and take the higher result.",
-        ))
-        card_id += 1
+    add_cards(settings.card_excalibur, "Excalibur", CardType.BONUS,
+              CardEffect.EXCALIBUR, "Legendary sword! Roll dice twice in combat and take the higher result.")
     
-    # Poisoned Arrows (x5)
-    for _ in range(5):
-        cards.append(Card(
-            id=f"card_{card_id}",
-            name="Poisoned Arrows",
-            card_type=CardType.BONUS,
-            effect=CardEffect.POISONED_ARROWS,
-            description="Deadly toxins! Your opponent's dice score is halved in the next combat.",
-        ))
-        card_id += 1
+    add_cards(settings.card_poisoned_arrows, "Poisoned Arrows", CardType.BONUS,
+              CardEffect.POISONED_ARROWS, "Deadly toxins! Your opponent's dice score is halved in combat.")
     
-    # Forbid Mercenaries (x3)
-    for _ in range(3):
-        cards.append(Card(
-            id=f"card_{card_id}",
-            name="Forbid Mercenaries",
-            card_type=CardType.BONUS,
-            effect=CardEffect.FORBID_MERCENARIES,
-            description="Economic sanctions! No player may buy or trade soldiers for one complete turn.",
-        ))
-        card_id += 1
+    add_cards(settings.card_forbid_mercenaries, "Forbid Mercenaries", CardType.BONUS,
+              CardEffect.FORBID_MERCENARIES, "Economic sanctions! No player may buy soldiers for one turn.")
     
-    # Talented Commander (x4)
-    for _ in range(4):
-        cards.append(Card(
-            id=f"card_{card_id}",
-            name="Talented Commander",
-            card_type=CardType.BONUS,
-            effect=CardEffect.TALENTED_COMMANDER,
-            description="Brilliant tactics! You lose no soldiers when winning a combat.",
-        ))
-        card_id += 1
+    add_cards(settings.card_talented_commander, "Talented Commander", CardType.BONUS,
+              CardEffect.TALENTED_COMMANDER, "Brilliant tactics! You lose no soldiers when winning combat.")
     
-    # Vassal Revolt (x3)
-    for _ in range(3):
-        cards.append(Card(
-            id=f"card_{card_id}",
-            name="Vassal Revolt",
-            card_type=CardType.BONUS,
-            effect=CardEffect.VASSAL_REVOLT,
-            description="Rebellion stirs! Higher tier lords may attack their vassals this turn.",
-        ))
-        card_id += 1
+    add_cards(settings.card_vassal_revolt, "Vassal Revolt", CardType.BONUS,
+              CardEffect.VASSAL_REVOLT, "Rebellion stirs! Higher tier lords may attack their vassals this turn.")
     
-    # Enforce Peace (x3)
-    for _ in range(3):
-        cards.append(Card(
-            id=f"card_{card_id}",
-            name="Enforce Peace",
-            card_type=CardType.BONUS,
-            effect=CardEffect.ENFORCE_PEACE,
-            description="The Pope intervenes! No wars may be waged for one complete turn.",
-        ))
-        card_id += 1
+    add_cards(settings.card_enforce_peace, "Enforce Peace", CardType.BONUS,
+              CardEffect.ENFORCE_PEACE, "The Pope intervenes! No wars may be waged for one complete turn.")
     
-    # Duel (x1)
-    cards.append(Card(
-        id=f"card_{card_id}",
-        name="Duel",
-        card_type=CardType.BONUS,
-        effect=CardEffect.DUEL,
-        description="Challenge to single combat! An army-less fight where only dice determine the winner.",
-    ))
-    card_id += 1
+    add_cards(settings.card_duel, "Duel", CardType.BONUS,
+              CardEffect.DUEL, "Challenge to single combat! An army-less fight where only dice decide.")
     
-    # Spy (x1)
-    cards.append(Card(
-        id=f"card_{card_id}",
-        name="Spy",
-        card_type=CardType.BONUS,
-        effect=CardEffect.SPY,
-        description="Intelligence network! View one player's cards or reorder the next 3 cards in the deck.",
-    ))
-    card_id += 1
+    add_cards(settings.card_spy, "Spy", CardType.BONUS,
+              CardEffect.SPY, "Intelligence network! View one player's cards or reorder the deck.")
     
     # ============ Claim Cards ============
     
-    # Claim X (x7)
-    for _ in range(7):
-        cards.append(Card(
-            id=f"card_{card_id}",
-            name="Claim: County X",
-            card_type=CardType.CLAIM,
-            effect=CardEffect.CLAIM_X,
-            description="Press a claim on any town in County X.",
-            target_county="X",
-        ))
-        card_id += 1
+    add_cards(settings.card_claim_x, "Claim: County X", CardType.CLAIM,
+              CardEffect.CLAIM_X, "Press a claim on any town in County X.", target_county="X")
     
-    # Claim U (x7)
-    for _ in range(7):
-        cards.append(Card(
-            id=f"card_{card_id}",
-            name="Claim: County U",
-            card_type=CardType.CLAIM,
-            effect=CardEffect.CLAIM_U,
-            description="Press a claim on any town in County U.",
-            target_county="U",
-        ))
-        card_id += 1
+    add_cards(settings.card_claim_u, "Claim: County U", CardType.CLAIM,
+              CardEffect.CLAIM_U, "Press a claim on any town in County U.", target_county="U")
     
-    # Claim V (x7)
-    for _ in range(7):
-        cards.append(Card(
-            id=f"card_{card_id}",
-            name="Claim: County V",
-            card_type=CardType.CLAIM,
-            effect=CardEffect.CLAIM_V,
-            description="Press a claim on any town in County V.",
-            target_county="V",
-        ))
-        card_id += 1
+    add_cards(settings.card_claim_v, "Claim: County V", CardType.CLAIM,
+              CardEffect.CLAIM_V, "Press a claim on any town in County V.", target_county="V")
     
-    # Claim Q (x7)
-    for _ in range(7):
-        cards.append(Card(
-            id=f"card_{card_id}",
-            name="Claim: County Q",
-            card_type=CardType.CLAIM,
-            effect=CardEffect.CLAIM_Q,
-            description="Press a claim on any town in County Q.",
-            target_county="Q",
-        ))
-        card_id += 1
+    add_cards(settings.card_claim_q, "Claim: County Q", CardType.CLAIM,
+              CardEffect.CLAIM_Q, "Press a claim on any town in County Q.", target_county="Q")
     
-    # Ultimate Claim (x1)
-    cards.append(Card(
-        id=f"card_{card_id}",
-        name="Ultimate Claim",
-        card_type=CardType.CLAIM,
-        effect=CardEffect.ULTIMATE_CLAIM,
-        description="Divine right! Claim any town or title on the board.",
-    ))
-    card_id += 1
+    add_cards(settings.card_ultimate_claim, "Ultimate Claim", CardType.CLAIM,
+              CardEffect.ULTIMATE_CLAIM, "Divine right! Claim any town or title on the board.")
     
-    # Duchy Claim (x1)
-    cards.append(Card(
-        id=f"card_{card_id}",
-        name="Duchy Claim",
-        card_type=CardType.CLAIM,
-        effect=CardEffect.DUCHY_CLAIM,
-        description="Noble heritage! Claim any town or Duke title and above.",
-    ))
-    card_id += 1
+    add_cards(settings.card_duchy_claim, "Duchy Claim", CardType.CLAIM,
+              CardEffect.DUCHY_CLAIM, "Noble heritage! Claim any town or Duke title and above.")
     
     return cards
 

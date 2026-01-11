@@ -7,6 +7,7 @@ interface DefenseModalProps {
   attacker: Player
   defender: Player
   cards: Record<string, Card>
+  holdings: Holding[]
   onDefend: (soldiers: number, cardIds: string[]) => void
 }
 
@@ -16,6 +17,7 @@ export default function DefenseModal({
   attacker,
   defender,
   cards,
+  holdings,
   onDefend,
 }: DefenseModalProps) {
   const [soldiersToCommit, setSoldiersToCommit] = useState(defender.soldiers)
@@ -32,6 +34,16 @@ export default function DefenseModal({
   const attackerCardNames = pendingCombat.attacker_cards
     .map(cardId => cards[cardId]?.name)
     .filter(Boolean)
+
+  // Get source holding for attack bonus display
+  const sourceHolding = pendingCombat.source_holding_id 
+    ? holdings.find(h => h.id === pendingCombat.source_holding_id) 
+    : null
+  
+  // Calculate attack bonus: attack_modifier + fortification bonus
+  const fortCount = sourceHolding?.fortification_count || 0
+  const fortAttackBonus = (fortCount >= 1 ? 1 : 0) + (fortCount >= 2 ? 2 : 0) + (fortCount >= 3 ? 2 : 0)
+  const attackBonus = (sourceHolding?.attack_modifier || 0) + fortAttackBonus
 
   const toggleCard = (cardId: string) => {
     setSelectedCards(prev =>
@@ -64,7 +76,9 @@ export default function DefenseModal({
           <h3 className="font-medieval text-sm text-red-700 mb-2">Enemy Forces:</h3>
           <div className="text-sm text-medieval-stone">
             <div>⚔️ Soldiers committed: <span className="font-bold">{pendingCombat.attacker_soldiers}</span></div>
-            <div>💪 Combat bonus: +{Math.floor(pendingCombat.attacker_soldiers / 100)}</div>
+            {attackBonus > 0 && (
+              <div>🏹 Attack bonus ({sourceHolding?.name}): +{attackBonus}</div>
+            )}
             {attackerCardNames.length > 0 && (
               <div className="mt-1">
                 ✨ Using cards: {attackerCardNames.join(', ')}
@@ -79,7 +93,7 @@ export default function DefenseModal({
           <div className="text-sm text-medieval-stone">
             <div>🛡️ Base defense bonus: +{1 + targetHolding.defense_modifier}</div>
             {targetHolding.fortification_count > 0 && (
-              <div>🏰 Fortification bonus: +{targetHolding.fortification_count + (targetHolding.fortification_count >= 2 ? 2 : 0) + (targetHolding.fortification_count >= 3 ? 2 : 0)}</div>
+              <div>🏰 Fortification bonus: +{(targetHolding.fortification_count >= 1 ? 1 : 0) + (targetHolding.fortification_count >= 2 ? 2 : 0) + (targetHolding.fortification_count >= 3 ? 2 : 0)}</div>
             )}
           </div>
         </div>
@@ -100,9 +114,6 @@ export default function DefenseModal({
           />
           <div className="text-center font-medieval text-xl text-medieval-bronze mt-2">
             {soldiersToCommit} / {maxSoldiers} soldiers
-          </div>
-          <div className="text-center text-xs text-medieval-stone">
-            Combat bonus: +{Math.floor(soldiersToCommit / 100)}
           </div>
           {soldiersToCommit === 0 && (
             <div className="text-center text-xs text-yellow-600 mt-1">

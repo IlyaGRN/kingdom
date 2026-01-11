@@ -328,12 +328,15 @@ export default function ActionPanel({ onPerformAction, selectedHolding, onOpenCo
             </div>
           )}
 
-          {/* Build fortification - only show when own town is selected */}
-          {selectedHolding && isOwnTown && (
+          {/* Build fortification - show for any selected town */}
+          {selectedHolding && selectedHolding.holding_type === 'town' && (
             <div className="p-3 bg-amber-50 rounded border border-amber-200">
               <h3 className="font-medieval text-sm text-amber-800 mb-2">
                 Fortify {selectedHolding.name}
                 {selectedHolding.is_capitol && <span className="text-yellow-600"> ★ Capitol</span>}
+                {!isOwnTown && selectedHolding.owner_id && (
+                  <span className="text-gray-500 text-xs ml-1">(not yours)</span>
+                )}
               </h3>
               <p className="text-xs text-medieval-stone mb-2">
                 Current fortifications: {selectedHolding.fortification_count}/3 (yours: {playerFortsOnSelected})
@@ -341,8 +344,8 @@ export default function ActionPanel({ onPerformAction, selectedHolding, onOpenCo
                 Your total: {currentPlayer.fortifications_placed || 0}/4
               </p>
               
-              {/* Capitol hint - show claim title option if fortified */}
-              {selectedHolding.is_capitol && playerFortsOnSelected >= 1 && (() => {
+              {/* Capitol hint - show claim title option if fortified (only for own towns) */}
+              {isOwnTown && selectedHolding.is_capitol && playerFortsOnSelected >= 1 && (() => {
                 // Find the claim_title action for this county's castle
                 const countyId = selectedHolding.county
                 const castleId = `${countyId?.toLowerCase()}_castle`
@@ -390,8 +393,8 @@ export default function ActionPanel({ onPerformAction, selectedHolding, onOpenCo
                 )
               })()}
               
-              {/* Capitol hint - need fortification */}
-              {selectedHolding.is_capitol && playerFortsOnSelected === 0 && (
+              {/* Capitol hint - need fortification (only for own towns) */}
+              {isOwnTown && selectedHolding.is_capitol && playerFortsOnSelected === 0 && (
                 <div className="mb-2 p-2 bg-blue-50 rounded border border-blue-200">
                   <p className="text-xs text-blue-800">
                     💡 Fortify this Capitol to claim Count title!
@@ -418,7 +421,9 @@ export default function ActionPanel({ onPerformAction, selectedHolding, onOpenCo
                         ? "Need 10 gold" 
                         : selectedHolding.fortification_count >= 3 
                           ? "Town has max fortifications" 
-                          : "Cannot build here"
+                          : playerFortsOnSelected >= 2
+                            ? "You already have 2 fortifications here"
+                            : "Cannot build here"
                   }
                 >
                   🏰 Build Fortification ({currentPlayer.gold < 10 ? `Need 10g, have ${currentPlayer.gold}` : 'Max reached'})
@@ -473,7 +478,7 @@ export default function ActionPanel({ onPerformAction, selectedHolding, onOpenCo
           {!selectedHolding && (currentPlayer.fortifications_placed || 0) < 4 && currentPlayer.gold >= 10 && groupedActions.build_fortification && (
             <div className="p-2 bg-amber-50/50 rounded border border-amber-100 text-center">
               <span className="text-xs text-amber-600">
-                🏰 Select one of your towns to build fortifications
+                🏰 Select any town to build fortifications
               </span>
             </div>
           )}

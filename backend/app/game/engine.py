@@ -211,6 +211,8 @@ class GameEngine:
         
         Attack requires a valid claim on the target territory.
         Player can attack ANY holding they have a claim on (not just adjacent).
+        
+        IMPORTANT: Cannot attack vassals (holdings in your domain) without VASSAL_REVOLT card.
         """
         player_holdings = [h.id for h in state.holdings if h.owner_id == player.id]
         added_targets = set()  # Track to avoid duplicates
@@ -224,7 +226,8 @@ class GameEngine:
                 # Must be owned by another player (not unowned, not own)
                 if adj_holding and adj_holding.owner_id is not None and adj_holding.owner_id != player.id:
                     has_claim = self._has_valid_claim(player, adj_holding)
-                    if has_claim and adj_id not in added_targets:
+                    can_attack = self._can_attack_holding(player, adj_holding)
+                    if has_claim and can_attack and adj_id not in added_targets:
                         actions.append(Action(
                             action_type=ActionType.ATTACK,
                             player_id=player.id,
@@ -241,6 +244,9 @@ class GameEngine:
             claim_holding = next((h for h in state.holdings if h.id == claim_id), None)
             # Must be owned by another player (not unowned, not own)
             if claim_holding and claim_holding.owner_id is not None and claim_holding.owner_id != player.id:
+                # Check vassal protection
+                if not self._can_attack_holding(player, claim_holding):
+                    continue
                 # Use any player holding as source (they're "projecting power")
                 source_holding = player_holdings[0] if player_holdings else None
                 if source_holding:
@@ -278,6 +284,53 @@ class GameEngine:
             return True
         
         return False
+    
+    def _is_holding_in_domain(self, player, holding) -> bool:
+        """Check if a holding is within the player's domain (making its owner a vassal).
+        
+        Vassal relationships:
+        - Count of county X: all holdings in county X are in their domain
+        - Duke of duchy XU: all holdings in counties X and U are in their domain
+        - King: all holdings in the realm are in their domain
+        
+        A player cannot attack holdings in their domain without VASSAL_REVOLT card.
+        """
+        # King controls the entire realm
+        if player.is_king:
+            return True
+        
+        # Duke controls their duchy (both counties)
+        for duchy in player.duchies:
+            duchy_counties = []
+            if duchy == "XU":
+                duchy_counties = ["X", "U"]
+            elif duchy == "QV":
+                duchy_counties = ["Q", "V"]
+            
+            if holding.county in duchy_counties:
+                return True
+            if holding.duchy == duchy:
+                return True
+        
+        # Count controls their county
+        if holding.county in player.counties:
+            return True
+        
+        return False
+    
+    def _can_attack_holding(self, player, holding) -> bool:
+        """Check if player can attack a holding, considering vassal protection.
+        
+        Returns False if:
+        - The holding is in the player's domain (vassal) AND
+        - The player doesn't have VASSAL_REVOLT active
+        """
+        # If holding is in player's domain, need Vassal Revolt to attack
+        if self._is_holding_in_domain(player, holding):
+            if CardEffect.VASSAL_REVOLT not in player.active_effects:
+                return False
+        
+        return True
     
     def _consume_claim(self, player, holding) -> None:
         """Remove the claim used for attack/capture."""
@@ -402,10 +455,10 @@ class GameEngine:
         
         elif card.card_type == CardType.GLOBAL_EVENT:
             if card.effect == CardEffect.CRUSADE:
-                # All players lose half gold and soldiers
+                # All players lose half gold and soldiers (soldiers rounded down to 100)
                 for p in state.players:
                     p.gold = p.gold // 2
-                    p.soldiers = p.soldiers // 2
+                    p.soldiers = (p.soldiers // 2 // 100) * 100  # Half, then round down to 100
                 return "Crusade! All players lost half their gold and soldiers!"
         
         return f"Drew {card.name}"
@@ -702,7 +755,14 @@ class GameEngine:
         if not self._has_valid_claim(player, target):
             return False, "You need a valid claim to attack this territory", None
         
+        # Check vassal protection - cannot attack holdings in your domain without Vassal Revolt
+        if not self._can_attack_holding(player, target):
+            return False, "Cannot attack your vassals! Use Vassal Revolt card first.", None
+        
         soldiers = action.soldiers_count or 200  # Default to minimum
+        # Enforce soldiers must be multiples of 100
+        soldiers = (soldiers // 100) * 100
+        soldiers = max(200, soldiers)  # Minimum 200
         
         if player.soldiers < soldiers:
             return False, "Not enough soldiers", None
@@ -721,6 +781,7 @@ class GameEngine:
                 target_holding_id=action.target_holding_id,
                 attacker_soldiers=soldiers,
                 attacker_cards=action.attack_cards or [],
+                source_holding_id=action.source_holding_id,
             )
             # Change phase to COMBAT to pause game until human responds
             state.phase = GamePhase.COMBAT
@@ -746,6 +807,7 @@ class GameEngine:
             action.player_id,
             action.target_holding_id,
             soldiers,
+            source_holding_id=action.source_holding_id,
             attacker_cards=action.attack_cards or [],
             defender_cards=defender_cards,
             defender_soldiers_override=defender_soldiers if defender else None,
@@ -822,6 +884,7 @@ class GameEngine:
             pending.attacker_id,
             pending.target_holding_id,
             pending.attacker_soldiers,
+            source_holding_id=pending.source_holding_id,
             attacker_cards=pending.attacker_cards,
             defender_cards=action.defense_cards or [],
             defender_soldiers_override=defender_soldiers,

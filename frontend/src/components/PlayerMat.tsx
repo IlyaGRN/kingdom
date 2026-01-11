@@ -8,11 +8,17 @@ interface PlayerMatProps {
   onCardClick?: (cardId: string) => void
 }
 
+interface HoldingIncome {
+  name: string
+  gold: number
+  soldiers: number
+  fortBonus: number  // Gold from fortifications on this holding
+}
+
 interface IncomeBreakdown {
-  goldFromHoldings: number
-  soldiersFromHoldings: number
-  goldFromFortifications: number
+  holdingDetails: HoldingIncome[]
   goldFromTitles: number
+  titleDetails: string  // e.g., "King (+8)" or "Count of X, U (+4)"
   totalGold: number
   totalSoldiers: number
 }
@@ -28,46 +34,57 @@ export default function PlayerMat({ player, isCurrentPlayer, cards, holdings, on
   const armyCap = getArmyCap(player.title, player.has_big_war_effect)
   const isOverCap = player.soldiers > armyCap
 
-  // Calculate income breakdown
+  // Calculate income breakdown with per-holding details
   const calculateIncome = (): IncomeBreakdown => {
-    let goldFromHoldings = 0
-    let soldiersFromHoldings = 0
-    let goldFromFortifications = 0
+    const holdingDetails: HoldingIncome[] = []
+    let totalGold = 0
+    let totalSoldiers = 0
     let goldFromTitles = 0
+    let titleDetails = ''
 
     // Income from player's holdings
     for (const holdingId of player.holdings) {
       const holding = holdings.find(h => h.id === holdingId)
       if (holding) {
-        goldFromHoldings += holding.gold_value
-        soldiersFromHoldings += holding.soldier_value
+        // Fortification bonus: only from THIS PLAYER'S fortifications on THEIR OWN towns
+        // +2 gold for first fort, +5 for second = +7 total for 2 forts
+        const playerForts = holding.fortifications_by_player?.[player.id] ?? 0
+        let fortBonus = 0
+        if (playerForts >= 1) fortBonus += 2
+        if (playerForts >= 2) fortBonus += 5
 
-        // Fortification bonus: +2 gold per first fort, +5 for second
-        if (holding.fortification_count >= 1) {
-          goldFromFortifications += 2
-        }
-        if (holding.fortification_count >= 2) {
-          goldFromFortifications += 5
-        }
+        holdingDetails.push({
+          name: holding.name,
+          gold: holding.gold_value,
+          soldiers: holding.soldier_value,
+          fortBonus,
+        })
+
+        totalGold += holding.gold_value + fortBonus
+        totalSoldiers += holding.soldier_value
       }
     }
 
     // Title stipends
     if (player.is_king) {
       goldFromTitles = 8
+      titleDetails = 'King (+8g)'
     } else if (player.title === 'duke') {
       goldFromTitles = 4 * player.duchies.length
+      titleDetails = `Duke of ${player.duchies.join(', ')} (+${goldFromTitles}g)`
     } else if (player.title === 'count') {
       goldFromTitles = 2 * player.counties.length
+      titleDetails = `Count of ${player.counties.join(', ')} (+${goldFromTitles}g)`
     }
 
+    totalGold += goldFromTitles
+
     return {
-      goldFromHoldings,
-      soldiersFromHoldings,
-      goldFromFortifications,
+      holdingDetails,
       goldFromTitles,
-      totalGold: goldFromHoldings + goldFromFortifications + goldFromTitles,
-      totalSoldiers: soldiersFromHoldings,
+      titleDetails,
+      totalGold,
+      totalSoldiers,
     }
   }
 
@@ -147,9 +164,11 @@ export default function PlayerMat({ player, isCurrentPlayer, cards, holdings, on
         </div>
       </div>
 
-      {/* Income per turn */}
-      <div className="bg-parchment-100 rounded p-2 mb-3">
-        <div className="text-xs font-medieval text-medieval-stone mb-1">Income per turn:</div>
+      {/* Income per turn - with hover tooltip for breakdown */}
+      <div className="bg-parchment-100 rounded p-2 mb-3 relative group cursor-help">
+        <div className="text-xs font-medieval text-medieval-stone mb-1">
+          Income per turn: <span className="text-medieval-stone/50">(hover for details)</span>
+        </div>
         <div className="grid grid-cols-2 gap-2 text-xs">
           <div className="flex justify-between">
             <span className="text-medieval-stone">💰 Gold:</span>
@@ -160,24 +179,61 @@ export default function PlayerMat({ player, isCurrentPlayer, cards, holdings, on
             <span className="font-medieval text-medieval-bronze">+{income.totalSoldiers}</span>
           </div>
         </div>
-        {/* Breakdown (collapsed by default, show on hover) */}
-        <div className="mt-1 pt-1 border-t border-parchment-300 text-xs text-medieval-stone">
-          <div className="flex justify-between">
-            <span>From holdings:</span>
-            <span>+{income.goldFromHoldings}g / +{income.soldiersFromHoldings}s</span>
+        {/* Hover tooltip with per-holding breakdown */}
+        <div className="absolute left-0 right-0 top-full mt-1 hidden group-hover:block z-10">
+          <div className="bg-gray-900 text-white text-xs rounded p-3 shadow-lg mx-1 max-h-64 overflow-y-auto">
+            <div className="font-bold mb-2 text-center border-b border-gray-700 pb-1">Income Breakdown</div>
+            
+            {/* Per-holding breakdown */}
+            {income.holdingDetails.length > 0 ? (
+              <div className="mb-2">
+                <div className="font-bold text-parchment-300 mb-1">Holdings:</div>
+                {income.holdingDetails.map((h, idx) => (
+                  <div key={idx} className="flex justify-between pl-2 py-0.5 border-b border-gray-800 last:border-0">
+                    <span className="truncate mr-2">{h.name}</span>
+                    <span className="whitespace-nowrap">
+                      <span className="text-medieval-gold">+{h.gold + h.fortBonus}g</span>
+                      {h.fortBonus > 0 && <span className="text-gray-400 text-[10px]"> (fort +{h.fortBonus})</span>}
+                      <span className="text-medieval-bronze ml-1">+{h.soldiers}s</span>
+                    </span>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="text-gray-400 text-center mb-2">No holdings</div>
+            )}
+            
+            {/* Title income */}
+            {income.goldFromTitles > 0 && (
+              <div className="flex justify-between pl-2 pt-1 border-t border-gray-700">
+                <span>{income.titleDetails}</span>
+              </div>
+            )}
+            
+            {/* Totals */}
+            <div className="mt-2 pt-2 border-t border-gray-600">
+              <div className="flex justify-between font-bold">
+                <span>Total:</span>
+                <span>
+                  <span className="text-medieval-gold">+{income.totalGold}g</span>
+                  <span className="text-medieval-bronze ml-1">+{income.totalSoldiers}s</span>
+                </span>
+              </div>
+            </div>
+            
+            {/* Army cap info */}
+            <div className="mt-2 pt-2 border-t border-gray-700 text-gray-400">
+              <div className="flex justify-between">
+                <span>Army cap:</span>
+                <span>{armyCap}</span>
+              </div>
+              {isOverCap && (
+                <div className="text-red-400 text-center mt-1">
+                  ⚠️ Over cap! Excess lost at upkeep
+                </div>
+              )}
+            </div>
           </div>
-          {income.goldFromFortifications > 0 && (
-            <div className="flex justify-between">
-              <span>From fortifications:</span>
-              <span>+{income.goldFromFortifications}g</span>
-            </div>
-          )}
-          {income.goldFromTitles > 0 && (
-            <div className="flex justify-between">
-              <span>From titles:</span>
-              <span>+{income.goldFromTitles}g</span>
-            </div>
-          )}
         </div>
       </div>
 

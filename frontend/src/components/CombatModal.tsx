@@ -70,8 +70,8 @@ export default function CombatModal({ combat, players, holdings, onClose }: Comb
               <span className="font-medieval text-medieval-bronze">{combat.attacker_roll}</span>
             </div>
             <div className="flex justify-between items-center mb-1">
-              <span className="text-sm text-medieval-stone">⚔️ Soldiers ({combat.attacker_soldiers_committed}):</span>
-              <span className="font-medieval text-medieval-bronze">+{combat.attacker_soldiers_bonus}</span>
+              <span className="text-sm text-medieval-stone">⚔️ Soldiers:</span>
+              <span className="font-medieval text-medieval-bronze">{combat.attacker_soldiers_committed}</span>
             </div>
             {combat.attacker_attack_bonus > 0 && (
               <div className="flex justify-between items-center mb-1">
@@ -98,8 +98,8 @@ export default function CombatModal({ combat, players, holdings, onClose }: Comb
               <span className="font-medieval text-medieval-bronze">{combat.defender_roll}</span>
             </div>
             <div className="flex justify-between items-center mb-1">
-              <span className="text-sm text-medieval-stone">🛡️ Soldiers ({combat.defender_soldiers_committed}):</span>
-              <span className="font-medieval text-medieval-bronze">+{combat.defender_soldiers_bonus}</span>
+              <span className="text-sm text-medieval-stone">🛡️ Soldiers:</span>
+              <span className="font-medieval text-medieval-bronze">{combat.defender_soldiers_committed}</span>
             </div>
             {combat.defender_defense_bonus > 0 && (
               <div className="flex justify-between items-center mb-1">

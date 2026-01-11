@@ -1,42 +1,31 @@
 """Board topology and holding definitions."""
+import json
+from pathlib import Path
 from app.models.schemas import Holding, HoldingType
+
+
+def _load_positions() -> dict[str, dict[str, float]]:
+    """Load holding positions from config file."""
+    config_path = Path(__file__).parent.parent / "config" / "holding_positions.json"
+    with open(config_path) as f:
+        config = json.load(f)
+    return config["holdings"]
 
 
 def create_board() -> list[Holding]:
     """Create the game board with all holdings.
     
-    Board Layout (100% Symmetrical):
-    ┌─────────────┬─────────────┐
-    │  County U   │  County V   │
-    │   (top-left)│  (top-right)│
-    ├──XU─────────┼─────────QV──┤  <- Duchy castles + King in center row
-    │  County X   │  County Q   │
-    │(bottom-left)│(bottom-right│
-    └─────────────┴─────────────┘
-    
-    - King's Castle: center (0.50, 0.50)
-    - Duchy XU Castle: left of king (0.25, 0.50)
-    - Duchy QV Castle: right of king (0.75, 0.50)
-    - County castles: center of each quadrant
-    - Towns: symmetrically arranged around each county castle
+    Positions are loaded from config/holding_positions.json for easy adjustment.
     """
+    positions = _load_positions()
     holdings = []
     
-    # Town offsets from county castle center (triangular arrangement)
-    # For TOP quadrants (U, V): triangle pointing UP (town above, two below)
-    TOWN_OFFSET_UP_TOP = (0.0, -0.12)
-    TOWN_OFFSET_UP_BL = (-0.10, 0.08)
-    TOWN_OFFSET_UP_BR = (0.10, 0.08)
-    
-    # For BOTTOM quadrants (X, Q): triangle pointing DOWN (town below, two above) - vertical mirror
-    TOWN_OFFSET_DOWN_BOT = (0.0, 0.12)
-    TOWN_OFFSET_DOWN_TL = (-0.10, -0.08)
-    TOWN_OFFSET_DOWN_TR = (0.10, -0.08)
+    def pos(holding_id: str) -> tuple[float, float]:
+        """Get position for a holding from config."""
+        p = positions[holding_id]
+        return p["x"], p["y"]
     
     # ============ County X (Bottom Left Quadrant) ============
-    # County castle at center of quadrant: (0.25, 0.75)
-    X_CENTER = (0.25, 0.75)
-    
     holdings.extend([
         Holding(
             id="xandoria",
@@ -47,8 +36,8 @@ def create_board() -> list[Holding]:
             gold_value=1,
             soldier_value=400,
             defense_modifier=2,  # +2 dice when defending
-            position_x=X_CENTER[0] + TOWN_OFFSET_DOWN_BOT[0],
-            position_y=X_CENTER[1] + TOWN_OFFSET_DOWN_BOT[1],
+            position_x=pos("xandoria")[0],
+            position_y=pos("xandoria")[1],
         ),
         Holding(
             id="xelphane",
@@ -59,8 +48,8 @@ def create_board() -> list[Holding]:
             gold_value=5,
             soldier_value=200,
             defense_modifier=0,
-            position_x=X_CENTER[0] + TOWN_OFFSET_DOWN_TL[0],
-            position_y=X_CENTER[1] + TOWN_OFFSET_DOWN_TL[1],
+            position_x=pos("xelphane")[0],
+            position_y=pos("xelphane")[1],
         ),
         Holding(
             id="xythera",
@@ -72,8 +61,8 @@ def create_board() -> list[Holding]:
             soldier_value=300,
             defense_modifier=1,  # +1 dice when defending
             is_capitol=True,  # Capitol of County X
-            position_x=X_CENTER[0] + TOWN_OFFSET_DOWN_TR[0],
-            position_y=X_CENTER[1] + TOWN_OFFSET_DOWN_TR[1],
+            position_x=pos("xythera")[0],
+            position_y=pos("xythera")[1],
         ),
         Holding(
             id="x_castle",
@@ -84,15 +73,12 @@ def create_board() -> list[Holding]:
             gold_value=0,
             soldier_value=0,
             defense_modifier=0,
-            position_x=X_CENTER[0],
-            position_y=X_CENTER[1],
+            position_x=pos("x_castle")[0],
+            position_y=pos("x_castle")[1],
         ),
     ])
     
     # ============ County U (Top Left Quadrant) ============
-    # County castle at center of quadrant: (0.25, 0.25)
-    U_CENTER = (0.25, 0.25)
-    
     holdings.extend([
         Holding(
             id="ulverin",
@@ -103,8 +89,8 @@ def create_board() -> list[Holding]:
             gold_value=5,
             soldier_value=200,
             defense_modifier=0,
-            position_x=U_CENTER[0] + TOWN_OFFSET_UP_TOP[0],
-            position_y=U_CENTER[1] + TOWN_OFFSET_UP_TOP[1],
+            position_x=pos("ulverin")[0],
+            position_y=pos("ulverin")[1],
         ),
         Holding(
             id="uldorwyn",
@@ -115,8 +101,8 @@ def create_board() -> list[Holding]:
             gold_value=4,
             soldier_value=300,
             defense_modifier=0,
-            position_x=U_CENTER[0] + TOWN_OFFSET_UP_BL[0],
-            position_y=U_CENTER[1] + TOWN_OFFSET_UP_BL[1],
+            position_x=pos("uldorwyn")[0],
+            position_y=pos("uldorwyn")[1],
         ),
         Holding(
             id="umbrith",
@@ -129,8 +115,8 @@ def create_board() -> list[Holding]:
             defense_modifier=0,
             attack_modifier=1,  # +1 dice when attacking FROM this town
             is_capitol=True,  # Capitol of County U
-            position_x=U_CENTER[0] + TOWN_OFFSET_UP_BR[0],
-            position_y=U_CENTER[1] + TOWN_OFFSET_UP_BR[1],
+            position_x=pos("umbrith")[0],
+            position_y=pos("umbrith")[1],
         ),
         Holding(
             id="u_castle",
@@ -141,15 +127,12 @@ def create_board() -> list[Holding]:
             gold_value=0,
             soldier_value=0,
             defense_modifier=0,
-            position_x=U_CENTER[0],
-            position_y=U_CENTER[1],
+            position_x=pos("u_castle")[0],
+            position_y=pos("u_castle")[1],
         ),
     ])
     
     # ============ County V (Top Right Quadrant) ============
-    # County castle at center of quadrant: (0.75, 0.25)
-    V_CENTER = (0.75, 0.25)
-    
     holdings.extend([
         Holding(
             id="valoria",
@@ -161,8 +144,8 @@ def create_board() -> list[Holding]:
             soldier_value=300,
             defense_modifier=1,  # +1 dice when defending
             is_capitol=True,  # Capitol of County V
-            position_x=V_CENTER[0] + TOWN_OFFSET_UP_TOP[0],
-            position_y=V_CENTER[1] + TOWN_OFFSET_UP_TOP[1],
+            position_x=pos("valoria")[0],
+            position_y=pos("valoria")[1],
         ),
         Holding(
             id="vardhelm",
@@ -173,8 +156,8 @@ def create_board() -> list[Holding]:
             gold_value=5,
             soldier_value=200,
             defense_modifier=0,
-            position_x=V_CENTER[0] + TOWN_OFFSET_UP_BL[0],
-            position_y=V_CENTER[1] + TOWN_OFFSET_UP_BL[1],
+            position_x=pos("vardhelm")[0],
+            position_y=pos("vardhelm")[1],
         ),
         Holding(
             id="velthar",
@@ -185,8 +168,8 @@ def create_board() -> list[Holding]:
             gold_value=1,
             soldier_value=500,
             defense_modifier=2,  # +2 dice when defending
-            position_x=V_CENTER[0] + TOWN_OFFSET_UP_BR[0],
-            position_y=V_CENTER[1] + TOWN_OFFSET_UP_BR[1],
+            position_x=pos("velthar")[0],
+            position_y=pos("velthar")[1],
         ),
         Holding(
             id="v_castle",
@@ -197,15 +180,12 @@ def create_board() -> list[Holding]:
             gold_value=0,
             soldier_value=0,
             defense_modifier=0,
-            position_x=V_CENTER[0],
-            position_y=V_CENTER[1],
+            position_x=pos("v_castle")[0],
+            position_y=pos("v_castle")[1],
         ),
     ])
     
     # ============ County Q (Bottom Right Quadrant) ============
-    # County castle at center of quadrant: (0.75, 0.75)
-    Q_CENTER = (0.75, 0.75)
-    
     holdings.extend([
         Holding(
             id="quindara",
@@ -217,8 +197,8 @@ def create_board() -> list[Holding]:
             soldier_value=100,
             defense_modifier=-2,  # -2 dice when defending (weak walls)
             is_capitol=True,  # Capitol of County Q
-            position_x=Q_CENTER[0] + TOWN_OFFSET_DOWN_BOT[0],
-            position_y=Q_CENTER[1] + TOWN_OFFSET_DOWN_BOT[1],
+            position_x=pos("quindara")[0],
+            position_y=pos("quindara")[1],
         ),
         Holding(
             id="qyrelis",
@@ -229,8 +209,8 @@ def create_board() -> list[Holding]:
             gold_value=4,
             soldier_value=300,
             defense_modifier=0,
-            position_x=Q_CENTER[0] + TOWN_OFFSET_DOWN_TL[0],
-            position_y=Q_CENTER[1] + TOWN_OFFSET_DOWN_TL[1],
+            position_x=pos("qyrelis")[0],
+            position_y=pos("qyrelis")[1],
         ),
         Holding(
             id="quorwyn",
@@ -241,8 +221,8 @@ def create_board() -> list[Holding]:
             gold_value=5,
             soldier_value=200,
             defense_modifier=0,
-            position_x=Q_CENTER[0] + TOWN_OFFSET_DOWN_TR[0],
-            position_y=Q_CENTER[1] + TOWN_OFFSET_DOWN_TR[1],
+            position_x=pos("quorwyn")[0],
+            position_y=pos("quorwyn")[1],
         ),
         Holding(
             id="q_castle",
@@ -253,12 +233,12 @@ def create_board() -> list[Holding]:
             gold_value=0,
             soldier_value=0,
             defense_modifier=0,
-            position_x=Q_CENTER[0],
-            position_y=Q_CENTER[1],
+            position_x=pos("q_castle")[0],
+            position_y=pos("q_castle")[1],
         ),
     ])
     
-    # ============ Duchy Castles (on center horizontal line) ============
+    # ============ Duchy Castles ============
     holdings.extend([
         Holding(
             id="xu_castle",
@@ -268,8 +248,8 @@ def create_board() -> list[Holding]:
             gold_value=0,
             soldier_value=0,
             defense_modifier=0,
-            position_x=0.25,  # Left side, same x as County X and U
-            position_y=0.50,  # Center horizontal line
+            position_x=pos("xu_castle")[0],
+            position_y=pos("xu_castle")[1],
         ),
         Holding(
             id="qv_castle",
@@ -279,8 +259,8 @@ def create_board() -> list[Holding]:
             gold_value=0,
             soldier_value=0,
             defense_modifier=0,
-            position_x=0.75,  # Right side, same x as County V and Q
-            position_y=0.50,  # Center horizontal line
+            position_x=pos("qv_castle")[0],
+            position_y=pos("qv_castle")[1],
         ),
     ])
     
@@ -293,8 +273,8 @@ def create_board() -> list[Holding]:
             gold_value=0,
             soldier_value=0,
             defense_modifier=0,  # King wins ties when defending
-            position_x=0.50,
-            position_y=0.50,
+            position_x=pos("king_castle")[0],
+            position_y=pos("king_castle")[1],
         )
     )
     

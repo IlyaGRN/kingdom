@@ -134,6 +134,17 @@ export interface PendingCombat {
   target_holding_id: string
   attacker_soldiers: number
   attacker_cards: string[]
+  source_holding_id: string | null
+}
+
+export interface DrawnCardInfo {
+  card_id: string
+  card_name: string
+  card_type: string
+  player_id: string
+  player_name: string
+  is_instant: boolean
+  is_hidden: boolean  // True if should show "hidden card" (e.g. AI bonus cards)
 }
 
 export interface CombatResult {
@@ -186,6 +197,7 @@ export interface GameState {
   phase: GamePhase
   card_drawn_this_turn: boolean
   war_fought_this_turn: boolean
+  last_drawn_card: DrawnCardInfo | null  // For card draw popup display
   forbid_mercenaries_active: boolean
   enforce_peace_active: boolean
   players: Player[]

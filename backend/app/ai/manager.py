@@ -148,8 +148,10 @@ class SimpleAIPlayer(AIPlayer):
             if attack_actions and player.soldiers >= 200:
                 # Sort by weakest target first (prefer attacking towns with fewer fortifications)
                 chosen_action = attack_actions[0]
-                # Commit 70% of soldiers for aggressive attacks (minimum 300)
-                chosen_action.soldiers_count = max(300, int(player.soldiers * 0.7))
+                # Commit 70% of soldiers for aggressive attacks (minimum 300), rounded down to 100s
+                raw_soldiers = max(300, int(player.soldiers * 0.7))
+                rounded_soldiers = (raw_soldiers // 100) * 100  # Round down to nearest 100
+                chosen_action.soldiers_count = rounded_soldiers
                 chosen_reason = f"ATTACKING {chosen_action.target_holding_id} with {chosen_action.soldiers_count} soldiers! War is the path to victory!"
                 considered.append(AIDecisionLogEntry(action="attack", status="chosen", reason=chosen_reason))
             elif attack_actions:
