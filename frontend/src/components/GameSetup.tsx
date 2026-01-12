@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useGameStore } from '../store/gameStore'
 import { createGame, startGame, autoAssignStartingTowns } from '../api/gameApi'
 import { PlayerConfig, PLAYER_COLORS, AI_TYPES, PlayerType } from '../types/game'
+import { visualConfig, getDefaultCrest } from '../config/visualConfig'
 
 interface GameSetupProps {
   onGameCreated: () => void
@@ -11,10 +12,10 @@ interface GameSetupProps {
 export default function GameSetup({ onGameCreated, onBack }: GameSetupProps) {
   const [playerCount, setPlayerCount] = useState(4)
   const [players, setPlayers] = useState<PlayerConfig[]>([
-    { name: 'You', player_type: 'human', color: PLAYER_COLORS[0] },
-    { name: 'Baron Alpha', player_type: 'ai_openai', color: PLAYER_COLORS[1] },
-    { name: 'Baron Beta', player_type: 'ai_openai', color: PLAYER_COLORS[2] },
-    { name: 'Baron Gamma', player_type: 'ai_openai', color: PLAYER_COLORS[3] },
+    { name: 'You', player_type: 'human', color: PLAYER_COLORS[0], crest: getDefaultCrest('human', 0) },
+    { name: 'Baron Alpha', player_type: 'ai_openai', color: PLAYER_COLORS[1], crest: getDefaultCrest('ai_openai') },
+    { name: 'Baron Beta', player_type: 'ai_openai', color: PLAYER_COLORS[2], crest: getDefaultCrest('ai_openai') },
+    { name: 'Baron Gamma', player_type: 'ai_openai', color: PLAYER_COLORS[3], crest: getDefaultCrest('ai_openai') },
   ])
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -31,6 +32,7 @@ export default function GameSetup({ onGameCreated, onBack }: GameSetupProps) {
         name: `Baron ${idx + 1}`,
         player_type: 'ai_openai',  // Default all new AI players to GPT
         color: PLAYER_COLORS[idx],
+        crest: getDefaultCrest('ai_openai'),
       })
     }
     
@@ -44,6 +46,13 @@ export default function GameSetup({ onGameCreated, onBack }: GameSetupProps) {
   const handlePlayerChange = (index: number, field: keyof PlayerConfig, value: string) => {
     const newPlayers = [...players]
     newPlayers[index] = { ...newPlayers[index], [field]: value }
+    
+    // When player_type changes, update the crest to the default for that type
+    if (field === 'player_type') {
+      const humanCount = newPlayers.slice(0, index).filter(p => p.player_type === 'human').length
+      newPlayers[index].crest = getDefaultCrest(value, value === 'human' ? humanCount : 0)
+    }
+    
     setPlayers(newPlayers)
   }
 
@@ -109,10 +118,11 @@ export default function GameSetup({ onGameCreated, onBack }: GameSetupProps) {
               key={index}
               className="flex items-center gap-4 p-4 rounded bg-parchment-100 border border-parchment-300"
             >
-              {/* Color indicator */}
-              <div 
-                className="w-8 h-8 rounded-full border-2 border-parchment-400 flex-shrink-0"
-                style={{ backgroundColor: player.color }}
+              {/* Crest indicator */}
+              <img 
+                src={player.crest}
+                alt="Crest"
+                className="w-10 h-10 object-contain flex-shrink-0"
               />
 
               {/* Player name */}
@@ -133,6 +143,19 @@ export default function GameSetup({ onGameCreated, onBack }: GameSetupProps) {
                 {AI_TYPES.map(type => (
                   <option key={type.value} value={type.value}>
                     {type.label}
+                  </option>
+                ))}
+              </select>
+
+              {/* Crest selector */}
+              <select
+                value={player.crest}
+                onChange={(e) => handlePlayerChange(index, 'crest', e.target.value)}
+                className="px-3 py-2 rounded border border-parchment-300 bg-white text-medieval-bronze focus:outline-none focus:border-medieval-gold"
+              >
+                {visualConfig.crests.available.map(crest => (
+                  <option key={crest.id} value={crest.path}>
+                    {crest.label}
                   </option>
                 ))}
               </select>

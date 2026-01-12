@@ -128,15 +128,39 @@ def create_game(player_configs: list[dict]) -> GameState:
     
     # Create players
     players = []
-    colors = ["#8B0000", "#00008B", "#006400", "#4B0082", "#8B4513", "#2F4F4F"]
+    from app.config import get_settings
+    settings = get_settings()
+    colors = settings.player_colors
+    
+    # Default crest mapping for AI players (used as fallback)
+    ai_crest_map = {
+        PlayerType.AI_OPENAI: "/crest_openai.png",
+        PlayerType.AI_ANTHROPIC: "/crest_anthropic.png",
+        PlayerType.AI_GEMINI: "/crest_gemini.png",
+        PlayerType.AI_GROK: "/crest_grok.png",
+    }
+    human_index = 0
     
     for i, config in enumerate(player_configs):
         player_type = PlayerType(config.get("player_type", "human"))
+        
+        # Use crest from config if provided, otherwise use default based on player type
+        crest = config.get("crest")
+        if not crest:
+            if player_type == PlayerType.HUMAN:
+                crest = f"/crest_player_{human_index}.png"
+            else:
+                crest = ai_crest_map.get(player_type, "")
+        
+        if player_type == PlayerType.HUMAN:
+            human_index += 1
+        
         player = Player(
             id=str(uuid.uuid4()),
             name=config.get("name", f"Player {i + 1}"),
             player_type=player_type,
-            color=config.get("color", colors[i]),
+            color=config.get("color", colors[i % len(colors)]),
+            crest=crest,
         )
         players.append(player)
     

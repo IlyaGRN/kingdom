@@ -108,14 +108,18 @@ export default function PlayerMat({ player, isCurrentPlayer, cards, holdings, on
     >
       {/* Header */}
       <div className="flex items-center gap-3 mb-4">
-        <div 
-          className="w-10 h-10 rounded-full border-2 border-parchment-400 flex items-center justify-center"
-          style={{ backgroundColor: player.color }}
-        >
+        <div className="relative flex-shrink-0">
+          <img 
+            src={player.crest}
+            alt={`${player.name}'s crest`}
+            className="w-10 h-10 object-contain"
+          />
           {player.is_king && (
-            <svg className="w-6 h-6 text-yellow-300" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M5 16L3 5l5.5 5L12 4l3.5 6L21 5l-2 11H5z"/>
-            </svg>
+            <div className="absolute -top-1 -right-1">
+              <svg className="w-4 h-4 text-yellow-400 drop-shadow-md" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M5 16L3 5l5.5 5L12 4l3.5 6L21 5l-2 11H5z"/>
+              </svg>
+            </div>
           )}
         </div>
         <div className="flex-1">

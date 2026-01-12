@@ -100,6 +100,7 @@ export interface Player {
   name: string
   player_type: PlayerType
   color: string
+  crest: string                  // Path to crest image
   gold: number
   soldiers: number
   title: TitleType
@@ -222,6 +223,7 @@ export interface PlayerConfig {
   name: string
   player_type: PlayerType
   color: string
+  crest: string  // Path to crest image
 }
 
 export const PLAYER_COLORS = [

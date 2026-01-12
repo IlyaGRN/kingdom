@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react'
 import { createSimulation, simulationStep, getWinner } from '../api/gameApi'
 import { GameState, Player, PlayerConfig, PLAYER_COLORS, AI_TYPES, PlayerType } from '../types/game'
 import { useGameStore } from '../store/gameStore'
+import { visualConfig, getDefaultCrest } from '../config/visualConfig'
 import Board from './Board'
 
 interface SimulationViewProps {
@@ -19,10 +20,10 @@ export default function SimulationView({ onBack }: SimulationViewProps) {
   const [isConfiguring, setIsConfiguring] = useState(true)
   const [playerCount, setPlayerCount] = useState(4)
   const [players, setPlayers] = useState<PlayerConfig[]>([
-    { name: 'Baron Alpha', player_type: 'ai_openai', color: PLAYER_COLORS[0] },
-    { name: 'Baron Beta', player_type: 'ai_openai', color: PLAYER_COLORS[1] },
-    { name: 'Baron Gamma', player_type: 'ai_openai', color: PLAYER_COLORS[2] },
-    { name: 'Baron Delta', player_type: 'ai_openai', color: PLAYER_COLORS[3] },
+    { name: 'Baron Alpha', player_type: 'ai_openai', color: PLAYER_COLORS[0], crest: getDefaultCrest('ai_openai') },
+    { name: 'Baron Beta', player_type: 'ai_anthropic', color: PLAYER_COLORS[1], crest: getDefaultCrest('ai_anthropic') },
+    { name: 'Baron Gamma', player_type: 'ai_gemini', color: PLAYER_COLORS[2], crest: getDefaultCrest('ai_gemini') },
+    { name: 'Baron Delta', player_type: 'ai_grok', color: PLAYER_COLORS[3], crest: getDefaultCrest('ai_grok') },
   ])
   const [speed, setSpeed] = useState(1000)
   
@@ -46,15 +47,17 @@ export default function SimulationView({ onBack }: SimulationViewProps) {
     setPlayerCount(count)
     const newPlayers = [...players]
     
-    const aiTypes: PlayerType[] = ['ai_openai', 'ai_openai', 'ai_openai', 'ai_openai', 'ai_openai', 'ai_openai']  // All GPT by default
+    const aiTypes: PlayerType[] = ['ai_openai', 'ai_anthropic', 'ai_gemini', 'ai_grok', 'ai_openai', 'ai_anthropic']
     const names = ['Baron GPT', 'Baron Claude', 'Baron Gemini', 'Baron Grok', 'Baron GPT-2', 'Baron Claude-2']
     
     while (newPlayers.length < count) {
       const idx = newPlayers.length
+      const aiType = aiTypes[idx]
       newPlayers.push({
         name: names[idx],
-        player_type: aiTypes[idx],
+        player_type: aiType,
         color: PLAYER_COLORS[idx],
+        crest: getDefaultCrest(aiType),
       })
     }
     
@@ -68,6 +71,12 @@ export default function SimulationView({ onBack }: SimulationViewProps) {
   const handlePlayerChange = (index: number, field: keyof PlayerConfig, value: string) => {
     const newPlayers = [...players]
     newPlayers[index] = { ...newPlayers[index], [field]: value }
+    
+    // When player_type changes, update the crest to the default for that type
+    if (field === 'player_type') {
+      newPlayers[index].crest = getDefaultCrest(value)
+    }
+    
     setPlayers(newPlayers)
   }
 
@@ -192,9 +201,10 @@ export default function SimulationView({ onBack }: SimulationViewProps) {
                 key={index}
                 className="flex items-center gap-4 p-3 rounded bg-parchment-100 border border-parchment-300"
               >
-                <div 
-                  className="w-8 h-8 rounded-full border-2 border-parchment-400"
-                  style={{ backgroundColor: player.color }}
+                <img 
+                  src={player.crest}
+                  alt="Crest"
+                  className="w-10 h-10 object-contain flex-shrink-0"
                 />
                 <input
                   type="text"
@@ -210,6 +220,17 @@ export default function SimulationView({ onBack }: SimulationViewProps) {
                   {AI_TYPES.filter(t => t.value !== 'human').map(type => (
                     <option key={type.value} value={type.value}>
                       {type.label}
+                    </option>
+                  ))}
+                </select>
+                <select
+                  value={player.crest}
+                  onChange={(e) => handlePlayerChange(index, 'crest', e.target.value)}
+                  className="px-3 py-2 rounded border border-parchment-300 bg-white text-medieval-bronze"
+                >
+                  {visualConfig.crests.available.map(crest => (
+                    <option key={crest.id} value={crest.path}>
+                      {crest.label}
                     </option>
                   ))}
                 </select>

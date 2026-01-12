@@ -36,6 +36,16 @@ class Settings(BaseSettings):
     #        Player 3 -> Vardhelm (V), Player 4 -> Quorwyn (Q)
     fixed_starting_towns: list[str] = ["xelphane", "ulverin", "vardhelm", "quorwyn"]
     
+    # Player colors (hex format) - must have at least as many as max players (6)
+    player_colors: list[str] = [
+        "#e63946",  # Red
+        "#2a9d8f",  # Teal
+        "#e9c46a",  # Gold
+        "#9b59b6",  # Purple
+        "#3498db",  # Blue
+        "#e67e22",  # Orange
+    ]
+    
     # Card Deck Configuration - quantities per card type
     # Personal Events (instant effects)
     card_gold_5: int = 4       # Gold Chest (5) - gain 5 gold

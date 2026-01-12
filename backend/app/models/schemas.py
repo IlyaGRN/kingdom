@@ -151,6 +151,7 @@ class Player(BaseModel):
     name: str
     player_type: PlayerType
     color: str
+    crest: str = ""  # Path to crest image
     
     # Resources
     gold: int = Field(default=0, ge=0)
