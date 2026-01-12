@@ -65,6 +65,40 @@ export default function Board({ onHoldingClick }: BoardProps) {
         />
       </div>
 
+      {/* County labels in corners */}
+      <div className="absolute top-6 left-6">
+        <span className="absolute font-medieval text-3xl text-black font-bold" style={{textShadow: '0 0 8px black, 0 0 16px black, 0 0 24px black'}}>U</span>
+        <span className="absolute font-medieval text-2xl text-amber-100 blur-[1px]">U</span>
+        <span className="relative font-medieval text-2xl text-amber-50 drop-shadow-lg font-bold">U</span>
+      </div>
+      <div className="absolute top-6 right-6">
+        <span className="absolute font-medieval text-3xl text-black font-bold" style={{textShadow: '0 0 8px black, 0 0 16px black, 0 0 24px black'}}>V</span>
+        <span className="absolute font-medieval text-2xl text-amber-100 blur-[1px]">V</span>
+        <span className="relative font-medieval text-2xl text-amber-50 drop-shadow-lg font-bold">V</span>
+      </div>
+      <div className="absolute bottom-6 left-6">
+        <span className="absolute font-medieval text-3xl text-black font-bold" style={{textShadow: '0 0 8px black, 0 0 16px black, 0 0 24px black'}}>X</span>
+        <span className="absolute font-medieval text-2xl text-amber-100 blur-[1px]">X</span>
+        <span className="relative font-medieval text-2xl text-amber-50 drop-shadow-lg font-bold">X</span>
+      </div>
+      <div className="absolute bottom-6 right-6">
+        <span className="absolute font-medieval text-3xl text-black font-bold" style={{textShadow: '0 0 8px black, 0 0 16px black, 0 0 24px black'}}>Q</span>
+        <span className="absolute font-medieval text-2xl text-amber-100 blur-[1px]">Q</span>
+        <span className="relative font-medieval text-2xl text-amber-50 drop-shadow-lg font-bold">Q</span>
+      </div>
+
+      {/* Duchy labels on middle sides */}
+      <div className="absolute top-1/2 left-10 -translate-y-1/2">
+        <span className="absolute font-medieval text-base text-black font-bold" style={{textShadow: '0 0 5px black, 0 0 10px black'}}>XU</span>
+        <span className="absolute font-medieval text-sm text-amber-100 blur-[1px]">XU</span>
+        <span className="relative font-medieval text-sm text-amber-50 drop-shadow-lg font-bold">XU</span>
+      </div>
+      <div className="absolute top-1/2 right-10 -translate-y-1/2">
+        <span className="absolute font-medieval text-base text-black font-bold" style={{textShadow: '0 0 5px black, 0 0 10px black'}}>QV</span>
+        <span className="absolute font-medieval text-sm text-amber-100 blur-[1px]">QV</span>
+        <span className="relative font-medieval text-sm text-amber-50 drop-shadow-lg font-bold">QV</span>
+      </div>
+
       {/* Holdings overlay */}
       {gameState.holdings.map(holding => {
         const ownerCrest = getOwnerCrest(holding)
@@ -132,7 +166,7 @@ export default function Board({ onHoldingClick }: BoardProps) {
               <div className="absolute inset-0 flex items-center justify-center transform -rotate-45">
                 {/* Crown for king's castle */}
                 {holding.holding_type === 'king_castle' && (
-                  <svg className="w-6 h-6" viewBox="0 0 24 24" fill={getIconColor(holding)}>
+                  <svg className="w-6 h-6 rotate-45" viewBox="0 0 24 24" fill="#f59e0b">
                     <path d="M5 16L3 5l5.5 5L12 4l3.5 6L21 5l-2 11H5zm0 2h14v2H5v-2z"/>
                   </svg>
                 )}
