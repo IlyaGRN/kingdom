@@ -62,6 +62,7 @@ export default function Board({ onHoldingClick }: BoardProps) {
           src="/board.png" 
           alt="Game Board" 
           className="w-full h-full object-contain"
+          style={{ filter: `saturate(${visualConfig.board.saturation}%)` }}
         />
       </div>
 

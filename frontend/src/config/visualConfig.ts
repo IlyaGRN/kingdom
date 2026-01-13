@@ -3,6 +3,12 @@
  */
 
 export const visualConfig = {
+  // Board image settings
+  board: {
+    // Saturation filter percentage (0-200, 100 = normal)
+    saturation: 62,
+  },
+
   // Possible player colors (hex format)
   playerColors: [
     '#D10303',  // Red
