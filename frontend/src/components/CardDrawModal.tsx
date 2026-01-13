@@ -6,78 +6,99 @@ interface CardDrawModalProps {
   onClose: () => void
 }
 
+// Map card effects to image filenames
+const getCardImagePath = (effect: string): string => {
+  const effectToImage: Record<string, string> = {
+    // Gold cards
+    'gold_5': 'card__gold_chest.png',
+    'gold_10': 'card__gold_chest.png',
+    'gold_15': 'card__gold_chest.png',
+    'gold_25': 'card__gold_chest.png',
+    // Soldier cards
+    'soldiers_100': 'card__mercenaries.png',
+    'soldiers_200': 'card__mercenaries.png',
+    'soldiers_300': 'card__mercenaries.png',
+    // Events
+    'raiders': 'card__raiders.png',
+    'crusade': 'card__crusade.png',
+    // Bonus cards
+    'big_war': 'card__big_war.png',
+    'adventurer': 'card__mercenaries.png',
+    'excalibur': 'card__excalibur.png',
+    'poisoned_arrows': 'card__poisoned_arrowes.png',
+    'forbid_mercenaries': 'card__mercenaries_forbidden.png',
+    'talented_commander': 'card__talented_commander.png',
+    'vassal_revolt': 'card__vassal_revolt.png',
+    'enforce_peace': 'card__enforce_peace.png',
+    'duel': 'card__duel.png',
+    'spy': 'card__spy.png',
+    // Claim cards
+    'claim_x': 'card__claim_x.png',
+    'claim_u': 'card__claim_u.png',
+    'claim_v': 'card__claim_v.png',
+    'claim_q': 'card__claim_q.png',
+    'ultimate_claim': 'card__ultimate_claim.png',
+    'duchy_claim': 'card__ultimate_claim.png',
+  }
+  return effectToImage[effect] || ''
+}
+
 export default function CardDrawModal({ drawnCard, card, onClose }: CardDrawModalProps) {
   // Determine display text based on whether card is hidden
   const isHidden = drawnCard.is_hidden
-  const displayName = isHidden ? 'a hidden card' : drawnCard.card_name
   const isCurrentPlayerDraw = !isHidden  // Only show details if not hidden
   
-  // Card type styling
-  const getCardTypeStyle = () => {
-    if (isHidden) return 'bg-gray-600'
-    switch (drawnCard.card_type) {
-      case 'personal_event': return 'bg-blue-600'
-      case 'global_event': return 'bg-red-600'
-      case 'bonus': return 'bg-purple-600'
-      case 'claim': return 'bg-amber-600'
-      default: return 'bg-gray-600'
-    }
-  }
-
-  const getCardTypeIcon = () => {
-    if (isHidden) return '🎴'
-    switch (drawnCard.card_type) {
-      case 'personal_event': return '⚡'
-      case 'global_event': return '🌍'
-      case 'bonus': return '✨'
-      case 'claim': return '📜'
-      default: return '🃏'
-    }
-  }
+  // Get card image path
+  const cardImagePath = card?.effect ? getCardImagePath(card.effect) : ''
 
   return (
     <div 
-      className="fixed inset-0 bg-black/60 flex items-center justify-center z-50"
+      className="fixed inset-0 bg-black/70 flex items-center justify-center z-50"
       onClick={onClose}
     >
       <div 
-        className="bg-parchment-100 rounded-lg shadow-2xl max-w-md w-full mx-4 overflow-hidden"
+        className="flex flex-col items-center max-w-sm w-full mx-4"
         onClick={e => e.stopPropagation()}
       >
-        {/* Header */}
-        <div className={`${getCardTypeStyle()} px-6 py-4 text-white text-center`}>
-          <div className="text-4xl mb-2">{getCardTypeIcon()}</div>
-          <h2 className="font-medieval text-xl">
-            {drawnCard.player_name} drew {displayName}
+        {/* Header - who drew */}
+        <div className="bg-medieval-navy/90 px-6 py-2 rounded-t-lg text-white text-center w-full">
+          <h2 className="font-medieval text-lg">
+            {drawnCard.player_name} drew a card
             {drawnCard.is_instant && !isHidden && (
-              <span className="block text-sm opacity-80 mt-1">
+              <span className="block text-xs opacity-80">
                 (Instant effect applied!)
               </span>
             )}
           </h2>
         </div>
         
+        {/* Card image - only show if not hidden */}
+        {isCurrentPlayerDraw && cardImagePath && (
+          <div className="bg-parchment-100 p-4 w-full flex justify-center">
+            <img 
+              src={`/${cardImagePath}`}
+              alt={card?.name || 'Card'}
+              className="max-h-64 w-auto object-contain rounded-lg shadow-lg"
+            />
+          </div>
+        )}
+        
         {/* Card details - only show if not hidden */}
         {isCurrentPlayerDraw && card && (
-          <div className="p-6">
-            <div className="text-center mb-4">
-              <h3 className="font-medieval text-2xl text-medieval-bronze mb-2">
-                {card.name}
-              </h3>
-              <p className="text-medieval-stone text-sm">
-                {card.description}
-              </p>
-            </div>
-            
-            <div className="text-center text-xs text-medieval-stone/70 uppercase tracking-wide">
-              {drawnCard.card_type.replace('_', ' ')}
-            </div>
+          <div className="bg-parchment-100 px-6 pb-2 w-full text-center">
+            <h3 className="font-medieval text-xl text-medieval-bronze">
+              {card.name}
+            </h3>
+            <p className="text-medieval-stone text-sm mt-1">
+              {card.description}
+            </p>
           </div>
         )}
         
         {/* Hidden card message */}
         {isHidden && (
-          <div className="p-6 text-center">
+          <div className="bg-parchment-100 p-6 w-full text-center">
+            <div className="text-6xl mb-4">🎴</div>
             <p className="text-medieval-stone">
               This card is kept secret until played.
             </p>
@@ -85,7 +106,7 @@ export default function CardDrawModal({ drawnCard, card, onClose }: CardDrawModa
         )}
         
         {/* Close button */}
-        <div className="px-6 pb-6 text-center">
+        <div className="bg-parchment-100 px-6 pb-4 pt-2 rounded-b-lg w-full text-center">
           <button
             onClick={onClose}
             className="px-8 py-2 bg-medieval-bronze hover:bg-medieval-bronze/90 text-white rounded font-medieval transition-colors"
