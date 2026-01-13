@@ -47,6 +47,9 @@ export default function GameBoard({ onBack }: GameBoardProps) {
     defender: Player | null
   } | null>(null)
   
+  // Sidebar state for collapsible right panel
+  const [sidebarOpen, setSidebarOpen] = useState(true)
+  
   // Defense modal shows automatically when pending_combat targets this human player
 
   // Fetch valid actions when turn changes
@@ -441,33 +444,31 @@ export default function GameBoard({ onBack }: GameBoardProps) {
   const currentPlayer = gameState.players[gameState.current_player_idx]
 
   return (
-    <div className="min-h-screen p-4 flex flex-col">
-      {/* Top bar */}
-      <div className="flex items-center justify-between mb-4">
-        <button
-          onClick={onBack}
-          className="px-4 py-2 text-parchment-300 hover:text-parchment-100 transition-colors"
-        >
-          ← Back to Menu
-        </button>
-        
-        <div className="text-center">
-          <h1 className="font-medieval text-2xl text-parchment-100">
-            Machiavelli's Kingdom
-          </h1>
-          <p className="text-parchment-400 text-sm">
-            Round {gameState.current_round} • Goal: {gameState.victory_threshold} VP
-          </p>
-        </div>
-        
-        <div className="text-right">
+    <div className="h-screen overflow-hidden relative">
+      {/* Game info panel - fixed top left */}
+      <div className="fixed top-0 left-0 z-40 bg-medieval-navy/90 text-white px-3 py-2 rounded-br-lg shadow-lg">
+        <div className="flex items-center gap-3">
+          <button
+            onClick={onBack}
+            className="text-xs text-parchment-300 hover:text-parchment-100 transition-colors"
+          >
+            ← Back
+          </button>
+          <div className="border-l border-parchment-400/50 pl-3">
+            <h1 className="font-medieval text-sm text-parchment-100">
+              Machiavelli's Kingdom
+            </h1>
+            <p className="text-parchment-400 text-[10px]">
+              Round {gameState.current_round} • {gameState.victory_threshold} VP
+            </p>
+          </div>
           {currentPlayer && (
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1.5 border-l border-parchment-400/50 pl-3">
               <div 
-                className="w-4 h-4 rounded-full"
+                className="w-3 h-3 rounded-full"
                 style={{ backgroundColor: currentPlayer.color }}
               />
-              <span className="text-parchment-300 text-sm">
+              <span className="text-parchment-300 text-xs">
                 {currentPlayer.name}'s Turn
               </span>
             </div>
@@ -475,30 +476,47 @@ export default function GameBoard({ onBack }: GameBoardProps) {
         </div>
       </div>
 
-      {/* Main game area */}
-      <div className="flex-1 grid grid-cols-12 gap-4">
-        {/* Left sidebar - Player mats */}
-        <div className="col-span-3 space-y-3 overflow-y-auto max-h-[calc(100vh-120px)]">
-          {gameState.players.map((player, idx) => (
-            <PlayerMat
-              key={player.id}
-              player={player}
-              isCurrentPlayer={idx === gameState.current_player_idx}
-              cards={gameState.cards}
-              holdings={gameState.holdings}
-            />
-          ))}
-        </div>
-
-        {/* Center - Game board */}
-        <div className="col-span-6">
-          <div className="aspect-square max-h-[calc(100vh-120px)] mx-auto">
-            <Board onHoldingClick={handleHoldingClick} />
+      {/* Left sidebar - Player mats */}
+      <div className="absolute left-0 top-16 bottom-0 flex z-30">
+        {/* Collapsible Left Sidebar */}
+        <div 
+          className={`transition-all duration-300 flex-shrink-0 overflow-hidden ${sidebarOpen ? 'w-72' : 'w-0'}`}
+        >
+          <div className="w-72 h-full flex flex-col bg-parchment-100/90 border-r border-parchment-300">
+            {/* Player mats - scrollable */}
+            <div className="flex-1 overflow-y-auto space-y-2 p-2">
+              {gameState.players.map((player, idx) => (
+                <PlayerMat
+                  key={player.id}
+                  player={player}
+                  isCurrentPlayer={idx === gameState.current_player_idx}
+                  cards={gameState.cards}
+                  holdings={gameState.holdings}
+                />
+              ))}
+            </div>
           </div>
         </div>
+        
+        {/* Left sidebar toggle button */}
+        <button
+          onClick={() => setSidebarOpen(!sidebarOpen)}
+          className="flex-shrink-0 bg-parchment-200 hover:bg-parchment-300 text-medieval-bronze px-1 py-4 transition-all self-center"
+        >
+          {sidebarOpen ? '←' : '→'}
+        </button>
+      </div>
 
-        {/* Right sidebar - Actions */}
-        <div className="col-span-3">
+      {/* Board - strictly centered on screen */}
+      <div className="absolute inset-0 flex items-center justify-center">
+        <div className="h-full aspect-square max-h-full">
+          <Board onHoldingClick={handleHoldingClick} />
+        </div>
+      </div>
+
+      {/* Right sidebar - Action panel */}
+      <div className="absolute right-0 top-0 h-full z-30">
+        <div className="h-full bg-parchment-100/90 border-l border-parchment-300 w-72 overflow-y-auto p-2">
           <ActionPanel
             onPerformAction={handlePerformAction}
             selectedHolding={selectedHolding}

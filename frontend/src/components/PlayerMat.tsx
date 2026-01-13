@@ -102,86 +102,80 @@ export default function PlayerMat({ player, isCurrentPlayer, cards, holdings, on
 
   return (
     <div 
-      className={`card-parchment rounded-lg p-4 transition-all ${
+      className={`card-parchment rounded-lg p-2 transition-all ${
         isCurrentPlayer ? 'ring-2 ring-medieval-gold shadow-lg' : ''
       }`}
     >
       {/* Header */}
-      <div className="flex items-center gap-3 mb-4">
+      <div className="flex items-center gap-2 mb-2">
         <div className="relative flex-shrink-0">
           <img 
             src={player.crest}
             alt={`${player.name}'s crest`}
-            className="w-10 h-10 object-contain"
+            className="w-7 h-7 object-contain"
           />
           {player.is_king && (
             <div className="absolute -top-1 -right-1">
-              <svg className="w-4 h-4 text-yellow-400 drop-shadow-md" viewBox="0 0 24 24" fill="currentColor">
+              <svg className="w-3 h-3 text-yellow-400 drop-shadow-md" viewBox="0 0 24 24" fill="currentColor">
                 <path d="M5 16L3 5l5.5 5L12 4l3.5 6L21 5l-2 11H5z"/>
               </svg>
             </div>
           )}
         </div>
-        <div className="flex-1">
-          <h3 className="font-medieval text-lg text-medieval-bronze">
+        <div className="flex-1 min-w-0">
+          <h3 className="font-medieval text-sm text-medieval-bronze truncate">
             {player.name}
           </h3>
-          <p className="text-sm text-medieval-stone">
+          <p className="text-[10px] text-medieval-stone truncate">
             {getTitleDisplay()}
             {player.counties.length > 0 && ` of ${player.counties.join(', ')}`}
             {player.duchies.length > 0 && ` • Duke of ${player.duchies.join(', ')}`}
           </p>
         </div>
         {isCurrentPlayer && (
-          <span className="px-2 py-1 bg-medieval-gold text-white text-xs rounded font-medieval">
-            YOUR TURN
+          <span className="px-1.5 py-0.5 bg-medieval-gold text-white text-[10px] rounded font-medieval">
+            TURN
           </span>
         )}
       </div>
 
       {/* Resources */}
-      <div className="grid grid-cols-3 gap-3 mb-4">
+      <div className="grid grid-cols-3 gap-1 mb-2">
         {/* Gold */}
-        <div className="text-center p-2 bg-parchment-100 rounded">
-          <div className="text-2xl font-medieval text-medieval-gold">
+        <div className="text-center p-1 bg-parchment-100 rounded">
+          <div className="text-base font-medieval text-medieval-gold">
             {player.gold}
           </div>
-          <div className="text-xs text-medieval-stone">Gold</div>
+          <div className="text-[9px] text-medieval-stone">Gold</div>
         </div>
 
         {/* Soldiers */}
-        <div className={`text-center p-2 rounded ${isOverCap ? 'bg-red-100' : 'bg-parchment-100'}`}>
-          <div className={`text-2xl font-medieval ${isOverCap ? 'text-medieval-crimson' : 'text-medieval-bronze'}`}>
+        <div className={`text-center p-1 rounded ${isOverCap ? 'bg-red-100' : 'bg-parchment-100'}`}>
+          <div className={`text-base font-medieval ${isOverCap ? 'text-medieval-crimson' : 'text-medieval-bronze'}`}>
             {player.soldiers}
           </div>
-          <div className="text-xs text-medieval-stone">
-            Soldiers {isOverCap && `(cap: ${armyCap})`}
+          <div className="text-[9px] text-medieval-stone">
+            Army {isOverCap && `(${armyCap})`}
           </div>
         </div>
 
         {/* Prestige */}
-        <div className="text-center p-2 bg-parchment-100 rounded">
-          <div className="text-2xl font-medieval text-medieval-navy">
+        <div className="text-center p-1 bg-parchment-100 rounded">
+          <div className="text-base font-medieval text-medieval-navy">
             {player.prestige}
           </div>
-          <div className="text-xs text-medieval-stone">VP</div>
+          <div className="text-[9px] text-medieval-stone">VP</div>
         </div>
       </div>
 
       {/* Income per turn - with hover tooltip for breakdown */}
-      <div className="bg-parchment-100 rounded p-2 mb-3 relative group cursor-help">
-        <div className="text-xs font-medieval text-medieval-stone mb-1">
-          Income per turn: <span className="text-medieval-stone/50">(hover for details)</span>
-        </div>
-        <div className="grid grid-cols-2 gap-2 text-xs">
-          <div className="flex justify-between">
-            <span className="text-medieval-stone">💰 Gold:</span>
-            <span className="font-medieval text-medieval-gold">+{income.totalGold}</span>
-          </div>
-          <div className="flex justify-between">
-            <span className="text-medieval-stone">⚔️ Soldiers:</span>
-            <span className="font-medieval text-medieval-bronze">+{income.totalSoldiers}</span>
-          </div>
+      <div className="bg-parchment-100 rounded p-1.5 mb-2 relative group cursor-help">
+        <div className="flex items-center justify-between text-[10px]">
+          <span className="text-medieval-stone">Income/turn:</span>
+          <span>
+            <span className="font-medieval text-medieval-gold">+{income.totalGold}g</span>
+            <span className="font-medieval text-medieval-bronze ml-1">+{income.totalSoldiers}s</span>
+          </span>
         </div>
         {/* Hover tooltip with per-holding breakdown */}
         <div className="absolute left-0 right-0 top-full mt-1 hidden group-hover:block z-10">
@@ -242,36 +236,36 @@ export default function PlayerMat({ player, isCurrentPlayer, cards, holdings, on
       </div>
 
       {/* Holdings & Fortifications */}
-      <div className="flex items-center justify-between text-sm mb-3 px-1">
+      <div className="flex items-center justify-between text-[10px] mb-1 px-0.5">
         <span className="text-medieval-stone">Holdings:</span>
         <span className="font-medieval text-medieval-bronze">{player.holdings.length}</span>
       </div>
-      <div className="flex items-center justify-between text-sm mb-3 px-1">
-        <span className="text-medieval-stone">Fortifications:</span>
+      <div className="flex items-center justify-between text-[10px] mb-1 px-0.5">
+        <span className="text-medieval-stone">Forts:</span>
         <span className="font-medieval text-medieval-bronze">{player.fortifications_placed}/4</span>
       </div>
 
       {/* Active effects */}
       {player.active_effects && player.active_effects.length > 0 && (
-        <div className="text-sm text-purple-700 bg-purple-50 p-2 rounded mb-3">
-          ✨ Active: {player.active_effects.join(', ')}
+        <div className="text-[10px] text-purple-700 bg-purple-50 p-1 rounded mb-1">
+          ✨ {player.active_effects.join(', ')}
         </div>
       )}
 
       {/* Big War effect indicator */}
       {player.has_big_war_effect && (
-        <div className="text-sm text-amber-700 bg-amber-50 p-2 rounded mb-3">
-          ⚔️ Big War: Army cap doubled!
+        <div className="text-[10px] text-amber-700 bg-amber-50 p-1 rounded mb-1">
+          ⚔️ Army cap doubled
         </div>
       )}
 
       {/* Hand (only show if current player) */}
       {isCurrentPlayer && player.hand.length > 0 && (
-        <div className="mt-4 border-t border-parchment-300 pt-3">
-          <h4 className="text-sm font-medieval text-medieval-stone mb-2">
-            Your Hand ({player.hand.length}/7)
+        <div className="mt-2 border-t border-parchment-300 pt-2">
+          <h4 className="text-[10px] font-medieval text-medieval-stone mb-1">
+            Hand ({player.hand.length}/7)
           </h4>
-          <div className="space-y-2 max-h-40 overflow-y-auto">
+          <div className="space-y-1 max-h-28 overflow-y-auto">
             {player.hand.map(cardId => {
               const card = cards[cardId]
               if (!card) return null
@@ -279,13 +273,10 @@ export default function PlayerMat({ player, isCurrentPlayer, cards, holdings, on
                 <button
                   key={cardId}
                   onClick={() => onCardClick?.(cardId)}
-                  className="w-full text-left p-2 bg-parchment-100 rounded hover:bg-parchment-200 transition-colors"
+                  className="w-full text-left p-1.5 bg-parchment-100 rounded hover:bg-parchment-200 transition-colors"
                 >
-                  <div className="font-medieval text-sm text-medieval-bronze">
+                  <div className="font-medieval text-[11px] text-medieval-bronze truncate">
                     {getCardTypeIcon(card)} {card.name}
-                  </div>
-                  <div className="text-xs text-medieval-stone truncate">
-                    {card.description}
                   </div>
                 </button>
               )

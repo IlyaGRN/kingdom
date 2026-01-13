@@ -77,15 +77,14 @@ h1, h2, h3, h4, h5, h6 {
 
 /* Board overlay styles */
 .holding-marker {
-  @apply absolute cursor-pointer transition-all duration-200;
-  width: 60px;
-  height: 60px;
-  transform: translate(-50%, -50%) rotate(45deg);
+  @apply absolute cursor-pointer transition-all duration-200 rounded-lg;
+  width: 50px;
+  height: 50px;
   border: 3px solid transparent;
 }
 
 .holding-marker:hover {
-  transform: translate(-50%, -50%) rotate(45deg) scale(1.1);
+  transform: scale(1.1);
   z-index: 10;
 }
 

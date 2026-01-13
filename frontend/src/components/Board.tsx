@@ -108,15 +108,14 @@ export default function Board({ onHoldingClick }: BoardProps) {
           <div
             key={holding.id}
             onClick={() => onHoldingClick(holding)}
-            className={`absolute cursor-pointer transition-all ${
-              selectedHolding?.id === holding.id ? 'z-20 scale-125' : 'z-10'
+            className={`absolute cursor-pointer transition-transform duration-200 -translate-x-1/2 -translate-y-1/2 hover:scale-110 hover:z-20 ${
+              selectedHolding?.id === holding.id ? 'z-20 ring-2 ring-yellow-400' : 'z-10'
             } ${isAttackable(holding.id) ? 'animate-pulse' : ''} ${
               isClaimable(holding.id) ? 'ring-2 ring-green-400 ring-offset-1' : ''
-            } ${!isOccupied ? 'holding-marker' : ''}`}
+            } ${!isOccupied ? 'holding-marker hover:brightness-125' : ''}`}
             style={{
               left: `${holding.position_x * 100}%`,
               top: `${holding.position_y * 100}%`,
-              transform: 'translate(-50%, -50%)',
               ...(isOccupied ? {} : {
                 backgroundColor: getBackgroundColor(holding),
               }),
@@ -161,12 +160,12 @@ export default function Board({ onHoldingClick }: BoardProps) {
               </div>
             )}
             
-            {/* Unoccupied holding - show diamond with icon */}
+            {/* Unoccupied holding - show rectangle with icon */}
             {!isOccupied && (
-              <div className="absolute inset-0 flex items-center justify-center transform -rotate-45">
+              <div className="absolute inset-0 flex items-center justify-center">
                 {/* Crown for king's castle */}
                 {holding.holding_type === 'king_castle' && (
-                  <svg className="w-6 h-6 rotate-45" viewBox="0 0 24 24" fill="#f59e0b">
+                  <svg className="w-6 h-6" viewBox="0 0 24 24" fill="#f59e0b">
                     <path d="M5 16L3 5l5.5 5L12 4l3.5 6L21 5l-2 11H5zm0 2h14v2H5v-2z"/>
                   </svg>
                 )}

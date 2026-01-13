@@ -74,20 +74,22 @@ export default function AIDecisionPanel({ logs, combatLogs, onClear, onClearComb
   }
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-40">
+    <div className={`fixed bottom-4 left-4 z-40 transition-all duration-300 ${isExpanded ? 'w-96' : 'w-auto'}`}>
       {/* Header bar - always visible */}
       <div 
-        className="bg-medieval-navy text-white px-4 py-2 flex items-center justify-between cursor-pointer hover:bg-opacity-90 transition-colors"
+        className="bg-medieval-navy text-white px-3 py-1.5 flex items-center justify-between cursor-pointer hover:bg-opacity-90 transition-colors rounded-t-lg"
         onClick={() => setIsExpanded(!isExpanded)}
       >
-        <div className="flex items-center gap-3">
-          <span className="text-lg">
-            {isExpanded ? '▼' : '▲'}
+        <div className="flex items-center gap-2">
+          <span className="text-sm">
+            {isExpanded ? '▼' : '▶'}
           </span>
-          <span className="font-medieval text-sm">
-            AI Activity Log
-          </span>
-          <span className="bg-medieval-bronze text-medieval-navy px-2 py-0.5 rounded text-xs font-bold">
+          {isExpanded && (
+            <span className="font-medieval text-xs">
+              Activity Log
+            </span>
+          )}
+          <span className="bg-medieval-bronze text-medieval-navy px-1.5 py-0.5 rounded text-xs font-bold">
             {logs.length + combatLogs.length}
           </span>
         </div>
@@ -142,7 +144,7 @@ export default function AIDecisionPanel({ logs, combatLogs, onClear, onClearComb
 
       {/* Expandable content */}
       {isExpanded && (
-        <div className="bg-parchment-100 border-t-2 border-medieval-bronze max-h-64 overflow-y-auto">
+        <div className="bg-parchment-100 border-t-2 border-medieval-bronze max-h-48 overflow-y-auto rounded-b-lg shadow-lg">
           {/* Combat Logs Tab */}
           {activeTab === 'combats' && (
             combatLogs.length === 0 ? (
