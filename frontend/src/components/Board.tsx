@@ -130,10 +130,12 @@ export default function Board({ onHoldingClick }: BoardProps) {
             {/* Occupied holding - just show crest at diamond size */}
             {isOccupied && (
               <div className="relative">
+                {/* Blurred circle background */}
+                <div className="absolute inset-0 w-16 h-16 -translate-x-3 -translate-y-4 rounded-full bg-black/10 backdrop-blur-[2px] border-[3px] border-amber-400/85" />
                 <img 
                   src={ownerCrest} 
                   alt="Crest" 
-                  className="w-10 h-10 object-contain drop-shadow-lg"
+                  className="relative w-10 h-10 object-contain drop-shadow-lg"
                 />
                 {/* Capitol star indicator */}
                 {holding.is_capitol && (
