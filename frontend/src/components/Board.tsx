@@ -54,6 +54,16 @@ export default function Board({ onHoldingClick }: BoardProps) {
     return owner?.crest || null
   }
 
+  // Get crown image path for castle holdings
+  const getCrownImage = (holdingType: string): string | null => {
+    switch (holdingType) {
+      case 'king_castle': return '/crown__king.png'
+      case 'county_castle': return '/crown__count.png'
+      case 'duchy_castle': return '/crown__duke.png'
+      default: return null
+    }
+  }
+
   return (
     <div className="relative w-full h-full">
       {/* Board image */}
@@ -109,11 +119,13 @@ export default function Board({ onHoldingClick }: BoardProps) {
           <div
             key={holding.id}
             onClick={() => onHoldingClick(holding)}
-            className={`absolute cursor-pointer transition-transform duration-200 -translate-x-1/2 -translate-y-1/2 hover:scale-110 hover:z-20 ${
+            className={`absolute cursor-pointer transition-all duration-200 -translate-x-1/2 -translate-y-1/2 hover:scale-110 hover:z-20 ${
               selectedHolding?.id === holding.id ? 'z-20 ring-2 ring-yellow-400' : 'z-10'
             } ${isAttackable(holding.id) ? 'animate-pulse' : ''} ${
               isClaimable(holding.id) ? 'ring-2 ring-green-400 ring-offset-1' : ''
-            } ${!isOccupied ? 'holding-marker hover:brightness-125' : ''}`}
+            } ${!isOccupied ? 'holding-marker hover:brightness-125' : ''} ${
+              !isOccupied && holding.holding_type === 'king_castle' ? 'hover:shadow-[0_0_20px_8px_rgba(251,191,36,0.6)]' : ''
+            }`}
             style={{
               left: `${holding.position_x * 100}%`,
               top: `${holding.position_y * 100}%`,
@@ -132,13 +144,24 @@ export default function Board({ onHoldingClick }: BoardProps) {
               <div className="relative">
                 {/* Blurred circle background */}
                 <div className="absolute inset-0 w-16 h-16 -translate-x-3 -translate-y-4 rounded-full bg-black/10 backdrop-blur-[2px] border-[3px] border-amber-400/85" />
+                {/* Crown for castle holdings (70% saturation when occupied) */}
+                {getCrownImage(holding.holding_type) && (
+                  <img 
+                    src={getCrownImage(holding.holding_type)!}
+                    alt="Crown"
+                    className={`absolute left-1/2 -translate-x-1/2 object-contain z-10 ${
+                      holding.holding_type === 'county_castle' ? 'w-5 h-5 -top-4' : 'w-6 h-6 -top-5'
+                    }`}
+                    style={{ filter: 'saturate(70%)' }}
+                  />
+                )}
                 <img 
                   src={ownerCrest} 
                   alt="Crest" 
                   className="relative w-10 h-10 object-contain drop-shadow-lg"
                 />
-                {/* Capitol star indicator */}
-                {holding.is_capitol && (
+                {/* Capitol star indicator (only show if not a castle with crown) */}
+                {holding.is_capitol && !getCrownImage(holding.holding_type) && (
                   <div className="absolute -top-1 left-1/2 transform -translate-x-1/2 text-yellow-300 text-xs font-bold drop-shadow-md">
                     ★
                   </div>
@@ -166,18 +189,14 @@ export default function Board({ onHoldingClick }: BoardProps) {
             {/* Unoccupied holding - show rectangle with icon */}
             {!isOccupied && (
               <div className="absolute inset-0 flex items-center justify-center">
-                {/* Crown for king's castle */}
-                {holding.holding_type === 'king_castle' && (
-                  <svg className="w-6 h-6" viewBox="0 0 24 24" fill="#f59e0b">
-                    <path d="M5 16L3 5l5.5 5L12 4l3.5 6L21 5l-2 11H5zm0 2h14v2H5v-2z"/>
-                  </svg>
-                )}
-                
-                {/* Castle icon for county/duchy castles */}
-                {(holding.holding_type === 'county_castle' || holding.holding_type === 'duchy_castle') && (
-                  <svg className="w-5 h-5" viewBox="0 0 24 24" fill={getIconColor(holding)}>
-                    <path d="M12 2L2 12h3v8h6v-6h2v6h6v-8h3L12 2zm0 2.8L18.2 11H17v7h-3v-6H10v6H7v-7H5.8L12 4.8z"/>
-                  </svg>
+                {/* Crown images for castle holdings (grayscale when unoccupied) */}
+                {getCrownImage(holding.holding_type) && (
+                  <img 
+                    src={getCrownImage(holding.holding_type)!}
+                    alt="Crown"
+                    className={holding.holding_type === 'county_castle' ? 'w-7 h-7 object-contain' : 'w-8 h-8 object-contain'}
+                    style={{ filter: 'saturate(0)' }}
+                  />
                 )}
                 
                 {/* Town icon */}
