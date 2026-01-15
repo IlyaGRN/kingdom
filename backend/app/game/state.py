@@ -168,7 +168,7 @@ def create_game(player_configs: list[dict]) -> GameState:
     state = GameState(
         id=game_id,
         player_count=player_count,
-        victory_threshold=18,
+        victory_threshold=20,
         current_round=1,
         current_player_idx=0,
         phase=GamePhase.SETUP,

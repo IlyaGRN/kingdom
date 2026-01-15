@@ -24,6 +24,16 @@ interface IncomeBreakdown {
 }
 
 export default function PlayerMat({ player, isCurrentPlayer, cards, holdings, onCardClick }: PlayerMatProps) {
+  // Determine crown based on player's title
+  const getCrownForTitle = () => {
+    if (player.is_king) return '/crown__king.png'
+    if (player.title === 'duke') return '/crown__duke.png'
+    if (player.title === 'count') return '/crown__count.png'
+    return null // Baron has no crown
+  }
+
+  const crownImage = getCrownForTitle()
+
   const getTitleDisplay = () => {
     if (player.is_king) return 'King'
     if (player.title === 'duke') return 'Duke'
@@ -109,18 +119,20 @@ export default function PlayerMat({ player, isCurrentPlayer, cards, holdings, on
       {/* Header */}
       <div className="flex items-center gap-2 mb-2">
         <div className="relative flex-shrink-0">
+          {/* Crown indicator based on player's title */}
+          {crownImage && (
+            <img 
+              src={crownImage}
+              alt="Crown"
+              className="absolute -top-2 left-1/2 -translate-x-1/2 w-3 h-3 object-contain drop-shadow-md z-10"
+              style={{ filter: 'saturate(70%)' }}
+            />
+          )}
           <img 
             src={player.crest}
             alt={`${player.name}'s crest`}
             className="w-7 h-7 object-contain"
           />
-          {player.is_king && (
-            <div className="absolute -top-1 -right-1">
-              <svg className="w-3 h-3 text-yellow-400 drop-shadow-md" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M5 16L3 5l5.5 5L12 4l3.5 6L21 5l-2 11H5z"/>
-              </svg>
-            </div>
-          )}
         </div>
         <div className="flex-1 min-w-0">
           <h3 className="font-medieval text-sm text-medieval-bronze truncate">
