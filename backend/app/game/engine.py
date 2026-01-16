@@ -264,10 +264,27 @@ class GameEngine:
         Claims come from:
         - Played claim cards (stored in player.claims list)
         - Fabricated claims (also in player.claims list)
+        - AUTOMATIC: Meeting Count/Duke/King prerequisites gives a claim on that castle
         
         IMPORTANT: Without any claims, you cannot attack anyone!
         """
-        # If player has no claims at all, return False immediately
+        # FIRST: Check for automatic claims based on title prerequisites
+        # If player meets Count prerequisites for a county, they have a claim on that county castle
+        if holding.holding_type == HoldingType.COUNTY_CASTLE and holding.county:
+            if can_claim_count(self.state, player.id, holding.county):
+                return True
+        
+        # If player meets Duke prerequisites for a duchy, they have a claim on that duchy castle
+        if holding.holding_type == HoldingType.DUCHY_CASTLE and holding.duchy:
+            if can_claim_duke(self.state, player.id, holding.duchy):
+                return True
+        
+        # If player meets King prerequisites, they have a claim on the king castle
+        if holding.id == "king_castle":
+            if can_claim_king(self.state, player.id):
+                return True
+        
+        # If player has no explicit claims at all, return False for non-castle holdings
         if not player.claims or len(player.claims) == 0:
             return False
         
@@ -276,7 +293,8 @@ class GameEngine:
             return True
         
         # Check if player has a claim for the holding's county (for towns)
-        if holding.county and f"county_{holding.county}" in player.claims:
+        county_claim_key = f"county_{holding.county}"
+        if holding.county and county_claim_key in player.claims:
             return True
         
         # Check for "all" claims (ultimate/duchy)
@@ -326,7 +344,8 @@ class GameEngine:
         - The player doesn't have VASSAL_REVOLT active
         """
         # If holding is in player's domain, need Vassal Revolt to attack
-        if self._is_holding_in_domain(player, holding):
+        is_in_domain = self._is_holding_in_domain(player, holding)
+        if is_in_domain:
             if CardEffect.VASSAL_REVOLT not in player.active_effects:
                 return False
         
@@ -1016,8 +1035,9 @@ class GameEngine:
             required_county = get_card_county(card)
             if holding.county != required_county:
                 return False, f"This claim only works in County {required_county}", None
-            if holding.holding_type != HoldingType.TOWN:
-                return False, "Can only claim towns with county claim cards", None
+            # County claim cards can target TOWNS or the COUNTY CASTLE
+            if holding.holding_type not in [HoldingType.TOWN, HoldingType.COUNTY_CASTLE]:
+                return False, "County claim cards only work on towns or county castles", None
         
         elif effect == CardEffect.DUCHY_CLAIM:
             # Can claim any town or Duke+ title

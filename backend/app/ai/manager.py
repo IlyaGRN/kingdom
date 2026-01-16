@@ -267,7 +267,16 @@ class SimpleAIPlayer(AIPlayer):
         # County claim cards (CLAIM_X, CLAIM_U, CLAIM_V, CLAIM_Q)
         if effect and effect.value in ["claim_x", "claim_u", "claim_v", "claim_q"]:
             required_county = get_card_county(card)
-            # Find a town in that county we don't own and haven't claimed
+            # Find a town OR county castle in that county we don't own and haven't claimed
+            # Prioritize castles owned by others (valuable targets)
+            for holding in game_state.holdings:
+                if (holding.holding_type == HoldingType.COUNTY_CASTLE and 
+                    holding.county == required_county and
+                    holding.owner_id is not None and
+                    holding.owner_id != player.id and
+                    holding.id not in (player.claims or [])):
+                    return holding
+            # Then look for towns
             for holding in game_state.holdings:
                 if (holding.holding_type == HoldingType.TOWN and 
                     holding.county == required_county and
