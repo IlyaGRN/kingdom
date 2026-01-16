@@ -34,15 +34,9 @@ def calculate_defense_bonus(state: GameState, holding_id: str, defender_id: str 
     
     bonus = 0
     
-    # Town base defense
+    # Town base defense - castles have no base defense bonus
     if holding.holding_type == HoldingType.TOWN:
         bonus += 1
-    elif holding.holding_type == HoldingType.COUNTY_CASTLE:
-        bonus += 2
-    elif holding.holding_type == HoldingType.DUCHY_CASTLE:
-        bonus += 3
-    elif holding.holding_type == HoldingType.KING_CASTLE:
-        bonus += 4
     
     # Fortification bonus: based on THIS PLAYER'S fortifications on the holding
     # +1 for first, +2 for second = +3 total for 2 forts

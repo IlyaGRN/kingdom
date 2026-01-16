@@ -162,7 +162,7 @@ export default function Board({ onHoldingClick }: BoardProps) {
                 />
                 {/* Capitol star indicator (only show if not a castle with crown) */}
                 {holding.is_capitol && !getCrownImage(holding.holding_type) && (
-                  <div className="absolute -top-1 left-1/2 transform -translate-x-1/2 text-yellow-300 text-xs font-bold drop-shadow-md">
+                  <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 text-yellow-300 text-xs font-bold drop-shadow-md">
                     ★
                   </div>
                 )}
