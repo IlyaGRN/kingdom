@@ -43,6 +43,39 @@ export const visualConfig = {
     borderWidth: 3,
   },
 
+  // Holding cover image settings
+  holdingCovers: {
+    // Vertical position offset for cover images (0% = top, 50% = center, 100% = bottom)
+    // Since images are square but displayed as rectangles, this controls which part is visible
+    verticalPosition: {
+      // Towns
+      xandoria: 15,
+      xelphane: 15,
+      xythera: 15,
+      ulverin: 15,
+      uldorwyn: 15,
+      umbrith: 15,
+      valoria: 15,
+      vardhelm: 15,
+      velthar: 15,
+      quindara: 15,
+      qyrelis: 15,
+      quorwyn: 15,
+      // County castles
+      x_castle: 15,
+      u_castle: 15,
+      v_castle: 15,
+      q_castle: 15,
+      // Duchy castles
+      xu_castle: 15,
+      qv_castle: 15,
+      // King castle
+      king_castle: 15,
+    } as Record<string, number>,
+    // Default position if holding not in list
+    defaultPosition: 50,
+  },
+
   // Crest image settings
   crests: {
     // Show colored box as fallback if crest image is missing

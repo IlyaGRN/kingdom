@@ -11,6 +11,7 @@ import CombatPrepModal from './CombatPrepModal'
 import DefenseModal from './DefenseModal'
 import AIDecisionPanel from './AIDecisionPanel'
 import CardDrawModal from './CardDrawModal'
+import HoldingInfoPanel from './HoldingInfoPanel'
 
 interface GameBoardProps {
   onBack: () => void
@@ -514,9 +515,16 @@ export default function GameBoard({ onBack }: GameBoardProps) {
         </div>
       </div>
 
-      {/* Right sidebar - Action panel */}
+      {/* Right sidebar - Holding info + Action panel */}
       <div className="absolute right-0 top-0 h-full z-30">
         <div className="h-full bg-parchment-100/90 border-l border-parchment-300 w-72 overflow-y-auto p-2">
+          {/* Holding info panel when a holding is selected */}
+          {selectedHolding && (
+            <HoldingInfoPanel 
+              holding={selectedHolding} 
+              players={gameState.players} 
+            />
+          )}
           <ActionPanel
             onPerformAction={handlePerformAction}
             selectedHolding={selectedHolding}
