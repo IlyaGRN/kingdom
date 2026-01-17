@@ -80,49 +80,68 @@ export default function GameSetup({ onGameCreated, onBack }: GameSetupProps) {
   }
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center p-8">
-      <div className="card-parchment rounded-lg p-8 max-w-2xl w-full">
-        <h1 className="font-medieval text-3xl text-center mb-8 text-medieval-bronze">
+    <div 
+      className="h-screen flex flex-col items-center justify-center p-4 bg-cover bg-center bg-no-repeat overflow-hidden relative"
+      style={{ backgroundImage: `url('${visualConfig.gameSetup.backgroundImage}')` }}
+    >
+      {/* Blur overlay */}
+      <div 
+        className="absolute inset-0 backdrop-blur-sm pointer-events-none"
+        style={{ 
+          backdropFilter: `blur(${visualConfig.gameSetup.backgroundBlur}px)`,
+          WebkitBackdropFilter: `blur(${visualConfig.gameSetup.backgroundBlur}px)`,
+        }}
+      />
+      {/* Dark overlay */}
+      <div 
+        className="absolute inset-0 pointer-events-none" 
+        style={{ backgroundColor: `rgba(0, 0, 0, ${visualConfig.gameSetup.overlayOpacity})` }}
+      />
+      
+      <div className="card-parchment rounded-lg p-6 max-w-2xl w-full relative z-10">
+        <h1 className="font-medieval text-2xl text-center mb-4 text-medieval-bronze">
           Game Setup
         </h1>
 
         {/* Player count selection */}
-        <div className="mb-8">
-          <label className="block font-medieval text-lg mb-3 text-medieval-bronze">
-            Number of Players
-          </label>
-          <div className="flex gap-2">
-            {[4, 5, 6].map(count => (
-              <button
-                key={count}
-                onClick={() => handlePlayerCountChange(count)}
-                className={`px-6 py-3 rounded font-medieval text-lg transition-all ${
-                  playerCount === count
-                    ? 'bg-medieval-gold text-white'
-                    : 'bg-parchment-200 text-medieval-bronze hover:bg-parchment-300'
-                }`}
-              >
-                {count} Players
-              </button>
-            ))}
+        <div className="mb-4">
+          <div className="flex items-center gap-4">
+            <label className="font-medieval text-base text-medieval-bronze whitespace-nowrap">
+              Players:
+            </label>
+            <div className="flex gap-2">
+              {[4, 5, 6].map(count => (
+                <button
+                  key={count}
+                  onClick={() => handlePlayerCountChange(count)}
+                  className={`px-4 py-2 rounded font-medieval text-base transition-all ${
+                    playerCount === count
+                      ? 'bg-medieval-gold text-white'
+                      : 'bg-parchment-200 text-medieval-bronze hover:bg-parchment-300'
+                  }`}
+                >
+                  {count}
+                </button>
+              ))}
+            </div>
+            <span className="text-sm text-medieval-stone">
+              ({playerCount === 4 ? '10' : playerCount === 5 ? '11' : '12'} rounds)
+            </span>
           </div>
-          <p className="text-sm text-medieval-stone mt-2">
-            Game length: {playerCount === 4 ? '10' : playerCount === 5 ? '11' : '12'} rounds
-          </p>
         </div>
 
         {/* Player configuration */}
-        <div className="space-y-4 mb-8">
+        <div className="space-y-2 mb-4">
           {players.map((player, index) => (
             <div 
               key={index}
-              className="flex items-center gap-4 p-4 rounded bg-parchment-100 border border-parchment-300"
+              className="flex items-center gap-2 p-2 rounded bg-parchment-100 border border-parchment-300"
             >
               {/* Crest indicator */}
               <img 
                 src={player.crest}
                 alt="Crest"
-                className="w-10 h-10 object-contain flex-shrink-0"
+                className="w-8 h-8 object-contain flex-shrink-0"
               />
 
               {/* Player name */}
@@ -130,7 +149,7 @@ export default function GameSetup({ onGameCreated, onBack }: GameSetupProps) {
                 type="text"
                 value={player.name}
                 onChange={(e) => handlePlayerChange(index, 'name', e.target.value)}
-                className="flex-1 px-3 py-2 rounded border border-parchment-300 bg-white text-medieval-bronze focus:outline-none focus:border-medieval-gold"
+                className="flex-1 px-2 py-1 rounded border border-parchment-300 bg-white text-medieval-bronze text-sm focus:outline-none focus:border-medieval-gold"
                 placeholder="Player name"
               />
 
@@ -138,7 +157,7 @@ export default function GameSetup({ onGameCreated, onBack }: GameSetupProps) {
               <select
                 value={player.player_type}
                 onChange={(e) => handlePlayerChange(index, 'player_type', e.target.value as PlayerType)}
-                className="px-3 py-2 rounded border border-parchment-300 bg-white text-medieval-bronze focus:outline-none focus:border-medieval-gold"
+                className="px-2 py-1 rounded border border-parchment-300 bg-white text-medieval-bronze text-sm focus:outline-none focus:border-medieval-gold"
               >
                 {AI_TYPES.map(type => (
                   <option key={type.value} value={type.value}>
@@ -151,7 +170,7 @@ export default function GameSetup({ onGameCreated, onBack }: GameSetupProps) {
               <select
                 value={player.crest}
                 onChange={(e) => handlePlayerChange(index, 'crest', e.target.value)}
-                className="px-3 py-2 rounded border border-parchment-300 bg-white text-medieval-bronze focus:outline-none focus:border-medieval-gold"
+                className="px-2 py-1 rounded border border-parchment-300 bg-white text-medieval-bronze text-sm focus:outline-none focus:border-medieval-gold"
               >
                 {visualConfig.crests.available.map(crest => (
                   <option key={crest.id} value={crest.path}>
@@ -165,16 +184,16 @@ export default function GameSetup({ onGameCreated, onBack }: GameSetupProps) {
 
         {/* Error display */}
         {error && (
-          <div className="mb-4 p-3 rounded bg-red-100 border border-red-300 text-red-700">
+          <div className="mb-3 p-2 rounded bg-red-100 border border-red-300 text-red-700 text-sm">
             {error}
           </div>
         )}
 
         {/* Action buttons */}
-        <div className="flex gap-4 justify-center">
+        <div className="flex gap-3 justify-center">
           <button
             onClick={onBack}
-            className="px-8 py-3 rounded font-medieval text-lg bg-parchment-300 text-medieval-bronze hover:bg-parchment-400 transition-colors"
+            className="px-6 py-2 rounded font-medieval text-base bg-parchment-300 text-medieval-bronze hover:bg-parchment-400 transition-colors"
           >
             Back
           </button>
@@ -182,7 +201,7 @@ export default function GameSetup({ onGameCreated, onBack }: GameSetupProps) {
           <button
             onClick={handleStartGame}
             disabled={isLoading}
-            className="btn-medieval px-8 py-3 rounded text-lg"
+            className="btn-medieval px-6 py-2 rounded text-base"
           >
             {isLoading ? 'Creating...' : 'Start Game'}
           </button>

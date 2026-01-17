@@ -11,6 +11,16 @@ export const visualConfig = {
     overlayOpacity: 0.3,
   },
 
+  // Game setup screen settings
+  gameSetup: {
+    // Background image filename (in /public folder)
+    backgroundImage: '/menu_background_dark.png',
+    // Blur amount in pixels
+    backgroundBlur: 8,
+    // Dark overlay opacity (0.0 - 1.0)
+    overlayOpacity: 0.6,
+  },
+
   // Board image settings
   board: {
     // Saturation filter percentage (0-200, 100 = normal)

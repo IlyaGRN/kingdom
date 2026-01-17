@@ -12,6 +12,7 @@ venv/
 node_modules/
 dist/
 .vite/
+backend/game_logs/
 
 # IDE
 .idea/
