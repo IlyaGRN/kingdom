@@ -1,3 +1,5 @@
+import { visualConfig } from '../config/visualConfig'
+
 interface MainMenuProps {
   onStartGame: () => void
   onStartSimulation: () => void
@@ -5,26 +7,18 @@ interface MainMenuProps {
 
 export default function MainMenu({ onStartGame, onStartSimulation }: MainMenuProps) {
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center p-8">
-      {/* Decorative background */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-0 left-0 w-96 h-96 bg-medieval-gold/5 rounded-full blur-3xl transform -translate-x-1/2 -translate-y-1/2" />
-        <div className="absolute bottom-0 right-0 w-96 h-96 bg-medieval-crimson/5 rounded-full blur-3xl transform translate-x-1/2 translate-y-1/2" />
-      </div>
+    <div 
+      className="min-h-screen flex flex-col items-center justify-center p-8 bg-cover bg-center bg-no-repeat"
+      style={{ backgroundImage: `url('${visualConfig.mainMenu.backgroundImage}')` }}
+    >
+      {/* Dark overlay for readability */}
+      <div 
+        className="absolute inset-0 pointer-events-none" 
+        style={{ backgroundColor: `rgba(0, 0, 0, ${visualConfig.mainMenu.overlayOpacity})` }}
+      />
 
       {/* Main content */}
       <div className="relative z-10 text-center">
-        {/* Crown icon */}
-        <div className="mb-6">
-          <svg 
-            className="w-24 h-24 mx-auto text-medieval-gold crown-pulse" 
-            viewBox="0 0 24 24" 
-            fill="currentColor"
-          >
-            <path d="M5 16L3 5l5.5 5L12 4l3.5 6L21 5l-2 11H5zm0 2h14v2H5v-2z"/>
-          </svg>
-        </div>
-
         {/* Title */}
         <h1 className="font-medieval text-6xl md:text-7xl text-parchment-100 mb-2 tracking-wider">
           Machiavelli's

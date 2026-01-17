@@ -30,7 +30,7 @@ class GeminiPlayer(AIPlayer):
             full_prompt,
             generation_config=genai.types.GenerationConfig(
                 temperature=0.7,
-                max_output_tokens=100,
+                max_output_tokens=300,
             ),
         )
         return response.text.strip()
@@ -49,28 +49,24 @@ class GeminiPlayer(AIPlayer):
             raise ValueError("No valid actions available")
         
         state_text = self._format_game_state(game_state, player)
-        actions_text = self._format_valid_actions(valid_actions)
+        actions_text = self._format_valid_actions(valid_actions, game_state, player)
         
         system_prompt = self._get_system_prompt()
         user_prompt = f"""{state_text}
 
 {actions_text}
 
-BE AGGRESSIVE! Choose the BEST action. Priority order (highest to lowest):
-1. attack - ATTACK enemies whenever possible! War brings victory! (requires 200+ soldiers)
-2. claim_title - ALWAYS claim titles immediately (gives VP!)
-3. claim_town - Capture unowned towns for 10 gold
-4. play_card - Play claim cards to enable MORE ATTACKS
-5. fake_claim - Fabricate claims on enemy towns to attack them! (35 gold)
-6. build_fortification - FORTIFY YOUR CAPITOL FIRST! (X=Xythera, U=Umbrith, V=Valoria, Q=Quindara)
-   - A fortified Capitol (1 fort) lets you become Count without 2 towns!
-7. end_turn - Only when no aggressive moves remain
-8. recruit - Only to prepare for attacks
+You have {player.soldiers} soldiers available. Minimum 200 required for attacks.
 
-IMPORTANT: You are a WARLORD. Attack first! Fortify your Capitol for a fast path to Count title!
-If you can attack, DO IT. Expansion through conquest is the path to victory!
+Choose your action wisely!
+- For claim cards (play_card): specify TARGET from CLAIMABLE TARGETS list
+- For attacks: specify SOLDIERS to commit (200-{player.soldiers}, multiples of 100)
 
-Respond with ONLY the number of your chosen action (1-{len(valid_actions)})."""
+Respond in this format:
+ACTION: [number 1-{len(valid_actions)}]
+TARGET: [holding_id or "none"]
+SOLDIERS: [number for attacks, or "none"]
+REASON: [your strategic reasoning]"""
         
         def make_log(action: Action, reason: str) -> AIDecisionLog:
             return AIDecisionLog(
@@ -102,14 +98,16 @@ Respond with ONLY the number of your chosen action (1-{len(valid_actions)})."""
         try:
             response = await self._get_completion(system_prompt, user_prompt)
             
-            numbers = re.findall(r'\d+', response)
-            if numbers:
-                action_idx = int(numbers[0]) - 1
+            # Parse the structured response
+            action_num, target_id, soldiers_count, reason = self._parse_ai_response(response)
+            
+            if action_num is not None:
+                action_idx = action_num - 1
                 if 0 <= action_idx < len(valid_actions):
                     chosen = valid_actions[action_idx]
-                    completed = self._complete_action(chosen, game_state, player)
+                    completed = self._complete_action(chosen, game_state, player, target_id, soldiers_count)
                     if completed:
-                        decision_log = make_log(completed, f"Gemini selected #{action_idx+1}: {response[:50]}")
+                        decision_log = make_log(completed, reason or f"Gemini selected #{action_num}")
                         log_ai_decision(response, completed, decision_log)
                         return completed, decision_log
                     for action in valid_actions:

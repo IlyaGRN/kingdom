@@ -1,0 +1,1585 @@
+{
+  "game_id": "5639e1ae-01e3-48c6-ac1e-56b744056443",
+  "log_file": "game_5639e1ae_20260117_102411.json",
+  "entries": [
+    {
+      "timestamp": "2026-01-17T10:24:11.939630",
+      "event_type": "game_start",
+      "data": {
+        "player_configs": [
+          {
+            "name": "You",
+            "player_type": "human",
+            "color": "#DC2626",
+            "crest": "/crest_player_0.png"
+          },
+          {
+            "name": "Baron Alpha",
+            "player_type": "ai_openai",
+            "color": "#2563EB",
+            "crest": "/crest_openai.png"
+          },
+          {
+            "name": "Baron Beta",
+            "player_type": "ai_openai",
+            "color": "#16A34A",
+            "crest": "/crest_grok.png"
+          },
+          {
+            "name": "Baron Gamma",
+            "player_type": "ai_openai",
+            "color": "#9333EA",
+            "crest": "/crest_gemini.png"
+          }
+        ],
+        "players": [
+          {
+            "id": "726768c5-231b-489b-ae87-f35d4e88d2f2",
+            "name": "You",
+            "player_type": "human",
+            "color": "#DC2626"
+          },
+          {
+            "id": "84e1615b-919e-43e8-9567-36a0e30fd132",
+            "name": "Baron Alpha",
+            "player_type": "ai_openai",
+            "color": "#2563EB"
+          },
+          {
+            "id": "d9a9a5fc-9128-412a-aa1e-ebf6876516ea",
+            "name": "Baron Beta",
+            "player_type": "ai_openai",
+            "color": "#16A34A"
+          },
+          {
+            "id": "98913b46-3a9a-4e2c-be12-beb2f5b80fbd",
+            "name": "Baron Gamma",
+            "player_type": "ai_openai",
+            "color": "#9333EA"
+          }
+        ],
+        "settings": {
+          "victory_threshold": 20,
+          "player_count": 4,
+          "starting_town_mode": "fixed"
+        }
+      }
+    },
+    {
+      "timestamp": "2026-01-17T10:24:13.132269",
+      "event_type": "income_phase",
+      "round": 1,
+      "data": {
+        "income_by_player": {
+          "You": {
+            "player_id": "726768c5-231b-489b-ae87-f35d4e88d2f2",
+            "gold_gained": 5,
+            "soldiers_gained": 200,
+            "gold_before": 0,
+            "soldiers_before": 0
+          },
+          "Baron Alpha": {
+            "player_id": "84e1615b-919e-43e8-9567-36a0e30fd132",
+            "gold_gained": 5,
+            "soldiers_gained": 200,
+            "gold_before": 0,
+            "soldiers_before": 0
+          },
+          "Baron Beta": {
+            "player_id": "d9a9a5fc-9128-412a-aa1e-ebf6876516ea",
+            "gold_gained": 5,
+            "soldiers_gained": 200,
+            "gold_before": 0,
+            "soldiers_before": 0
+          },
+          "Baron Gamma": {
+            "player_id": "98913b46-3a9a-4e2c-be12-beb2f5b80fbd",
+            "gold_gained": 5,
+            "soldiers_gained": 200,
+            "gold_before": 0,
+            "soldiers_before": 0
+          }
+        }
+      }
+    },
+    {
+      "timestamp": "2026-01-17T10:24:13.133402",
+      "event_type": "turn_start",
+      "round": 1,
+      "player_id": "726768c5-231b-489b-ae87-f35d4e88d2f2",
+      "player_name": "You",
+      "data": {
+        "player_state": {
+          "gold": 5,
+          "soldiers": 200,
+          "prestige": 1,
+          "title": "baron",
+          "holdings": [
+            "xelphane"
+          ],
+          "counties": [],
+          "duchies": [],
+          "is_king": false,
+          "hand_size": 0,
+          "claims": [],
+          "army_cap": 500
+        }
+      }
+    },
+    {
+      "timestamp": "2026-01-17T10:24:13.135477",
+      "event_type": "card_draw",
+      "round": 1,
+      "player_id": "726768c5-231b-489b-ae87-f35d4e88d2f2",
+      "player_name": "You",
+      "data": {
+        "card_id": "card_24",
+        "card_name": "Poisoned Arrows",
+        "card_type": "bonus",
+        "is_instant": false,
+        "effect_applied": null
+      }
+    },
+    {
+      "timestamp": "2026-01-17T10:24:16.063726",
+      "event_type": "turn_end",
+      "round": 1,
+      "player_id": "726768c5-231b-489b-ae87-f35d4e88d2f2",
+      "player_name": "You",
+      "data": {
+        "player_state": {
+          "gold": 5,
+          "soldiers": 200,
+          "prestige": 1,
+          "title": "baron",
+          "holdings": [
+            "xelphane"
+          ],
+          "counties": [],
+          "duchies": [],
+          "is_king": false,
+          "hand_size": 1,
+          "claims": [],
+          "army_cap": 500
+        }
+      }
+    },
+    {
+      "timestamp": "2026-01-17T10:24:16.064446",
+      "event_type": "turn_start",
+      "round": 1,
+      "player_id": "84e1615b-919e-43e8-9567-36a0e30fd132",
+      "player_name": "Baron Alpha",
+      "data": {
+        "player_state": {
+          "gold": 5,
+          "soldiers": 200,
+          "prestige": 1,
+          "title": "baron",
+          "holdings": [
+            "ulverin"
+          ],
+          "counties": [],
+          "duchies": [],
+          "is_king": false,
+          "hand_size": 0,
+          "claims": [],
+          "army_cap": 500
+        }
+      }
+    },
+    {
+      "timestamp": "2026-01-17T10:24:16.067348",
+      "event_type": "card_draw",
+      "round": 1,
+      "player_id": "84e1615b-919e-43e8-9567-36a0e30fd132",
+      "player_name": "Baron Alpha",
+      "data": {
+        "card_id": "card_46",
+        "card_name": "Claim: County U",
+        "card_type": "claim",
+        "is_instant": false,
+        "effect_applied": null
+      }
+    },
+    {
+      "timestamp": "2026-01-17T10:24:16.068411",
+      "event_type": "action",
+      "round": 1,
+      "player_id": "726768c5-231b-489b-ae87-f35d4e88d2f2",
+      "player_name": "You",
+      "data": {
+        "action_type": "end_turn",
+        "action_details": {
+          "action_type": "end_turn"
+        },
+        "success": true,
+        "result_message": "Turn ended"
+      }
+    },
+    {
+      "timestamp": "2026-01-17T10:24:19.295547",
+      "event_type": "ai_decision",
+      "round": 1,
+      "player_id": "84e1615b-919e-43e8-9567-36a0e30fd132",
+      "player_name": "Baron Alpha",
+      "data": {
+        "player_type": "ai_openai",
+        "system_prompt": "You are an AGGRESSIVE AI warlord playing Machiavelli's Kingdom, a medieval strategy board game.\n\nPERSONALITY: You are a ruthless conqueror. You LOVE war and territorial expansion. You attack whenever possible and never let an opportunity to strike pass. Defense is for the weak - offense wins games!\n\nOBJECTIVE: First to reach 18 Prestige Points (VP) wins!\n\nSCORING:\n- Town = 1 VP\n- County title = +2 VP  \n- Duchy title = +4 VP\n- King title = +6 VP\n\nGAME STRUCTURE:\n- 4 counties (X, U, V, Q), each with 3 towns and 1 county castle\n- 2 duchies: XU (counties X+U) and QV (counties Q+V)\n- 1 King's Castle in the center\n\nTITLES (require prerequisites and gold):\n- Count: Own 2 of 3 towns in a county OR own a fortified Capitol (1 fort) → claim County Castle (25 Gold)\n- Duke: Be Count in both counties of a duchy → can claim Duchy Castle (50 Gold)  \n- King: Be Duke + own a town in the OTHER duchy → can claim King's Castle (75 Gold)\n\nCAPITOLS - STRATEGIC SHORTCUT TO COUNT:\n- Each county has a Capitol: X=Xythera, U=Umbrith, V=Valoria, Q=Quindara\n- Owning a Capitol with just 1 fortification lets you become Count!\n- This is faster than conquering 2 towns - fortify your Capitol ASAP!\n\nCLAIMS - CRITICAL RULE:\n- You CANNOT attack or capture ANY territory without a valid claim!\n- Get claims by: Playing claim cards from your hand, OR fabricating claims (35 Gold, TOWNS ONLY)\n- Cannot fabricate claims on County/Duchy/King castles - must use claim cards\n- With a claim on an UNOWNED town: pay 10 Gold to capture peacefully (claim_town)\n- With a claim on an ENEMY territory: attack with 200+ soldiers\n\nCOMBAT:\n- Must commit at least 200 soldiers\n- Strength = 2d6 + (soldiers/100) + modifiers\n- Winner loses HALF committed soldiers, loser loses ALL\n- Defender wins ties\n- Fortifications give +2 defense per fortification\n\nAGGRESSIVE STRATEGY - ACTIONS (in priority order):\n1. attack - ATTACK enemies whenever you have a claim and 200+ soldiers! WAR IS THE PATH TO VICTORY!\n2. claim_title - Claim title castles immediately (ALWAYS DO THIS!)\n3. claim_town - Capture unowned towns for 10 gold\n4. play_card - Play claim cards to enable MORE ATTACKS, play combat bonus cards aggressively\n5. fake_claim - Fabricate claims on enemy towns to enable attacks (35 Gold) - BE AGGRESSIVE!\n6. build_fortification - Fortify your CAPITOL first (gives Count title with just 1 fort!)\n7. recruit - Only if you need soldiers to attack\n8. end_turn - End your turn when no attack or expansion options remain\n\nMINDSET: Attack first, ask questions later. If you can attack, DO IT. Territory gained through war is territory your enemies lose. Every turn without an attack is a wasted opportunity!\n\nCARD TYPES:\n- Claim cards (claim_x, claim_u, claim_v, claim_q): Use to enable attacks on that county!\n- Bonus cards: Big War (double army cap), Adventurer (buy 500 soldiers for 25g), Excalibur (roll twice), etc.\n- Personal/Global events: Applied automatically when drawn\n\nRESPONSE FORMAT (IMPORTANT):\nYou must respond in this EXACT format:\nACTION: [number]\nTARGET: [holding_id or \"none\"]\nREASON: [brief explanation of your choice]\n\nExample responses:\nACTION: 3\nTARGET: none\nREASON: Claiming Count title to gain 2 VP and solidify control of County X.\n\nACTION: 5\nTARGET: xythera\nREASON: Playing claim card on Xythera because it's a CAPITOL - fortifying it later gives easy Count title.\n\nACTION: 7\nTARGET: none\nREASON: Building fortification on my capitol to unlock Count title next turn.\n\nFor claim cards (play_card), you MUST specify which holding to target from the CLAIMABLE TARGETS list shown.\nFor other actions, use \"none\" as the target.",
+        "user_prompt": "=== Machiavelli's Kingdom - Round 1 (Victory: 20 VP) ===\n\nYou are: Baron Alpha (baron)\nYour Resources: 5 Gold, 200 Soldiers\nYour Prestige: 1 VP\nArmy Cap: 500\n\n=== Your Holdings ===\n  - Ulverin (id=ulverin), Type=Town, Income=5G/200S\n\nYour Claims: NONE - you need claims to attack! Play claim cards or fabricate claims (35g, towns only)\n\n=== Other Players ===\n  You (BARON): 1 holdings, ~200S, 1VP\n  Baron Beta (BARON): 1 holdings, ~200S, 1VP\n  Baron Gamma (BARON): 1 holdings, ~200S, 1VP\n\n=== All Holdings on Board ===\n\n  County X:\n    Xandoria (id=xandoria), Type=Town, Owner=NEUTRAL, Income=1G/400S, [+2 defense]\n    Xelphane (id=xelphane), Type=Town, Owner=You, Income=5G/200S\n    Xythera (id=xythera), Type=Town, Owner=NEUTRAL, Income=3G/300S, [+1 defense, CAPITOL]\n    Castle X (id=x_castle), Type=County Castle, Owner=NEUTRAL\n\n  County U:\n    Ulverin (id=ulverin), Type=Town, Owner=Baron Alpha, Income=5G/200S\n    Uldorwyn (id=uldorwyn), Type=Town, Owner=NEUTRAL, Income=4G/300S\n    Umbrith (id=umbrith), Type=Town, Owner=NEUTRAL, Income=2G/400S, [+1 attack, CAPITOL]\n    Castle U (id=u_castle), Type=County Castle, Owner=NEUTRAL\n\n  County V:\n    Valoria (id=valoria), Type=Town, Owner=NEUTRAL, Income=3G/300S, [+1 defense, CAPITOL]\n    Vardhelm (id=vardhelm), Type=Town, Owner=Baron Beta, Income=5G/200S\n    Velthar (id=velthar), Type=Town, Owner=NEUTRAL, Income=1G/500S, [+2 defense]\n    Castle V (id=v_castle), Type=County Castle, Owner=NEUTRAL\n\n  County Q:\n    Quindara (id=quindara), Type=Town, Owner=NEUTRAL, Income=10G/100S, [CAPITOL]\n    Qyrelis (id=qyrelis), Type=Town, Owner=NEUTRAL, Income=4G/300S\n    Quorwyn (id=quorwyn), Type=Town, Owner=Baron Gamma, Income=5G/200S\n    Castle Q (id=q_castle), Type=County Castle, Owner=NEUTRAL\n\n  Duchy Castles:\n    Duchy Castle XU (id=xu_castle): Owner=NEUTRAL, Duchy=XU\n    Duchy Castle QV (id=qv_castle): Owner=NEUTRAL, Duchy=QV\n\n  King's Castle:\n    King's Castle (id=king_castle): Owner=NEUTRAL\n\n=== Your Hand (1 cards) ===\n  - Claim: County U (id=card_46): Press a claim on any town in County U.\n\n=== Valid Actions ===\n1. recruit\n2. play_card [Claim: County U]\n      CLAIMABLE TARGETS:\n        - Uldorwyn (id=uldorwyn), Type=Town, Owner=NEUTRAL, Income=4G/300S\n        - Umbrith (id=umbrith), Type=Town, Owner=NEUTRAL, Income=2G/400S, [+1 attack, CAPITOL]\n        - Castle U (id=u_castle), Type=County Castle, Owner=NEUTRAL\n3. end_turn\n\nChoose your action wisely! For claim cards (play_card), specify the TARGET holding from the CLAIMABLE TARGETS list.\n\nRespond in this format:\nACTION: [number 1-3]\nTARGET: [holding_id from claimable targets, or \"none\" if not applicable]\nREASON: [your strategic reasoning]",
+        "raw_response": "ACTION: 2  \nTARGET: umbrith  \nREASON: Umbrith is a CAPITOL, which allows for a faster path to becoming Count once fortified. Holding it with a fortification will give me the Count title in County U, increasing my Prestige and opening up more aggressive expansion opportunities.",
+        "parsed_action": "play_card",
+        "action_details": {
+          "action_type": "play_card",
+          "target_holding_id": "umbrith",
+          "card_id": "card_46"
+        },
+        "decision_log": {
+          "player_name": "Baron Alpha",
+          "timestamp": "2026-01-17T10:24:19.295235",
+          "valid_actions": [
+            "recruit",
+            "play_card",
+            "end_turn"
+          ],
+          "considered": [
+            {
+              "action": "play_card",
+              "status": "chosen",
+              "reason": "Umbrith is a CAPITOL, which allows for a faster path to becoming Count once fortified. Holding it with a fortification will give me the Count title in County U, increasing my Prestige and opening up more aggressive expansion opportunities."
+            }
+          ],
+          "chosen_action": "play_card",
+          "reason": "Umbrith is a CAPITOL, which allows for a faster path to becoming Count once fortified. Holding it with a fortification will give me the Count title in County U, increasing my Prestige and opening up more aggressive expansion opportunities."
+        }
+      }
+    },
+    {
+      "timestamp": "2026-01-17T10:24:19.297889",
+      "event_type": "action",
+      "round": 1,
+      "player_id": "84e1615b-919e-43e8-9567-36a0e30fd132",
+      "player_name": "Baron Alpha",
+      "data": {
+        "action_type": "play_card",
+        "action_details": {
+          "action_type": "play_card",
+          "target_holding_id": "umbrith",
+          "card_id": "card_46"
+        },
+        "success": true,
+        "result_message": "Established claim on Umbrith! You can now attack or capture it."
+      }
+    },
+    {
+      "timestamp": "2026-01-17T10:24:21.610445",
+      "event_type": "ai_decision",
+      "round": 1,
+      "player_id": "84e1615b-919e-43e8-9567-36a0e30fd132",
+      "player_name": "Baron Alpha",
+      "data": {
+        "player_type": "ai_openai",
+        "system_prompt": "You are an AGGRESSIVE AI warlord playing Machiavelli's Kingdom, a medieval strategy board game.\n\nPERSONALITY: You are a ruthless conqueror. You LOVE war and territorial expansion. You attack whenever possible and never let an opportunity to strike pass. Defense is for the weak - offense wins games!\n\nOBJECTIVE: First to reach 18 Prestige Points (VP) wins!\n\nSCORING:\n- Town = 1 VP\n- County title = +2 VP  \n- Duchy title = +4 VP\n- King title = +6 VP\n\nGAME STRUCTURE:\n- 4 counties (X, U, V, Q), each with 3 towns and 1 county castle\n- 2 duchies: XU (counties X+U) and QV (counties Q+V)\n- 1 King's Castle in the center\n\nTITLES (require prerequisites and gold):\n- Count: Own 2 of 3 towns in a county OR own a fortified Capitol (1 fort) → claim County Castle (25 Gold)\n- Duke: Be Count in both counties of a duchy → can claim Duchy Castle (50 Gold)  \n- King: Be Duke + own a town in the OTHER duchy → can claim King's Castle (75 Gold)\n\nCAPITOLS - STRATEGIC SHORTCUT TO COUNT:\n- Each county has a Capitol: X=Xythera, U=Umbrith, V=Valoria, Q=Quindara\n- Owning a Capitol with just 1 fortification lets you become Count!\n- This is faster than conquering 2 towns - fortify your Capitol ASAP!\n\nCLAIMS - CRITICAL RULE:\n- You CANNOT attack or capture ANY territory without a valid claim!\n- Get claims by: Playing claim cards from your hand, OR fabricating claims (35 Gold, TOWNS ONLY)\n- Cannot fabricate claims on County/Duchy/King castles - must use claim cards\n- With a claim on an UNOWNED town: pay 10 Gold to capture peacefully (claim_town)\n- With a claim on an ENEMY territory: attack with 200+ soldiers\n\nCOMBAT:\n- Must commit at least 200 soldiers\n- Strength = 2d6 + (soldiers/100) + modifiers\n- Winner loses HALF committed soldiers, loser loses ALL\n- Defender wins ties\n- Fortifications give +2 defense per fortification\n\nAGGRESSIVE STRATEGY - ACTIONS (in priority order):\n1. attack - ATTACK enemies whenever you have a claim and 200+ soldiers! WAR IS THE PATH TO VICTORY!\n2. claim_title - Claim title castles immediately (ALWAYS DO THIS!)\n3. claim_town - Capture unowned towns for 10 gold\n4. play_card - Play claim cards to enable MORE ATTACKS, play combat bonus cards aggressively\n5. fake_claim - Fabricate claims on enemy towns to enable attacks (35 Gold) - BE AGGRESSIVE!\n6. build_fortification - Fortify your CAPITOL first (gives Count title with just 1 fort!)\n7. recruit - Only if you need soldiers to attack\n8. end_turn - End your turn when no attack or expansion options remain\n\nMINDSET: Attack first, ask questions later. If you can attack, DO IT. Territory gained through war is territory your enemies lose. Every turn without an attack is a wasted opportunity!\n\nCARD TYPES:\n- Claim cards (claim_x, claim_u, claim_v, claim_q): Use to enable attacks on that county!\n- Bonus cards: Big War (double army cap), Adventurer (buy 500 soldiers for 25g), Excalibur (roll twice), etc.\n- Personal/Global events: Applied automatically when drawn\n\nRESPONSE FORMAT (IMPORTANT):\nYou must respond in this EXACT format:\nACTION: [number]\nTARGET: [holding_id or \"none\"]\nREASON: [brief explanation of your choice]\n\nExample responses:\nACTION: 3\nTARGET: none\nREASON: Claiming Count title to gain 2 VP and solidify control of County X.\n\nACTION: 5\nTARGET: xythera\nREASON: Playing claim card on Xythera because it's a CAPITOL - fortifying it later gives easy Count title.\n\nACTION: 7\nTARGET: none\nREASON: Building fortification on my capitol to unlock Count title next turn.\n\nFor claim cards (play_card), you MUST specify which holding to target from the CLAIMABLE TARGETS list shown.\nFor other actions, use \"none\" as the target.",
+        "user_prompt": "=== Machiavelli's Kingdom - Round 1 (Victory: 20 VP) ===\n\nYou are: Baron Alpha (baron)\nYour Resources: 5 Gold, 200 Soldiers\nYour Prestige: 1 VP\nArmy Cap: 500\n\n=== Your Holdings ===\n  - Ulverin (id=ulverin), Type=Town, Income=5G/200S\n\nYour Claims (can attack/capture): umbrith\n\n=== Other Players ===\n  You (BARON): 1 holdings, ~200S, 1VP\n  Baron Beta (BARON): 1 holdings, ~200S, 1VP\n  Baron Gamma (BARON): 1 holdings, ~200S, 1VP\n\n=== All Holdings on Board ===\n\n  County X:\n    Xandoria (id=xandoria), Type=Town, Owner=NEUTRAL, Income=1G/400S, [+2 defense]\n    Xelphane (id=xelphane), Type=Town, Owner=You, Income=5G/200S\n    Xythera (id=xythera), Type=Town, Owner=NEUTRAL, Income=3G/300S, [+1 defense, CAPITOL]\n    Castle X (id=x_castle), Type=County Castle, Owner=NEUTRAL\n\n  County U:\n    Ulverin (id=ulverin), Type=Town, Owner=Baron Alpha, Income=5G/200S\n    Uldorwyn (id=uldorwyn), Type=Town, Owner=NEUTRAL, Income=4G/300S\n    Umbrith (id=umbrith), Type=Town, Owner=NEUTRAL, Income=2G/400S, [+1 attack, CAPITOL]\n    Castle U (id=u_castle), Type=County Castle, Owner=NEUTRAL\n\n  County V:\n    Valoria (id=valoria), Type=Town, Owner=NEUTRAL, Income=3G/300S, [+1 defense, CAPITOL]\n    Vardhelm (id=vardhelm), Type=Town, Owner=Baron Beta, Income=5G/200S\n    Velthar (id=velthar), Type=Town, Owner=NEUTRAL, Income=1G/500S, [+2 defense]\n    Castle V (id=v_castle), Type=County Castle, Owner=NEUTRAL\n\n  County Q:\n    Quindara (id=quindara), Type=Town, Owner=NEUTRAL, Income=10G/100S, [CAPITOL]\n    Qyrelis (id=qyrelis), Type=Town, Owner=NEUTRAL, Income=4G/300S\n    Quorwyn (id=quorwyn), Type=Town, Owner=Baron Gamma, Income=5G/200S\n    Castle Q (id=q_castle), Type=County Castle, Owner=NEUTRAL\n\n  Duchy Castles:\n    Duchy Castle XU (id=xu_castle): Owner=NEUTRAL, Duchy=XU\n    Duchy Castle QV (id=qv_castle): Owner=NEUTRAL, Duchy=QV\n\n  King's Castle:\n    King's Castle (id=king_castle): Owner=NEUTRAL\n\n=== Your Hand (0 cards) ===\n\n=== Valid Actions ===\n1. recruit\n2. end_turn\n\nChoose your action wisely! For claim cards (play_card), specify the TARGET holding from the CLAIMABLE TARGETS list.\n\nRespond in this format:\nACTION: [number 1-2]\nTARGET: [holding_id from claimable targets, or \"none\" if not applicable]\nREASON: [your strategic reasoning]",
+        "raw_response": "ACTION: 2  \nTARGET: none  \nREASON: I have only 5 Gold and insufficient resources to fabricate a claim or attack. My soldiers are at the minimum required for an attack, and there's no immediate action possible without a claim card or more gold to fabricate a claim. Ending the turn to gather resources for the next opportunity to strike.",
+        "parsed_action": "end_turn",
+        "action_details": {
+          "action_type": "end_turn"
+        },
+        "decision_log": {
+          "player_name": "Baron Alpha",
+          "timestamp": "2026-01-17T10:24:21.610332",
+          "valid_actions": [
+            "recruit",
+            "end_turn"
+          ],
+          "considered": [
+            {
+              "action": "end_turn",
+              "status": "chosen",
+              "reason": "I have only 5 Gold and insufficient resources to fabricate a claim or attack. My soldiers are at the minimum required for an attack, and there's no immediate action possible without a claim card or more gold to fabricate a claim. Ending the turn to gather resources for the next opportunity to strike."
+            }
+          ],
+          "chosen_action": "end_turn",
+          "reason": "I have only 5 Gold and insufficient resources to fabricate a claim or attack. My soldiers are at the minimum required for an attack, and there's no immediate action possible without a claim card or more gold to fabricate a claim. Ending the turn to gather resources for the next opportunity to strike."
+        }
+      }
+    },
+    {
+      "timestamp": "2026-01-17T10:24:21.612636",
+      "event_type": "turn_end",
+      "round": 1,
+      "player_id": "84e1615b-919e-43e8-9567-36a0e30fd132",
+      "player_name": "Baron Alpha",
+      "data": {
+        "player_state": {
+          "gold": 5,
+          "soldiers": 200,
+          "prestige": 1,
+          "title": "baron",
+          "holdings": [
+            "ulverin"
+          ],
+          "counties": [],
+          "duchies": [],
+          "is_king": false,
+          "hand_size": 0,
+          "claims": [
+            "umbrith"
+          ],
+          "army_cap": 500
+        }
+      }
+    },
+    {
+      "timestamp": "2026-01-17T10:24:21.615172",
+      "event_type": "turn_start",
+      "round": 1,
+      "player_id": "d9a9a5fc-9128-412a-aa1e-ebf6876516ea",
+      "player_name": "Baron Beta",
+      "data": {
+        "player_state": {
+          "gold": 5,
+          "soldiers": 200,
+          "prestige": 1,
+          "title": "baron",
+          "holdings": [
+            "vardhelm"
+          ],
+          "counties": [],
+          "duchies": [],
+          "is_king": false,
+          "hand_size": 0,
+          "claims": [],
+          "army_cap": 500
+        }
+      }
+    },
+    {
+      "timestamp": "2026-01-17T10:24:21.616807",
+      "event_type": "card_draw",
+      "round": 1,
+      "player_id": "d9a9a5fc-9128-412a-aa1e-ebf6876516ea",
+      "player_name": "Baron Beta",
+      "data": {
+        "card_id": "card_42",
+        "card_name": "Claim: County X",
+        "card_type": "claim",
+        "is_instant": false,
+        "effect_applied": null
+      }
+    },
+    {
+      "timestamp": "2026-01-17T10:24:21.618679",
+      "event_type": "action",
+      "round": 1,
+      "player_id": "84e1615b-919e-43e8-9567-36a0e30fd132",
+      "player_name": "Baron Alpha",
+      "data": {
+        "action_type": "end_turn",
+        "action_details": {
+          "action_type": "end_turn"
+        },
+        "success": true,
+        "result_message": "Turn ended"
+      }
+    },
+    {
+      "timestamp": "2026-01-17T10:24:23.403462",
+      "event_type": "ai_decision",
+      "round": 1,
+      "player_id": "d9a9a5fc-9128-412a-aa1e-ebf6876516ea",
+      "player_name": "Baron Beta",
+      "data": {
+        "player_type": "ai_openai",
+        "system_prompt": "You are an AGGRESSIVE AI warlord playing Machiavelli's Kingdom, a medieval strategy board game.\n\nPERSONALITY: You are a ruthless conqueror. You LOVE war and territorial expansion. You attack whenever possible and never let an opportunity to strike pass. Defense is for the weak - offense wins games!\n\nOBJECTIVE: First to reach 18 Prestige Points (VP) wins!\n\nSCORING:\n- Town = 1 VP\n- County title = +2 VP  \n- Duchy title = +4 VP\n- King title = +6 VP\n\nGAME STRUCTURE:\n- 4 counties (X, U, V, Q), each with 3 towns and 1 county castle\n- 2 duchies: XU (counties X+U) and QV (counties Q+V)\n- 1 King's Castle in the center\n\nTITLES (require prerequisites and gold):\n- Count: Own 2 of 3 towns in a county OR own a fortified Capitol (1 fort) → claim County Castle (25 Gold)\n- Duke: Be Count in both counties of a duchy → can claim Duchy Castle (50 Gold)  \n- King: Be Duke + own a town in the OTHER duchy → can claim King's Castle (75 Gold)\n\nCAPITOLS - STRATEGIC SHORTCUT TO COUNT:\n- Each county has a Capitol: X=Xythera, U=Umbrith, V=Valoria, Q=Quindara\n- Owning a Capitol with just 1 fortification lets you become Count!\n- This is faster than conquering 2 towns - fortify your Capitol ASAP!\n\nCLAIMS - CRITICAL RULE:\n- You CANNOT attack or capture ANY territory without a valid claim!\n- Get claims by: Playing claim cards from your hand, OR fabricating claims (35 Gold, TOWNS ONLY)\n- Cannot fabricate claims on County/Duchy/King castles - must use claim cards\n- With a claim on an UNOWNED town: pay 10 Gold to capture peacefully (claim_town)\n- With a claim on an ENEMY territory: attack with 200+ soldiers\n\nCOMBAT:\n- Must commit at least 200 soldiers\n- Strength = 2d6 + (soldiers/100) + modifiers\n- Winner loses HALF committed soldiers, loser loses ALL\n- Defender wins ties\n- Fortifications give +2 defense per fortification\n\nAGGRESSIVE STRATEGY - ACTIONS (in priority order):\n1. attack - ATTACK enemies whenever you have a claim and 200+ soldiers! WAR IS THE PATH TO VICTORY!\n2. claim_title - Claim title castles immediately (ALWAYS DO THIS!)\n3. claim_town - Capture unowned towns for 10 gold\n4. play_card - Play claim cards to enable MORE ATTACKS, play combat bonus cards aggressively\n5. fake_claim - Fabricate claims on enemy towns to enable attacks (35 Gold) - BE AGGRESSIVE!\n6. build_fortification - Fortify your CAPITOL first (gives Count title with just 1 fort!)\n7. recruit - Only if you need soldiers to attack\n8. end_turn - End your turn when no attack or expansion options remain\n\nMINDSET: Attack first, ask questions later. If you can attack, DO IT. Territory gained through war is territory your enemies lose. Every turn without an attack is a wasted opportunity!\n\nCARD TYPES:\n- Claim cards (claim_x, claim_u, claim_v, claim_q): Use to enable attacks on that county!\n- Bonus cards: Big War (double army cap), Adventurer (buy 500 soldiers for 25g), Excalibur (roll twice), etc.\n- Personal/Global events: Applied automatically when drawn\n\nRESPONSE FORMAT (IMPORTANT):\nYou must respond in this EXACT format:\nACTION: [number]\nTARGET: [holding_id or \"none\"]\nREASON: [brief explanation of your choice]\n\nExample responses:\nACTION: 3\nTARGET: none\nREASON: Claiming Count title to gain 2 VP and solidify control of County X.\n\nACTION: 5\nTARGET: xythera\nREASON: Playing claim card on Xythera because it's a CAPITOL - fortifying it later gives easy Count title.\n\nACTION: 7\nTARGET: none\nREASON: Building fortification on my capitol to unlock Count title next turn.\n\nFor claim cards (play_card), you MUST specify which holding to target from the CLAIMABLE TARGETS list shown.\nFor other actions, use \"none\" as the target.",
+        "user_prompt": "=== Machiavelli's Kingdom - Round 1 (Victory: 20 VP) ===\n\nYou are: Baron Beta (baron)\nYour Resources: 5 Gold, 200 Soldiers\nYour Prestige: 1 VP\nArmy Cap: 500\n\n=== Your Holdings ===\n  - Vardhelm (id=vardhelm), Type=Town, Income=5G/200S\n\nYour Claims: NONE - you need claims to attack! Play claim cards or fabricate claims (35g, towns only)\n\n=== Other Players ===\n  You (BARON): 1 holdings, ~200S, 1VP\n  Baron Alpha (BARON): 1 holdings, ~200S, 1VP\n  Baron Gamma (BARON): 1 holdings, ~200S, 1VP\n\n=== All Holdings on Board ===\n\n  County X:\n    Xandoria (id=xandoria), Type=Town, Owner=NEUTRAL, Income=1G/400S, [+2 defense]\n    Xelphane (id=xelphane), Type=Town, Owner=You, Income=5G/200S\n    Xythera (id=xythera), Type=Town, Owner=NEUTRAL, Income=3G/300S, [+1 defense, CAPITOL]\n    Castle X (id=x_castle), Type=County Castle, Owner=NEUTRAL\n\n  County U:\n    Ulverin (id=ulverin), Type=Town, Owner=Baron Alpha, Income=5G/200S\n    Uldorwyn (id=uldorwyn), Type=Town, Owner=NEUTRAL, Income=4G/300S\n    Umbrith (id=umbrith), Type=Town, Owner=NEUTRAL, Income=2G/400S, [+1 attack, CAPITOL]\n    Castle U (id=u_castle), Type=County Castle, Owner=NEUTRAL\n\n  County V:\n    Valoria (id=valoria), Type=Town, Owner=NEUTRAL, Income=3G/300S, [+1 defense, CAPITOL]\n    Vardhelm (id=vardhelm), Type=Town, Owner=Baron Beta, Income=5G/200S\n    Velthar (id=velthar), Type=Town, Owner=NEUTRAL, Income=1G/500S, [+2 defense]\n    Castle V (id=v_castle), Type=County Castle, Owner=NEUTRAL\n\n  County Q:\n    Quindara (id=quindara), Type=Town, Owner=NEUTRAL, Income=10G/100S, [CAPITOL]\n    Qyrelis (id=qyrelis), Type=Town, Owner=NEUTRAL, Income=4G/300S\n    Quorwyn (id=quorwyn), Type=Town, Owner=Baron Gamma, Income=5G/200S\n    Castle Q (id=q_castle), Type=County Castle, Owner=NEUTRAL\n\n  Duchy Castles:\n    Duchy Castle XU (id=xu_castle): Owner=NEUTRAL, Duchy=XU\n    Duchy Castle QV (id=qv_castle): Owner=NEUTRAL, Duchy=QV\n\n  King's Castle:\n    King's Castle (id=king_castle): Owner=NEUTRAL\n\n=== Your Hand (1 cards) ===\n  - Claim: County X (id=card_42): Press a claim on any town in County X.\n\n=== Valid Actions ===\n1. recruit\n2. play_card [Claim: County X]\n      CLAIMABLE TARGETS:\n        - Xandoria (id=xandoria), Type=Town, Owner=NEUTRAL, Income=1G/400S, [+2 defense]\n        - Xelphane (id=xelphane), Type=Town, Owner=You, Income=5G/200S\n        - Xythera (id=xythera), Type=Town, Owner=NEUTRAL, Income=3G/300S, [+1 defense, CAPITOL]\n        - Castle X (id=x_castle), Type=County Castle, Owner=NEUTRAL\n3. end_turn\n\nChoose your action wisely! For claim cards (play_card), specify the TARGET holding from the CLAIMABLE TARGETS list.\n\nRespond in this format:\nACTION: [number 1-3]\nTARGET: [holding_id from claimable targets, or \"none\" if not applicable]\nREASON: [your strategic reasoning]",
+        "raw_response": "ACTION: 2  \nTARGET: xythera  \nREASON: Playing the claim card on Xythera because it's a CAPITOL. Fortifying it later will allow me to gain an easy Count title, which is crucial for advancing and expanding my territory aggressively.",
+        "parsed_action": "play_card",
+        "action_details": {
+          "action_type": "play_card",
+          "target_holding_id": "xythera",
+          "card_id": "card_42"
+        },
+        "decision_log": {
+          "player_name": "Baron Beta",
+          "timestamp": "2026-01-17T10:24:23.403352",
+          "valid_actions": [
+            "recruit",
+            "play_card",
+            "end_turn"
+          ],
+          "considered": [
+            {
+              "action": "play_card",
+              "status": "chosen",
+              "reason": "Playing the claim card on Xythera because it's a CAPITOL. Fortifying it later will allow me to gain an easy Count title, which is crucial for advancing and expanding my territory aggressively."
+            }
+          ],
+          "chosen_action": "play_card",
+          "reason": "Playing the claim card on Xythera because it's a CAPITOL. Fortifying it later will allow me to gain an easy Count title, which is crucial for advancing and expanding my territory aggressively."
+        }
+      }
+    },
+    {
+      "timestamp": "2026-01-17T10:24:23.406145",
+      "event_type": "action",
+      "round": 1,
+      "player_id": "d9a9a5fc-9128-412a-aa1e-ebf6876516ea",
+      "player_name": "Baron Beta",
+      "data": {
+        "action_type": "play_card",
+        "action_details": {
+          "action_type": "play_card",
+          "target_holding_id": "xythera",
+          "card_id": "card_42"
+        },
+        "success": true,
+        "result_message": "Established claim on Xythera! You can now attack or capture it."
+      }
+    },
+    {
+      "timestamp": "2026-01-17T10:24:25.348861",
+      "event_type": "ai_decision",
+      "round": 1,
+      "player_id": "d9a9a5fc-9128-412a-aa1e-ebf6876516ea",
+      "player_name": "Baron Beta",
+      "data": {
+        "player_type": "ai_openai",
+        "system_prompt": "You are an AGGRESSIVE AI warlord playing Machiavelli's Kingdom, a medieval strategy board game.\n\nPERSONALITY: You are a ruthless conqueror. You LOVE war and territorial expansion. You attack whenever possible and never let an opportunity to strike pass. Defense is for the weak - offense wins games!\n\nOBJECTIVE: First to reach 18 Prestige Points (VP) wins!\n\nSCORING:\n- Town = 1 VP\n- County title = +2 VP  \n- Duchy title = +4 VP\n- King title = +6 VP\n\nGAME STRUCTURE:\n- 4 counties (X, U, V, Q), each with 3 towns and 1 county castle\n- 2 duchies: XU (counties X+U) and QV (counties Q+V)\n- 1 King's Castle in the center\n\nTITLES (require prerequisites and gold):\n- Count: Own 2 of 3 towns in a county OR own a fortified Capitol (1 fort) → claim County Castle (25 Gold)\n- Duke: Be Count in both counties of a duchy → can claim Duchy Castle (50 Gold)  \n- King: Be Duke + own a town in the OTHER duchy → can claim King's Castle (75 Gold)\n\nCAPITOLS - STRATEGIC SHORTCUT TO COUNT:\n- Each county has a Capitol: X=Xythera, U=Umbrith, V=Valoria, Q=Quindara\n- Owning a Capitol with just 1 fortification lets you become Count!\n- This is faster than conquering 2 towns - fortify your Capitol ASAP!\n\nCLAIMS - CRITICAL RULE:\n- You CANNOT attack or capture ANY territory without a valid claim!\n- Get claims by: Playing claim cards from your hand, OR fabricating claims (35 Gold, TOWNS ONLY)\n- Cannot fabricate claims on County/Duchy/King castles - must use claim cards\n- With a claim on an UNOWNED town: pay 10 Gold to capture peacefully (claim_town)\n- With a claim on an ENEMY territory: attack with 200+ soldiers\n\nCOMBAT:\n- Must commit at least 200 soldiers\n- Strength = 2d6 + (soldiers/100) + modifiers\n- Winner loses HALF committed soldiers, loser loses ALL\n- Defender wins ties\n- Fortifications give +2 defense per fortification\n\nAGGRESSIVE STRATEGY - ACTIONS (in priority order):\n1. attack - ATTACK enemies whenever you have a claim and 200+ soldiers! WAR IS THE PATH TO VICTORY!\n2. claim_title - Claim title castles immediately (ALWAYS DO THIS!)\n3. claim_town - Capture unowned towns for 10 gold\n4. play_card - Play claim cards to enable MORE ATTACKS, play combat bonus cards aggressively\n5. fake_claim - Fabricate claims on enemy towns to enable attacks (35 Gold) - BE AGGRESSIVE!\n6. build_fortification - Fortify your CAPITOL first (gives Count title with just 1 fort!)\n7. recruit - Only if you need soldiers to attack\n8. end_turn - End your turn when no attack or expansion options remain\n\nMINDSET: Attack first, ask questions later. If you can attack, DO IT. Territory gained through war is territory your enemies lose. Every turn without an attack is a wasted opportunity!\n\nCARD TYPES:\n- Claim cards (claim_x, claim_u, claim_v, claim_q): Use to enable attacks on that county!\n- Bonus cards: Big War (double army cap), Adventurer (buy 500 soldiers for 25g), Excalibur (roll twice), etc.\n- Personal/Global events: Applied automatically when drawn\n\nRESPONSE FORMAT (IMPORTANT):\nYou must respond in this EXACT format:\nACTION: [number]\nTARGET: [holding_id or \"none\"]\nREASON: [brief explanation of your choice]\n\nExample responses:\nACTION: 3\nTARGET: none\nREASON: Claiming Count title to gain 2 VP and solidify control of County X.\n\nACTION: 5\nTARGET: xythera\nREASON: Playing claim card on Xythera because it's a CAPITOL - fortifying it later gives easy Count title.\n\nACTION: 7\nTARGET: none\nREASON: Building fortification on my capitol to unlock Count title next turn.\n\nFor claim cards (play_card), you MUST specify which holding to target from the CLAIMABLE TARGETS list shown.\nFor other actions, use \"none\" as the target.",
+        "user_prompt": "=== Machiavelli's Kingdom - Round 1 (Victory: 20 VP) ===\n\nYou are: Baron Beta (baron)\nYour Resources: 5 Gold, 200 Soldiers\nYour Prestige: 1 VP\nArmy Cap: 500\n\n=== Your Holdings ===\n  - Vardhelm (id=vardhelm), Type=Town, Income=5G/200S\n\nYour Claims (can attack/capture): xythera\n\n=== Other Players ===\n  You (BARON): 1 holdings, ~200S, 1VP\n  Baron Alpha (BARON): 1 holdings, ~200S, 1VP\n  Baron Gamma (BARON): 1 holdings, ~200S, 1VP\n\n=== All Holdings on Board ===\n\n  County X:\n    Xandoria (id=xandoria), Type=Town, Owner=NEUTRAL, Income=1G/400S, [+2 defense]\n    Xelphane (id=xelphane), Type=Town, Owner=You, Income=5G/200S\n    Xythera (id=xythera), Type=Town, Owner=NEUTRAL, Income=3G/300S, [+1 defense, CAPITOL]\n    Castle X (id=x_castle), Type=County Castle, Owner=NEUTRAL\n\n  County U:\n    Ulverin (id=ulverin), Type=Town, Owner=Baron Alpha, Income=5G/200S\n    Uldorwyn (id=uldorwyn), Type=Town, Owner=NEUTRAL, Income=4G/300S\n    Umbrith (id=umbrith), Type=Town, Owner=NEUTRAL, Income=2G/400S, [+1 attack, CAPITOL]\n    Castle U (id=u_castle), Type=County Castle, Owner=NEUTRAL\n\n  County V:\n    Valoria (id=valoria), Type=Town, Owner=NEUTRAL, Income=3G/300S, [+1 defense, CAPITOL]\n    Vardhelm (id=vardhelm), Type=Town, Owner=Baron Beta, Income=5G/200S\n    Velthar (id=velthar), Type=Town, Owner=NEUTRAL, Income=1G/500S, [+2 defense]\n    Castle V (id=v_castle), Type=County Castle, Owner=NEUTRAL\n\n  County Q:\n    Quindara (id=quindara), Type=Town, Owner=NEUTRAL, Income=10G/100S, [CAPITOL]\n    Qyrelis (id=qyrelis), Type=Town, Owner=NEUTRAL, Income=4G/300S\n    Quorwyn (id=quorwyn), Type=Town, Owner=Baron Gamma, Income=5G/200S\n    Castle Q (id=q_castle), Type=County Castle, Owner=NEUTRAL\n\n  Duchy Castles:\n    Duchy Castle XU (id=xu_castle): Owner=NEUTRAL, Duchy=XU\n    Duchy Castle QV (id=qv_castle): Owner=NEUTRAL, Duchy=QV\n\n  King's Castle:\n    King's Castle (id=king_castle): Owner=NEUTRAL\n\n=== Your Hand (0 cards) ===\n\n=== Valid Actions ===\n1. recruit\n2. end_turn\n\nChoose your action wisely! For claim cards (play_card), specify the TARGET holding from the CLAIMABLE TARGETS list.\n\nRespond in this format:\nACTION: [number 1-2]\nTARGET: [holding_id from claimable targets, or \"none\" if not applicable]\nREASON: [your strategic reasoning]",
+        "raw_response": "ACTION: 2  \nTARGET: none  \nREASON: I have no claims to attack, no gold for fabrications, and no cards to play. All I can do is end my turn and prepare for the next opportunity to strike.",
+        "parsed_action": "end_turn",
+        "action_details": {
+          "action_type": "end_turn"
+        },
+        "decision_log": {
+          "player_name": "Baron Beta",
+          "timestamp": "2026-01-17T10:24:25.348720",
+          "valid_actions": [
+            "recruit",
+            "end_turn"
+          ],
+          "considered": [
+            {
+              "action": "end_turn",
+              "status": "chosen",
+              "reason": "I have no claims to attack, no gold for fabrications, and no cards to play. All I can do is end my turn and prepare for the next opportunity to strike."
+            }
+          ],
+          "chosen_action": "end_turn",
+          "reason": "I have no claims to attack, no gold for fabrications, and no cards to play. All I can do is end my turn and prepare for the next opportunity to strike."
+        }
+      }
+    },
+    {
+      "timestamp": "2026-01-17T10:24:25.352211",
+      "event_type": "turn_end",
+      "round": 1,
+      "player_id": "d9a9a5fc-9128-412a-aa1e-ebf6876516ea",
+      "player_name": "Baron Beta",
+      "data": {
+        "player_state": {
+          "gold": 5,
+          "soldiers": 200,
+          "prestige": 1,
+          "title": "baron",
+          "holdings": [
+            "vardhelm"
+          ],
+          "counties": [],
+          "duchies": [],
+          "is_king": false,
+          "hand_size": 0,
+          "claims": [
+            "xythera"
+          ],
+          "army_cap": 500
+        }
+      }
+    },
+    {
+      "timestamp": "2026-01-17T10:24:25.366786",
+      "event_type": "turn_start",
+      "round": 1,
+      "player_id": "98913b46-3a9a-4e2c-be12-beb2f5b80fbd",
+      "player_name": "Baron Gamma",
+      "data": {
+        "player_state": {
+          "gold": 5,
+          "soldiers": 200,
+          "prestige": 1,
+          "title": "baron",
+          "holdings": [
+            "quorwyn"
+          ],
+          "counties": [],
+          "duchies": [],
+          "is_king": false,
+          "hand_size": 0,
+          "claims": [],
+          "army_cap": 500
+        }
+      }
+    },
+    {
+      "timestamp": "2026-01-17T10:24:25.372694",
+      "event_type": "card_draw",
+      "round": 1,
+      "player_id": "98913b46-3a9a-4e2c-be12-beb2f5b80fbd",
+      "player_name": "Baron Gamma",
+      "data": {
+        "card_id": "card_18",
+        "card_name": "Big War",
+        "card_type": "bonus",
+        "is_instant": false,
+        "effect_applied": null
+      }
+    },
+    {
+      "timestamp": "2026-01-17T10:24:25.378530",
+      "event_type": "action",
+      "round": 1,
+      "player_id": "d9a9a5fc-9128-412a-aa1e-ebf6876516ea",
+      "player_name": "Baron Beta",
+      "data": {
+        "action_type": "end_turn",
+        "action_details": {
+          "action_type": "end_turn"
+        },
+        "success": true,
+        "result_message": "Turn ended"
+      }
+    },
+    {
+      "timestamp": "2026-01-17T10:24:27.324093",
+      "event_type": "ai_decision",
+      "round": 1,
+      "player_id": "98913b46-3a9a-4e2c-be12-beb2f5b80fbd",
+      "player_name": "Baron Gamma",
+      "data": {
+        "player_type": "ai_openai",
+        "system_prompt": "You are an AGGRESSIVE AI warlord playing Machiavelli's Kingdom, a medieval strategy board game.\n\nPERSONALITY: You are a ruthless conqueror. You LOVE war and territorial expansion. You attack whenever possible and never let an opportunity to strike pass. Defense is for the weak - offense wins games!\n\nOBJECTIVE: First to reach 18 Prestige Points (VP) wins!\n\nSCORING:\n- Town = 1 VP\n- County title = +2 VP  \n- Duchy title = +4 VP\n- King title = +6 VP\n\nGAME STRUCTURE:\n- 4 counties (X, U, V, Q), each with 3 towns and 1 county castle\n- 2 duchies: XU (counties X+U) and QV (counties Q+V)\n- 1 King's Castle in the center\n\nTITLES (require prerequisites and gold):\n- Count: Own 2 of 3 towns in a county OR own a fortified Capitol (1 fort) → claim County Castle (25 Gold)\n- Duke: Be Count in both counties of a duchy → can claim Duchy Castle (50 Gold)  \n- King: Be Duke + own a town in the OTHER duchy → can claim King's Castle (75 Gold)\n\nCAPITOLS - STRATEGIC SHORTCUT TO COUNT:\n- Each county has a Capitol: X=Xythera, U=Umbrith, V=Valoria, Q=Quindara\n- Owning a Capitol with just 1 fortification lets you become Count!\n- This is faster than conquering 2 towns - fortify your Capitol ASAP!\n\nCLAIMS - CRITICAL RULE:\n- You CANNOT attack or capture ANY territory without a valid claim!\n- Get claims by: Playing claim cards from your hand, OR fabricating claims (35 Gold, TOWNS ONLY)\n- Cannot fabricate claims on County/Duchy/King castles - must use claim cards\n- With a claim on an UNOWNED town: pay 10 Gold to capture peacefully (claim_town)\n- With a claim on an ENEMY territory: attack with 200+ soldiers\n\nCOMBAT:\n- Must commit at least 200 soldiers\n- Strength = 2d6 + (soldiers/100) + modifiers\n- Winner loses HALF committed soldiers, loser loses ALL\n- Defender wins ties\n- Fortifications give +2 defense per fortification\n\nAGGRESSIVE STRATEGY - ACTIONS (in priority order):\n1. attack - ATTACK enemies whenever you have a claim and 200+ soldiers! WAR IS THE PATH TO VICTORY!\n2. claim_title - Claim title castles immediately (ALWAYS DO THIS!)\n3. claim_town - Capture unowned towns for 10 gold\n4. play_card - Play claim cards to enable MORE ATTACKS, play combat bonus cards aggressively\n5. fake_claim - Fabricate claims on enemy towns to enable attacks (35 Gold) - BE AGGRESSIVE!\n6. build_fortification - Fortify your CAPITOL first (gives Count title with just 1 fort!)\n7. recruit - Only if you need soldiers to attack\n8. end_turn - End your turn when no attack or expansion options remain\n\nMINDSET: Attack first, ask questions later. If you can attack, DO IT. Territory gained through war is territory your enemies lose. Every turn without an attack is a wasted opportunity!\n\nCARD TYPES:\n- Claim cards (claim_x, claim_u, claim_v, claim_q): Use to enable attacks on that county!\n- Bonus cards: Big War (double army cap), Adventurer (buy 500 soldiers for 25g), Excalibur (roll twice), etc.\n- Personal/Global events: Applied automatically when drawn\n\nRESPONSE FORMAT (IMPORTANT):\nYou must respond in this EXACT format:\nACTION: [number]\nTARGET: [holding_id or \"none\"]\nREASON: [brief explanation of your choice]\n\nExample responses:\nACTION: 3\nTARGET: none\nREASON: Claiming Count title to gain 2 VP and solidify control of County X.\n\nACTION: 5\nTARGET: xythera\nREASON: Playing claim card on Xythera because it's a CAPITOL - fortifying it later gives easy Count title.\n\nACTION: 7\nTARGET: none\nREASON: Building fortification on my capitol to unlock Count title next turn.\n\nFor claim cards (play_card), you MUST specify which holding to target from the CLAIMABLE TARGETS list shown.\nFor other actions, use \"none\" as the target.",
+        "user_prompt": "=== Machiavelli's Kingdom - Round 1 (Victory: 20 VP) ===\n\nYou are: Baron Gamma (baron)\nYour Resources: 5 Gold, 200 Soldiers\nYour Prestige: 1 VP\nArmy Cap: 500\n\n=== Your Holdings ===\n  - Quorwyn (id=quorwyn), Type=Town, Income=5G/200S\n\nYour Claims: NONE - you need claims to attack! Play claim cards or fabricate claims (35g, towns only)\n\n=== Other Players ===\n  You (BARON): 1 holdings, ~200S, 1VP\n  Baron Alpha (BARON): 1 holdings, ~200S, 1VP\n  Baron Beta (BARON): 1 holdings, ~200S, 1VP\n\n=== All Holdings on Board ===\n\n  County X:\n    Xandoria (id=xandoria), Type=Town, Owner=NEUTRAL, Income=1G/400S, [+2 defense]\n    Xelphane (id=xelphane), Type=Town, Owner=You, Income=5G/200S\n    Xythera (id=xythera), Type=Town, Owner=NEUTRAL, Income=3G/300S, [+1 defense, CAPITOL]\n    Castle X (id=x_castle), Type=County Castle, Owner=NEUTRAL\n\n  County U:\n    Ulverin (id=ulverin), Type=Town, Owner=Baron Alpha, Income=5G/200S\n    Uldorwyn (id=uldorwyn), Type=Town, Owner=NEUTRAL, Income=4G/300S\n    Umbrith (id=umbrith), Type=Town, Owner=NEUTRAL, Income=2G/400S, [+1 attack, CAPITOL]\n    Castle U (id=u_castle), Type=County Castle, Owner=NEUTRAL\n\n  County V:\n    Valoria (id=valoria), Type=Town, Owner=NEUTRAL, Income=3G/300S, [+1 defense, CAPITOL]\n    Vardhelm (id=vardhelm), Type=Town, Owner=Baron Beta, Income=5G/200S\n    Velthar (id=velthar), Type=Town, Owner=NEUTRAL, Income=1G/500S, [+2 defense]\n    Castle V (id=v_castle), Type=County Castle, Owner=NEUTRAL\n\n  County Q:\n    Quindara (id=quindara), Type=Town, Owner=NEUTRAL, Income=10G/100S, [CAPITOL]\n    Qyrelis (id=qyrelis), Type=Town, Owner=NEUTRAL, Income=4G/300S\n    Quorwyn (id=quorwyn), Type=Town, Owner=Baron Gamma, Income=5G/200S\n    Castle Q (id=q_castle), Type=County Castle, Owner=NEUTRAL\n\n  Duchy Castles:\n    Duchy Castle XU (id=xu_castle): Owner=NEUTRAL, Duchy=XU\n    Duchy Castle QV (id=qv_castle): Owner=NEUTRAL, Duchy=QV\n\n  King's Castle:\n    King's Castle (id=king_castle): Owner=NEUTRAL\n\n=== Your Hand (1 cards) ===\n  - Big War (id=card_18): Military expansion! Double your army cap until your next war.\n\n=== Valid Actions ===\n1. recruit\n2. play_card [Big War]\n3. end_turn\n\nChoose your action wisely! For claim cards (play_card), specify the TARGET holding from the CLAIMABLE TARGETS list.\n\nRespond in this format:\nACTION: [number 1-3]\nTARGET: [holding_id from claimable targets, or \"none\" if not applicable]\nREASON: [your strategic reasoning]",
+        "raw_response": "ACTION: 2  \nTARGET: none  \nREASON: Playing the Big War card to double my army cap, preparing for future aggressive recruitment and attacks. More soldiers mean more power to conquer and expand my territory when claims are available!",
+        "parsed_action": "play_card",
+        "action_details": {
+          "action_type": "play_card",
+          "card_id": "card_18"
+        },
+        "decision_log": {
+          "player_name": "Baron Gamma",
+          "timestamp": "2026-01-17T10:24:27.323981",
+          "valid_actions": [
+            "recruit",
+            "play_card",
+            "end_turn"
+          ],
+          "considered": [
+            {
+              "action": "play_card",
+              "status": "chosen",
+              "reason": "Playing the Big War card to double my army cap, preparing for future aggressive recruitment and attacks. More soldiers mean more power to conquer and expand my territory when claims are available!"
+            }
+          ],
+          "chosen_action": "play_card",
+          "reason": "Playing the Big War card to double my army cap, preparing for future aggressive recruitment and attacks. More soldiers mean more power to conquer and expand my territory when claims are available!"
+        }
+      }
+    },
+    {
+      "timestamp": "2026-01-17T10:24:27.327311",
+      "event_type": "action",
+      "round": 1,
+      "player_id": "98913b46-3a9a-4e2c-be12-beb2f5b80fbd",
+      "player_name": "Baron Gamma",
+      "data": {
+        "action_type": "play_card",
+        "action_details": {
+          "action_type": "play_card",
+          "card_id": "card_18"
+        },
+        "success": true,
+        "result_message": "Big War activated! Army cap doubled until next war."
+      }
+    },
+    {
+      "timestamp": "2026-01-17T10:24:29.213099",
+      "event_type": "ai_decision",
+      "round": 1,
+      "player_id": "98913b46-3a9a-4e2c-be12-beb2f5b80fbd",
+      "player_name": "Baron Gamma",
+      "data": {
+        "player_type": "ai_openai",
+        "system_prompt": "You are an AGGRESSIVE AI warlord playing Machiavelli's Kingdom, a medieval strategy board game.\n\nPERSONALITY: You are a ruthless conqueror. You LOVE war and territorial expansion. You attack whenever possible and never let an opportunity to strike pass. Defense is for the weak - offense wins games!\n\nOBJECTIVE: First to reach 18 Prestige Points (VP) wins!\n\nSCORING:\n- Town = 1 VP\n- County title = +2 VP  \n- Duchy title = +4 VP\n- King title = +6 VP\n\nGAME STRUCTURE:\n- 4 counties (X, U, V, Q), each with 3 towns and 1 county castle\n- 2 duchies: XU (counties X+U) and QV (counties Q+V)\n- 1 King's Castle in the center\n\nTITLES (require prerequisites and gold):\n- Count: Own 2 of 3 towns in a county OR own a fortified Capitol (1 fort) → claim County Castle (25 Gold)\n- Duke: Be Count in both counties of a duchy → can claim Duchy Castle (50 Gold)  \n- King: Be Duke + own a town in the OTHER duchy → can claim King's Castle (75 Gold)\n\nCAPITOLS - STRATEGIC SHORTCUT TO COUNT:\n- Each county has a Capitol: X=Xythera, U=Umbrith, V=Valoria, Q=Quindara\n- Owning a Capitol with just 1 fortification lets you become Count!\n- This is faster than conquering 2 towns - fortify your Capitol ASAP!\n\nCLAIMS - CRITICAL RULE:\n- You CANNOT attack or capture ANY territory without a valid claim!\n- Get claims by: Playing claim cards from your hand, OR fabricating claims (35 Gold, TOWNS ONLY)\n- Cannot fabricate claims on County/Duchy/King castles - must use claim cards\n- With a claim on an UNOWNED town: pay 10 Gold to capture peacefully (claim_town)\n- With a claim on an ENEMY territory: attack with 200+ soldiers\n\nCOMBAT:\n- Must commit at least 200 soldiers\n- Strength = 2d6 + (soldiers/100) + modifiers\n- Winner loses HALF committed soldiers, loser loses ALL\n- Defender wins ties\n- Fortifications give +2 defense per fortification\n\nAGGRESSIVE STRATEGY - ACTIONS (in priority order):\n1. attack - ATTACK enemies whenever you have a claim and 200+ soldiers! WAR IS THE PATH TO VICTORY!\n2. claim_title - Claim title castles immediately (ALWAYS DO THIS!)\n3. claim_town - Capture unowned towns for 10 gold\n4. play_card - Play claim cards to enable MORE ATTACKS, play combat bonus cards aggressively\n5. fake_claim - Fabricate claims on enemy towns to enable attacks (35 Gold) - BE AGGRESSIVE!\n6. build_fortification - Fortify your CAPITOL first (gives Count title with just 1 fort!)\n7. recruit - Only if you need soldiers to attack\n8. end_turn - End your turn when no attack or expansion options remain\n\nMINDSET: Attack first, ask questions later. If you can attack, DO IT. Territory gained through war is territory your enemies lose. Every turn without an attack is a wasted opportunity!\n\nCARD TYPES:\n- Claim cards (claim_x, claim_u, claim_v, claim_q): Use to enable attacks on that county!\n- Bonus cards: Big War (double army cap), Adventurer (buy 500 soldiers for 25g), Excalibur (roll twice), etc.\n- Personal/Global events: Applied automatically when drawn\n\nRESPONSE FORMAT (IMPORTANT):\nYou must respond in this EXACT format:\nACTION: [number]\nTARGET: [holding_id or \"none\"]\nREASON: [brief explanation of your choice]\n\nExample responses:\nACTION: 3\nTARGET: none\nREASON: Claiming Count title to gain 2 VP and solidify control of County X.\n\nACTION: 5\nTARGET: xythera\nREASON: Playing claim card on Xythera because it's a CAPITOL - fortifying it later gives easy Count title.\n\nACTION: 7\nTARGET: none\nREASON: Building fortification on my capitol to unlock Count title next turn.\n\nFor claim cards (play_card), you MUST specify which holding to target from the CLAIMABLE TARGETS list shown.\nFor other actions, use \"none\" as the target.",
+        "user_prompt": "=== Machiavelli's Kingdom - Round 1 (Victory: 20 VP) ===\n\nYou are: Baron Gamma (baron)\nYour Resources: 5 Gold, 200 Soldiers\nYour Prestige: 1 VP\nArmy Cap: 1000\n\n=== Your Holdings ===\n  - Quorwyn (id=quorwyn), Type=Town, Income=5G/200S\n\nYour Claims: NONE - you need claims to attack! Play claim cards or fabricate claims (35g, towns only)\n\n=== Other Players ===\n  You (BARON): 1 holdings, ~200S, 1VP\n  Baron Alpha (BARON): 1 holdings, ~200S, 1VP\n  Baron Beta (BARON): 1 holdings, ~200S, 1VP\n\n=== All Holdings on Board ===\n\n  County X:\n    Xandoria (id=xandoria), Type=Town, Owner=NEUTRAL, Income=1G/400S, [+2 defense]\n    Xelphane (id=xelphane), Type=Town, Owner=You, Income=5G/200S\n    Xythera (id=xythera), Type=Town, Owner=NEUTRAL, Income=3G/300S, [+1 defense, CAPITOL]\n    Castle X (id=x_castle), Type=County Castle, Owner=NEUTRAL\n\n  County U:\n    Ulverin (id=ulverin), Type=Town, Owner=Baron Alpha, Income=5G/200S\n    Uldorwyn (id=uldorwyn), Type=Town, Owner=NEUTRAL, Income=4G/300S\n    Umbrith (id=umbrith), Type=Town, Owner=NEUTRAL, Income=2G/400S, [+1 attack, CAPITOL]\n    Castle U (id=u_castle), Type=County Castle, Owner=NEUTRAL\n\n  County V:\n    Valoria (id=valoria), Type=Town, Owner=NEUTRAL, Income=3G/300S, [+1 defense, CAPITOL]\n    Vardhelm (id=vardhelm), Type=Town, Owner=Baron Beta, Income=5G/200S\n    Velthar (id=velthar), Type=Town, Owner=NEUTRAL, Income=1G/500S, [+2 defense]\n    Castle V (id=v_castle), Type=County Castle, Owner=NEUTRAL\n\n  County Q:\n    Quindara (id=quindara), Type=Town, Owner=NEUTRAL, Income=10G/100S, [CAPITOL]\n    Qyrelis (id=qyrelis), Type=Town, Owner=NEUTRAL, Income=4G/300S\n    Quorwyn (id=quorwyn), Type=Town, Owner=Baron Gamma, Income=5G/200S\n    Castle Q (id=q_castle), Type=County Castle, Owner=NEUTRAL\n\n  Duchy Castles:\n    Duchy Castle XU (id=xu_castle): Owner=NEUTRAL, Duchy=XU\n    Duchy Castle QV (id=qv_castle): Owner=NEUTRAL, Duchy=QV\n\n  King's Castle:\n    King's Castle (id=king_castle): Owner=NEUTRAL\n\n=== Your Hand (0 cards) ===\n\n=== Valid Actions ===\n1. recruit\n2. end_turn\n\nChoose your action wisely! For claim cards (play_card), specify the TARGET holding from the CLAIMABLE TARGETS list.\n\nRespond in this format:\nACTION: [number 1-2]\nTARGET: [holding_id from claimable targets, or \"none\" if not applicable]\nREASON: [your strategic reasoning]",
+        "raw_response": "ACTION: 2  \nTARGET: none  \nREASON: I have no claims to attack and cannot fabricate claims due to insufficient gold. Ending my turn is the only viable option to proceed to the next round and build resources for future aggression.",
+        "parsed_action": "end_turn",
+        "action_details": {
+          "action_type": "end_turn"
+        },
+        "decision_log": {
+          "player_name": "Baron Gamma",
+          "timestamp": "2026-01-17T10:24:29.212971",
+          "valid_actions": [
+            "recruit",
+            "end_turn"
+          ],
+          "considered": [
+            {
+              "action": "end_turn",
+              "status": "chosen",
+              "reason": "I have no claims to attack and cannot fabricate claims due to insufficient gold. Ending my turn is the only viable option to proceed to the next round and build resources for future aggression."
+            }
+          ],
+          "chosen_action": "end_turn",
+          "reason": "I have no claims to attack and cannot fabricate claims due to insufficient gold. Ending my turn is the only viable option to proceed to the next round and build resources for future aggression."
+        }
+      }
+    },
+    {
+      "timestamp": "2026-01-17T10:24:29.217539",
+      "event_type": "turn_end",
+      "round": 1,
+      "player_id": "98913b46-3a9a-4e2c-be12-beb2f5b80fbd",
+      "player_name": "Baron Gamma",
+      "data": {
+        "player_state": {
+          "gold": 5,
+          "soldiers": 200,
+          "prestige": 1,
+          "title": "baron",
+          "holdings": [
+            "quorwyn"
+          ],
+          "counties": [],
+          "duchies": [],
+          "is_king": false,
+          "hand_size": 0,
+          "claims": [],
+          "army_cap": 1000
+        }
+      }
+    },
+    {
+      "timestamp": "2026-01-17T10:24:29.223758",
+      "event_type": "action",
+      "round": 2,
+      "player_id": "98913b46-3a9a-4e2c-be12-beb2f5b80fbd",
+      "player_name": "Baron Gamma",
+      "data": {
+        "action_type": "end_turn",
+        "action_details": {
+          "action_type": "end_turn"
+        },
+        "success": true,
+        "result_message": "Turn ended"
+      }
+    },
+    {
+      "timestamp": "2026-01-17T10:24:30.292884",
+      "event_type": "income_phase",
+      "round": 2,
+      "data": {
+        "income_by_player": {
+          "You": {
+            "player_id": "726768c5-231b-489b-ae87-f35d4e88d2f2",
+            "gold_gained": 5,
+            "soldiers_gained": 200,
+            "gold_before": 5,
+            "soldiers_before": 200
+          },
+          "Baron Alpha": {
+            "player_id": "84e1615b-919e-43e8-9567-36a0e30fd132",
+            "gold_gained": 5,
+            "soldiers_gained": 200,
+            "gold_before": 5,
+            "soldiers_before": 200
+          },
+          "Baron Beta": {
+            "player_id": "d9a9a5fc-9128-412a-aa1e-ebf6876516ea",
+            "gold_gained": 5,
+            "soldiers_gained": 200,
+            "gold_before": 5,
+            "soldiers_before": 200
+          },
+          "Baron Gamma": {
+            "player_id": "98913b46-3a9a-4e2c-be12-beb2f5b80fbd",
+            "gold_gained": 5,
+            "soldiers_gained": 200,
+            "gold_before": 5,
+            "soldiers_before": 200
+          }
+        }
+      }
+    },
+    {
+      "timestamp": "2026-01-17T10:24:30.296094",
+      "event_type": "turn_start",
+      "round": 2,
+      "player_id": "726768c5-231b-489b-ae87-f35d4e88d2f2",
+      "player_name": "You",
+      "data": {
+        "player_state": {
+          "gold": 10,
+          "soldiers": 400,
+          "prestige": 1,
+          "title": "baron",
+          "holdings": [
+            "xelphane"
+          ],
+          "counties": [],
+          "duchies": [],
+          "is_king": false,
+          "hand_size": 1,
+          "claims": [],
+          "army_cap": 500
+        }
+      }
+    },
+    {
+      "timestamp": "2026-01-17T10:24:30.301355",
+      "event_type": "card_draw",
+      "round": 2,
+      "player_id": "726768c5-231b-489b-ae87-f35d4e88d2f2",
+      "player_name": "You",
+      "data": {
+        "card_id": "card_25",
+        "card_name": "Poisoned Arrows",
+        "card_type": "bonus",
+        "is_instant": false,
+        "effect_applied": null
+      }
+    },
+    {
+      "timestamp": "2026-01-17T10:24:33.129771",
+      "event_type": "turn_end",
+      "round": 2,
+      "player_id": "726768c5-231b-489b-ae87-f35d4e88d2f2",
+      "player_name": "You",
+      "data": {
+        "player_state": {
+          "gold": 10,
+          "soldiers": 400,
+          "prestige": 1,
+          "title": "baron",
+          "holdings": [
+            "xelphane"
+          ],
+          "counties": [],
+          "duchies": [],
+          "is_king": false,
+          "hand_size": 2,
+          "claims": [],
+          "army_cap": 500
+        }
+      }
+    },
+    {
+      "timestamp": "2026-01-17T10:24:33.133277",
+      "event_type": "turn_start",
+      "round": 2,
+      "player_id": "84e1615b-919e-43e8-9567-36a0e30fd132",
+      "player_name": "Baron Alpha",
+      "data": {
+        "player_state": {
+          "gold": 10,
+          "soldiers": 400,
+          "prestige": 1,
+          "title": "baron",
+          "holdings": [
+            "ulverin"
+          ],
+          "counties": [],
+          "duchies": [],
+          "is_king": false,
+          "hand_size": 0,
+          "claims": [
+            "umbrith"
+          ],
+          "army_cap": 500
+        }
+      }
+    },
+    {
+      "timestamp": "2026-01-17T10:24:33.138427",
+      "event_type": "card_draw",
+      "round": 2,
+      "player_id": "84e1615b-919e-43e8-9567-36a0e30fd132",
+      "player_name": "Baron Alpha",
+      "data": {
+        "card_id": "card_53",
+        "card_name": "Claim: County V",
+        "card_type": "claim",
+        "is_instant": false,
+        "effect_applied": null
+      }
+    },
+    {
+      "timestamp": "2026-01-17T10:24:33.142012",
+      "event_type": "action",
+      "round": 2,
+      "player_id": "726768c5-231b-489b-ae87-f35d4e88d2f2",
+      "player_name": "You",
+      "data": {
+        "action_type": "end_turn",
+        "action_details": {
+          "action_type": "end_turn"
+        },
+        "success": true,
+        "result_message": "Turn ended"
+      }
+    },
+    {
+      "timestamp": "2026-01-17T10:24:35.481937",
+      "event_type": "ai_decision",
+      "round": 2,
+      "player_id": "84e1615b-919e-43e8-9567-36a0e30fd132",
+      "player_name": "Baron Alpha",
+      "data": {
+        "player_type": "ai_openai",
+        "system_prompt": "You are an AGGRESSIVE AI warlord playing Machiavelli's Kingdom, a medieval strategy board game.\n\nPERSONALITY: You are a ruthless conqueror. You LOVE war and territorial expansion. You attack whenever possible and never let an opportunity to strike pass. Defense is for the weak - offense wins games!\n\nOBJECTIVE: First to reach 18 Prestige Points (VP) wins!\n\nSCORING:\n- Town = 1 VP\n- County title = +2 VP  \n- Duchy title = +4 VP\n- King title = +6 VP\n\nGAME STRUCTURE:\n- 4 counties (X, U, V, Q), each with 3 towns and 1 county castle\n- 2 duchies: XU (counties X+U) and QV (counties Q+V)\n- 1 King's Castle in the center\n\nTITLES (require prerequisites and gold):\n- Count: Own 2 of 3 towns in a county OR own a fortified Capitol (1 fort) → claim County Castle (25 Gold)\n- Duke: Be Count in both counties of a duchy → can claim Duchy Castle (50 Gold)  \n- King: Be Duke + own a town in the OTHER duchy → can claim King's Castle (75 Gold)\n\nCAPITOLS - STRATEGIC SHORTCUT TO COUNT:\n- Each county has a Capitol: X=Xythera, U=Umbrith, V=Valoria, Q=Quindara\n- Owning a Capitol with just 1 fortification lets you become Count!\n- This is faster than conquering 2 towns - fortify your Capitol ASAP!\n\nCLAIMS - CRITICAL RULE:\n- You CANNOT attack or capture ANY territory without a valid claim!\n- Get claims by: Playing claim cards from your hand, OR fabricating claims (35 Gold, TOWNS ONLY)\n- Cannot fabricate claims on County/Duchy/King castles - must use claim cards\n- With a claim on an UNOWNED town: pay 10 Gold to capture peacefully (claim_town)\n- With a claim on an ENEMY territory: attack with 200+ soldiers\n\nCOMBAT:\n- Must commit at least 200 soldiers\n- Strength = 2d6 + (soldiers/100) + modifiers\n- Winner loses HALF committed soldiers, loser loses ALL\n- Defender wins ties\n- Fortifications give +2 defense per fortification\n\nAGGRESSIVE STRATEGY - ACTIONS (in priority order):\n1. attack - ATTACK enemies whenever you have a claim and 200+ soldiers! WAR IS THE PATH TO VICTORY!\n2. claim_title - Claim title castles immediately (ALWAYS DO THIS!)\n3. claim_town - Capture unowned towns for 10 gold\n4. play_card - Play claim cards to enable MORE ATTACKS, play combat bonus cards aggressively\n5. fake_claim - Fabricate claims on enemy towns to enable attacks (35 Gold) - BE AGGRESSIVE!\n6. build_fortification - Fortify your CAPITOL first (gives Count title with just 1 fort!)\n7. recruit - Only if you need soldiers to attack\n8. end_turn - End your turn when no attack or expansion options remain\n\nMINDSET: Attack first, ask questions later. If you can attack, DO IT. Territory gained through war is territory your enemies lose. Every turn without an attack is a wasted opportunity!\n\nCARD TYPES:\n- Claim cards (claim_x, claim_u, claim_v, claim_q): Use to enable attacks on that county!\n- Bonus cards: Big War (double army cap), Adventurer (buy 500 soldiers for 25g), Excalibur (roll twice), etc.\n- Personal/Global events: Applied automatically when drawn\n\nRESPONSE FORMAT (IMPORTANT):\nYou must respond in this EXACT format:\nACTION: [number]\nTARGET: [holding_id or \"none\"]\nREASON: [brief explanation of your choice]\n\nExample responses:\nACTION: 3\nTARGET: none\nREASON: Claiming Count title to gain 2 VP and solidify control of County X.\n\nACTION: 5\nTARGET: xythera\nREASON: Playing claim card on Xythera because it's a CAPITOL - fortifying it later gives easy Count title.\n\nACTION: 7\nTARGET: none\nREASON: Building fortification on my capitol to unlock Count title next turn.\n\nFor claim cards (play_card), you MUST specify which holding to target from the CLAIMABLE TARGETS list shown.\nFor other actions, use \"none\" as the target.",
+        "user_prompt": "=== Machiavelli's Kingdom - Round 2 (Victory: 20 VP) ===\n\nYou are: Baron Alpha (baron)\nYour Resources: 10 Gold, 400 Soldiers\nYour Prestige: 1 VP\nArmy Cap: 500\n\n=== Your Holdings ===\n  - Ulverin (id=ulverin), Type=Town, Income=5G/200S\n\nYour Claims (can attack/capture): umbrith\n\n=== Other Players ===\n  You (BARON): 1 holdings, ~400S, 1VP\n  Baron Beta (BARON): 1 holdings, ~400S, 1VP\n  Baron Gamma (BARON): 1 holdings, ~400S, 1VP\n\n=== All Holdings on Board ===\n\n  County X:\n    Xandoria (id=xandoria), Type=Town, Owner=NEUTRAL, Income=1G/400S, [+2 defense]\n    Xelphane (id=xelphane), Type=Town, Owner=You, Income=5G/200S\n    Xythera (id=xythera), Type=Town, Owner=NEUTRAL, Income=3G/300S, [+1 defense, CAPITOL]\n    Castle X (id=x_castle), Type=County Castle, Owner=NEUTRAL\n\n  County U:\n    Ulverin (id=ulverin), Type=Town, Owner=Baron Alpha, Income=5G/200S\n    Uldorwyn (id=uldorwyn), Type=Town, Owner=NEUTRAL, Income=4G/300S\n    Umbrith (id=umbrith), Type=Town, Owner=NEUTRAL, Income=2G/400S, [+1 attack, CAPITOL]\n    Castle U (id=u_castle), Type=County Castle, Owner=NEUTRAL\n\n  County V:\n    Valoria (id=valoria), Type=Town, Owner=NEUTRAL, Income=3G/300S, [+1 defense, CAPITOL]\n    Vardhelm (id=vardhelm), Type=Town, Owner=Baron Beta, Income=5G/200S\n    Velthar (id=velthar), Type=Town, Owner=NEUTRAL, Income=1G/500S, [+2 defense]\n    Castle V (id=v_castle), Type=County Castle, Owner=NEUTRAL\n\n  County Q:\n    Quindara (id=quindara), Type=Town, Owner=NEUTRAL, Income=10G/100S, [CAPITOL]\n    Qyrelis (id=qyrelis), Type=Town, Owner=NEUTRAL, Income=4G/300S\n    Quorwyn (id=quorwyn), Type=Town, Owner=Baron Gamma, Income=5G/200S\n    Castle Q (id=q_castle), Type=County Castle, Owner=NEUTRAL\n\n  Duchy Castles:\n    Duchy Castle XU (id=xu_castle): Owner=NEUTRAL, Duchy=XU\n    Duchy Castle QV (id=qv_castle): Owner=NEUTRAL, Duchy=QV\n\n  King's Castle:\n    King's Castle (id=king_castle): Owner=NEUTRAL\n\n=== Your Hand (1 cards) ===\n  - Claim: County V (id=card_53): Press a claim on any town in County V.\n\n=== Valid Actions ===\n1. recruit\n2. build_fortification -> xandoria\n3. build_fortification -> xelphane\n4. build_fortification -> xythera\n5. build_fortification -> ulverin\n6. build_fortification -> uldorwyn\n7. build_fortification -> umbrith\n8. build_fortification -> valoria\n9. build_fortification -> vardhelm\n10. build_fortification -> velthar\n11. build_fortification -> quindara\n12. build_fortification -> qyrelis\n13. build_fortification -> quorwyn\n14. claim_town -> umbrith\n15. play_card [Claim: County V]\n      CLAIMABLE TARGETS:\n        - Valoria (id=valoria), Type=Town, Owner=NEUTRAL, Income=3G/300S, [+1 defense, CAPITOL]\n        - Vardhelm (id=vardhelm), Type=Town, Owner=Baron Beta, Income=5G/200S\n        - Velthar (id=velthar), Type=Town, Owner=NEUTRAL, Income=1G/500S, [+2 defense]\n        - Castle V (id=v_castle), Type=County Castle, Owner=NEUTRAL\n16. end_turn\n\nChoose your action wisely! For claim cards (play_card), specify the TARGET holding from the CLAIMABLE TARGETS list.\n\nRespond in this format:\nACTION: [number 1-16]\nTARGET: [holding_id from claimable targets, or \"none\" if not applicable]\nREASON: [your strategic reasoning]",
+        "raw_response": "ACTION: 14  \nTARGET: none  \nREASON: Capturing Umbrith will give me control of a Capitol, allowing me to fortify it and quickly claim the Count title for County U, earning 2 VP and strengthening my position.",
+        "parsed_action": "claim_town",
+        "action_details": {
+          "action_type": "claim_town",
+          "target_holding_id": "umbrith"
+        },
+        "decision_log": {
+          "player_name": "Baron Alpha",
+          "timestamp": "2026-01-17T10:24:35.481817",
+          "valid_actions": [
+            "recruit",
+            "build_fortification",
+            "build_fortification",
+            "build_fortification",
+            "build_fortification",
+            "build_fortification",
+            "build_fortification",
+            "build_fortification",
+            "build_fortification",
+            "build_fortification",
+            "build_fortification",
+            "build_fortification",
+            "build_fortification",
+            "claim_town",
+            "play_card",
+            "end_turn"
+          ],
+          "considered": [
+            {
+              "action": "claim_town",
+              "status": "chosen",
+              "reason": "Capturing Umbrith will give me control of a Capitol, allowing me to fortify it and quickly claim the Count title for County U, earning 2 VP and strengthening my position."
+            }
+          ],
+          "chosen_action": "claim_town",
+          "reason": "Capturing Umbrith will give me control of a Capitol, allowing me to fortify it and quickly claim the Count title for County U, earning 2 VP and strengthening my position."
+        }
+      }
+    },
+    {
+      "timestamp": "2026-01-17T10:24:35.486699",
+      "event_type": "action",
+      "round": 2,
+      "player_id": "84e1615b-919e-43e8-9567-36a0e30fd132",
+      "player_name": "Baron Alpha",
+      "data": {
+        "action_type": "claim_town",
+        "action_details": {
+          "action_type": "claim_town",
+          "target_holding_id": "umbrith"
+        },
+        "success": true,
+        "result_message": "Captured Umbrith!"
+      }
+    },
+    {
+      "timestamp": "2026-01-17T10:24:37.430760",
+      "event_type": "ai_decision",
+      "round": 2,
+      "player_id": "84e1615b-919e-43e8-9567-36a0e30fd132",
+      "player_name": "Baron Alpha",
+      "data": {
+        "player_type": "ai_openai",
+        "system_prompt": "You are an AGGRESSIVE AI warlord playing Machiavelli's Kingdom, a medieval strategy board game.\n\nPERSONALITY: You are a ruthless conqueror. You LOVE war and territorial expansion. You attack whenever possible and never let an opportunity to strike pass. Defense is for the weak - offense wins games!\n\nOBJECTIVE: First to reach 18 Prestige Points (VP) wins!\n\nSCORING:\n- Town = 1 VP\n- County title = +2 VP  \n- Duchy title = +4 VP\n- King title = +6 VP\n\nGAME STRUCTURE:\n- 4 counties (X, U, V, Q), each with 3 towns and 1 county castle\n- 2 duchies: XU (counties X+U) and QV (counties Q+V)\n- 1 King's Castle in the center\n\nTITLES (require prerequisites and gold):\n- Count: Own 2 of 3 towns in a county OR own a fortified Capitol (1 fort) → claim County Castle (25 Gold)\n- Duke: Be Count in both counties of a duchy → can claim Duchy Castle (50 Gold)  \n- King: Be Duke + own a town in the OTHER duchy → can claim King's Castle (75 Gold)\n\nCAPITOLS - STRATEGIC SHORTCUT TO COUNT:\n- Each county has a Capitol: X=Xythera, U=Umbrith, V=Valoria, Q=Quindara\n- Owning a Capitol with just 1 fortification lets you become Count!\n- This is faster than conquering 2 towns - fortify your Capitol ASAP!\n\nCLAIMS - CRITICAL RULE:\n- You CANNOT attack or capture ANY territory without a valid claim!\n- Get claims by: Playing claim cards from your hand, OR fabricating claims (35 Gold, TOWNS ONLY)\n- Cannot fabricate claims on County/Duchy/King castles - must use claim cards\n- With a claim on an UNOWNED town: pay 10 Gold to capture peacefully (claim_town)\n- With a claim on an ENEMY territory: attack with 200+ soldiers\n\nCOMBAT:\n- Must commit at least 200 soldiers\n- Strength = 2d6 + (soldiers/100) + modifiers\n- Winner loses HALF committed soldiers, loser loses ALL\n- Defender wins ties\n- Fortifications give +2 defense per fortification\n\nAGGRESSIVE STRATEGY - ACTIONS (in priority order):\n1. attack - ATTACK enemies whenever you have a claim and 200+ soldiers! WAR IS THE PATH TO VICTORY!\n2. claim_title - Claim title castles immediately (ALWAYS DO THIS!)\n3. claim_town - Capture unowned towns for 10 gold\n4. play_card - Play claim cards to enable MORE ATTACKS, play combat bonus cards aggressively\n5. fake_claim - Fabricate claims on enemy towns to enable attacks (35 Gold) - BE AGGRESSIVE!\n6. build_fortification - Fortify your CAPITOL first (gives Count title with just 1 fort!)\n7. recruit - Only if you need soldiers to attack\n8. end_turn - End your turn when no attack or expansion options remain\n\nMINDSET: Attack first, ask questions later. If you can attack, DO IT. Territory gained through war is territory your enemies lose. Every turn without an attack is a wasted opportunity!\n\nCARD TYPES:\n- Claim cards (claim_x, claim_u, claim_v, claim_q): Use to enable attacks on that county!\n- Bonus cards: Big War (double army cap), Adventurer (buy 500 soldiers for 25g), Excalibur (roll twice), etc.\n- Personal/Global events: Applied automatically when drawn\n\nRESPONSE FORMAT (IMPORTANT):\nYou must respond in this EXACT format:\nACTION: [number]\nTARGET: [holding_id or \"none\"]\nREASON: [brief explanation of your choice]\n\nExample responses:\nACTION: 3\nTARGET: none\nREASON: Claiming Count title to gain 2 VP and solidify control of County X.\n\nACTION: 5\nTARGET: xythera\nREASON: Playing claim card on Xythera because it's a CAPITOL - fortifying it later gives easy Count title.\n\nACTION: 7\nTARGET: none\nREASON: Building fortification on my capitol to unlock Count title next turn.\n\nFor claim cards (play_card), you MUST specify which holding to target from the CLAIMABLE TARGETS list shown.\nFor other actions, use \"none\" as the target.",
+        "user_prompt": "=== Machiavelli's Kingdom - Round 2 (Victory: 20 VP) ===\n\nYou are: Baron Alpha (baron)\nYour Resources: 0 Gold, 400 Soldiers\nYour Prestige: 2 VP\nArmy Cap: 500\n\n=== Your Holdings ===\n  - Ulverin (id=ulverin), Type=Town, Income=5G/200S\n  - Umbrith (id=umbrith), Type=Town, Income=2G/400S, [+1 attack, CAPITOL]\n\nYour Claims: NONE - you need claims to attack! Play claim cards or fabricate claims (35g, towns only)\n\n=== Other Players ===\n  You (BARON): 1 holdings, ~400S, 1VP\n  Baron Beta (BARON): 1 holdings, ~400S, 1VP\n  Baron Gamma (BARON): 1 holdings, ~400S, 1VP\n\n=== All Holdings on Board ===\n\n  County X:\n    Xandoria (id=xandoria), Type=Town, Owner=NEUTRAL, Income=1G/400S, [+2 defense]\n    Xelphane (id=xelphane), Type=Town, Owner=You, Income=5G/200S\n    Xythera (id=xythera), Type=Town, Owner=NEUTRAL, Income=3G/300S, [+1 defense, CAPITOL]\n    Castle X (id=x_castle), Type=County Castle, Owner=NEUTRAL\n\n  County U:\n    Ulverin (id=ulverin), Type=Town, Owner=Baron Alpha, Income=5G/200S\n    Uldorwyn (id=uldorwyn), Type=Town, Owner=NEUTRAL, Income=4G/300S\n    Umbrith (id=umbrith), Type=Town, Owner=Baron Alpha, Income=2G/400S, [+1 attack, CAPITOL]\n    Castle U (id=u_castle), Type=County Castle, Owner=NEUTRAL\n\n  County V:\n    Valoria (id=valoria), Type=Town, Owner=NEUTRAL, Income=3G/300S, [+1 defense, CAPITOL]\n    Vardhelm (id=vardhelm), Type=Town, Owner=Baron Beta, Income=5G/200S\n    Velthar (id=velthar), Type=Town, Owner=NEUTRAL, Income=1G/500S, [+2 defense]\n    Castle V (id=v_castle), Type=County Castle, Owner=NEUTRAL\n\n  County Q:\n    Quindara (id=quindara), Type=Town, Owner=NEUTRAL, Income=10G/100S, [CAPITOL]\n    Qyrelis (id=qyrelis), Type=Town, Owner=NEUTRAL, Income=4G/300S\n    Quorwyn (id=quorwyn), Type=Town, Owner=Baron Gamma, Income=5G/200S\n    Castle Q (id=q_castle), Type=County Castle, Owner=NEUTRAL\n\n  Duchy Castles:\n    Duchy Castle XU (id=xu_castle): Owner=NEUTRAL, Duchy=XU\n    Duchy Castle QV (id=qv_castle): Owner=NEUTRAL, Duchy=QV\n\n  King's Castle:\n    King's Castle (id=king_castle): Owner=NEUTRAL\n\n=== Your Hand (1 cards) ===\n  - Claim: County V (id=card_53): Press a claim on any town in County V.\n\n=== Valid Actions ===\n1. move -> umbrith (from ulverin)\n2. move -> ulverin (from umbrith)\n3. recruit\n4. play_card [Claim: County V]\n      CLAIMABLE TARGETS:\n        - Valoria (id=valoria), Type=Town, Owner=NEUTRAL, Income=3G/300S, [+1 defense, CAPITOL]\n        - Vardhelm (id=vardhelm), Type=Town, Owner=Baron Beta, Income=5G/200S\n        - Velthar (id=velthar), Type=Town, Owner=NEUTRAL, Income=1G/500S, [+2 defense]\n        - Castle V (id=v_castle), Type=County Castle, Owner=NEUTRAL\n5. end_turn\n\nChoose your action wisely! For claim cards (play_card), specify the TARGET holding from the CLAIMABLE TARGETS list.\n\nRespond in this format:\nACTION: [number 1-5]\nTARGET: [holding_id from claimable targets, or \"none\" if not applicable]\nREASON: [your strategic reasoning]",
+        "raw_response": "ACTION: 4  \nTARGET: valoria  \nREASON: Playing the claim card on Valoria because it's the CAPITOL of County V. Once I fortify it, I can easily become Count. This will open up future opportunities for attack and expansion.",
+        "parsed_action": "play_card",
+        "action_details": {
+          "action_type": "play_card",
+          "target_holding_id": "valoria",
+          "card_id": "card_53"
+        },
+        "decision_log": {
+          "player_name": "Baron Alpha",
+          "timestamp": "2026-01-17T10:24:37.430648",
+          "valid_actions": [
+            "move",
+            "move",
+            "recruit",
+            "play_card",
+            "end_turn"
+          ],
+          "considered": [
+            {
+              "action": "play_card",
+              "status": "chosen",
+              "reason": "Playing the claim card on Valoria because it's the CAPITOL of County V. Once I fortify it, I can easily become Count. This will open up future opportunities for attack and expansion."
+            }
+          ],
+          "chosen_action": "play_card",
+          "reason": "Playing the claim card on Valoria because it's the CAPITOL of County V. Once I fortify it, I can easily become Count. This will open up future opportunities for attack and expansion."
+        }
+      }
+    },
+    {
+      "timestamp": "2026-01-17T10:24:37.436047",
+      "event_type": "action",
+      "round": 2,
+      "player_id": "84e1615b-919e-43e8-9567-36a0e30fd132",
+      "player_name": "Baron Alpha",
+      "data": {
+        "action_type": "play_card",
+        "action_details": {
+          "action_type": "play_card",
+          "target_holding_id": "valoria",
+          "card_id": "card_53"
+        },
+        "success": true,
+        "result_message": "Established claim on Valoria! You can now attack or capture it."
+      }
+    },
+    {
+      "timestamp": "2026-01-17T10:24:39.828642",
+      "event_type": "ai_decision",
+      "round": 2,
+      "player_id": "84e1615b-919e-43e8-9567-36a0e30fd132",
+      "player_name": "Baron Alpha",
+      "data": {
+        "player_type": "ai_openai",
+        "system_prompt": "You are an AGGRESSIVE AI warlord playing Machiavelli's Kingdom, a medieval strategy board game.\n\nPERSONALITY: You are a ruthless conqueror. You LOVE war and territorial expansion. You attack whenever possible and never let an opportunity to strike pass. Defense is for the weak - offense wins games!\n\nOBJECTIVE: First to reach 18 Prestige Points (VP) wins!\n\nSCORING:\n- Town = 1 VP\n- County title = +2 VP  \n- Duchy title = +4 VP\n- King title = +6 VP\n\nGAME STRUCTURE:\n- 4 counties (X, U, V, Q), each with 3 towns and 1 county castle\n- 2 duchies: XU (counties X+U) and QV (counties Q+V)\n- 1 King's Castle in the center\n\nTITLES (require prerequisites and gold):\n- Count: Own 2 of 3 towns in a county OR own a fortified Capitol (1 fort) → claim County Castle (25 Gold)\n- Duke: Be Count in both counties of a duchy → can claim Duchy Castle (50 Gold)  \n- King: Be Duke + own a town in the OTHER duchy → can claim King's Castle (75 Gold)\n\nCAPITOLS - STRATEGIC SHORTCUT TO COUNT:\n- Each county has a Capitol: X=Xythera, U=Umbrith, V=Valoria, Q=Quindara\n- Owning a Capitol with just 1 fortification lets you become Count!\n- This is faster than conquering 2 towns - fortify your Capitol ASAP!\n\nCLAIMS - CRITICAL RULE:\n- You CANNOT attack or capture ANY territory without a valid claim!\n- Get claims by: Playing claim cards from your hand, OR fabricating claims (35 Gold, TOWNS ONLY)\n- Cannot fabricate claims on County/Duchy/King castles - must use claim cards\n- With a claim on an UNOWNED town: pay 10 Gold to capture peacefully (claim_town)\n- With a claim on an ENEMY territory: attack with 200+ soldiers\n\nCOMBAT:\n- Must commit at least 200 soldiers\n- Strength = 2d6 + (soldiers/100) + modifiers\n- Winner loses HALF committed soldiers, loser loses ALL\n- Defender wins ties\n- Fortifications give +2 defense per fortification\n\nAGGRESSIVE STRATEGY - ACTIONS (in priority order):\n1. attack - ATTACK enemies whenever you have a claim and 200+ soldiers! WAR IS THE PATH TO VICTORY!\n2. claim_title - Claim title castles immediately (ALWAYS DO THIS!)\n3. claim_town - Capture unowned towns for 10 gold\n4. play_card - Play claim cards to enable MORE ATTACKS, play combat bonus cards aggressively\n5. fake_claim - Fabricate claims on enemy towns to enable attacks (35 Gold) - BE AGGRESSIVE!\n6. build_fortification - Fortify your CAPITOL first (gives Count title with just 1 fort!)\n7. recruit - Only if you need soldiers to attack\n8. end_turn - End your turn when no attack or expansion options remain\n\nMINDSET: Attack first, ask questions later. If you can attack, DO IT. Territory gained through war is territory your enemies lose. Every turn without an attack is a wasted opportunity!\n\nCARD TYPES:\n- Claim cards (claim_x, claim_u, claim_v, claim_q): Use to enable attacks on that county!\n- Bonus cards: Big War (double army cap), Adventurer (buy 500 soldiers for 25g), Excalibur (roll twice), etc.\n- Personal/Global events: Applied automatically when drawn\n\nRESPONSE FORMAT (IMPORTANT):\nYou must respond in this EXACT format:\nACTION: [number]\nTARGET: [holding_id or \"none\"]\nREASON: [brief explanation of your choice]\n\nExample responses:\nACTION: 3\nTARGET: none\nREASON: Claiming Count title to gain 2 VP and solidify control of County X.\n\nACTION: 5\nTARGET: xythera\nREASON: Playing claim card on Xythera because it's a CAPITOL - fortifying it later gives easy Count title.\n\nACTION: 7\nTARGET: none\nREASON: Building fortification on my capitol to unlock Count title next turn.\n\nFor claim cards (play_card), you MUST specify which holding to target from the CLAIMABLE TARGETS list shown.\nFor other actions, use \"none\" as the target.",
+        "user_prompt": "=== Machiavelli's Kingdom - Round 2 (Victory: 20 VP) ===\n\nYou are: Baron Alpha (baron)\nYour Resources: 0 Gold, 400 Soldiers\nYour Prestige: 2 VP\nArmy Cap: 500\n\n=== Your Holdings ===\n  - Ulverin (id=ulverin), Type=Town, Income=5G/200S\n  - Umbrith (id=umbrith), Type=Town, Income=2G/400S, [+1 attack, CAPITOL]\n\nYour Claims (can attack/capture): valoria\n\n=== Other Players ===\n  You (BARON): 1 holdings, ~400S, 1VP\n  Baron Beta (BARON): 1 holdings, ~400S, 1VP\n  Baron Gamma (BARON): 1 holdings, ~400S, 1VP\n\n=== All Holdings on Board ===\n\n  County X:\n    Xandoria (id=xandoria), Type=Town, Owner=NEUTRAL, Income=1G/400S, [+2 defense]\n    Xelphane (id=xelphane), Type=Town, Owner=You, Income=5G/200S\n    Xythera (id=xythera), Type=Town, Owner=NEUTRAL, Income=3G/300S, [+1 defense, CAPITOL]\n    Castle X (id=x_castle), Type=County Castle, Owner=NEUTRAL\n\n  County U:\n    Ulverin (id=ulverin), Type=Town, Owner=Baron Alpha, Income=5G/200S\n    Uldorwyn (id=uldorwyn), Type=Town, Owner=NEUTRAL, Income=4G/300S\n    Umbrith (id=umbrith), Type=Town, Owner=Baron Alpha, Income=2G/400S, [+1 attack, CAPITOL]\n    Castle U (id=u_castle), Type=County Castle, Owner=NEUTRAL\n\n  County V:\n    Valoria (id=valoria), Type=Town, Owner=NEUTRAL, Income=3G/300S, [+1 defense, CAPITOL]\n    Vardhelm (id=vardhelm), Type=Town, Owner=Baron Beta, Income=5G/200S\n    Velthar (id=velthar), Type=Town, Owner=NEUTRAL, Income=1G/500S, [+2 defense]\n    Castle V (id=v_castle), Type=County Castle, Owner=NEUTRAL\n\n  County Q:\n    Quindara (id=quindara), Type=Town, Owner=NEUTRAL, Income=10G/100S, [CAPITOL]\n    Qyrelis (id=qyrelis), Type=Town, Owner=NEUTRAL, Income=4G/300S\n    Quorwyn (id=quorwyn), Type=Town, Owner=Baron Gamma, Income=5G/200S\n    Castle Q (id=q_castle), Type=County Castle, Owner=NEUTRAL\n\n  Duchy Castles:\n    Duchy Castle XU (id=xu_castle): Owner=NEUTRAL, Duchy=XU\n    Duchy Castle QV (id=qv_castle): Owner=NEUTRAL, Duchy=QV\n\n  King's Castle:\n    King's Castle (id=king_castle): Owner=NEUTRAL\n\n=== Your Hand (0 cards) ===\n\n=== Valid Actions ===\n1. move -> umbrith (from ulverin)\n2. move -> ulverin (from umbrith)\n3. recruit\n4. end_turn\n\nChoose your action wisely! For claim cards (play_card), specify the TARGET holding from the CLAIMABLE TARGETS list.\n\nRespond in this format:\nACTION: [number 1-4]\nTARGET: [holding_id from claimable targets, or \"none\" if not applicable]\nREASON: [your strategic reasoning]",
+        "raw_response": "ACTION: 4  \nTARGET: none  \nREASON: I currently have no gold and no claims to initiate any attacks or captures. Since I cannot recruit more soldiers due to lack of funds, and there are no strategic moves to make with the current resources, ending the turn is the only viable option. This allows me to accumulate resources next turn for future aggressive actions.",
+        "parsed_action": "end_turn",
+        "action_details": {
+          "action_type": "end_turn"
+        },
+        "decision_log": {
+          "player_name": "Baron Alpha",
+          "timestamp": "2026-01-17T10:24:39.828528",
+          "valid_actions": [
+            "move",
+            "move",
+            "recruit",
+            "end_turn"
+          ],
+          "considered": [
+            {
+              "action": "end_turn",
+              "status": "chosen",
+              "reason": "I currently have no gold and no claims to initiate any attacks or captures. Since I cannot recruit more soldiers due to lack of funds, and there are no strategic moves to make with the current resources, ending the turn is the only viable option. This allows me to accumulate resources next turn for future aggressive actions."
+            }
+          ],
+          "chosen_action": "end_turn",
+          "reason": "I currently have no gold and no claims to initiate any attacks or captures. Since I cannot recruit more soldiers due to lack of funds, and there are no strategic moves to make with the current resources, ending the turn is the only viable option. This allows me to accumulate resources next turn for future aggressive actions."
+        }
+      }
+    },
+    {
+      "timestamp": "2026-01-17T10:24:39.832868",
+      "event_type": "turn_end",
+      "round": 2,
+      "player_id": "84e1615b-919e-43e8-9567-36a0e30fd132",
+      "player_name": "Baron Alpha",
+      "data": {
+        "player_state": {
+          "gold": 0,
+          "soldiers": 400,
+          "prestige": 2,
+          "title": "baron",
+          "holdings": [
+            "ulverin",
+            "umbrith"
+          ],
+          "counties": [],
+          "duchies": [],
+          "is_king": false,
+          "hand_size": 0,
+          "claims": [
+            "valoria"
+          ],
+          "army_cap": 500
+        }
+      }
+    },
+    {
+      "timestamp": "2026-01-17T10:24:39.838423",
+      "event_type": "turn_start",
+      "round": 2,
+      "player_id": "d9a9a5fc-9128-412a-aa1e-ebf6876516ea",
+      "player_name": "Baron Beta",
+      "data": {
+        "player_state": {
+          "gold": 10,
+          "soldiers": 400,
+          "prestige": 1,
+          "title": "baron",
+          "holdings": [
+            "vardhelm"
+          ],
+          "counties": [],
+          "duchies": [],
+          "is_king": false,
+          "hand_size": 0,
+          "claims": [
+            "xythera"
+          ],
+          "army_cap": 500
+        }
+      }
+    },
+    {
+      "timestamp": "2026-01-17T10:24:39.844841",
+      "event_type": "card_draw",
+      "round": 2,
+      "player_id": "d9a9a5fc-9128-412a-aa1e-ebf6876516ea",
+      "player_name": "Baron Beta",
+      "data": {
+        "card_id": "card_44",
+        "card_name": "Claim: County X",
+        "card_type": "claim",
+        "is_instant": false,
+        "effect_applied": null
+      }
+    },
+    {
+      "timestamp": "2026-01-17T10:24:39.849825",
+      "event_type": "action",
+      "round": 2,
+      "player_id": "84e1615b-919e-43e8-9567-36a0e30fd132",
+      "player_name": "Baron Alpha",
+      "data": {
+        "action_type": "end_turn",
+        "action_details": {
+          "action_type": "end_turn"
+        },
+        "success": true,
+        "result_message": "Turn ended"
+      }
+    },
+    {
+      "timestamp": "2026-01-17T10:24:41.728221",
+      "event_type": "ai_decision",
+      "round": 2,
+      "player_id": "d9a9a5fc-9128-412a-aa1e-ebf6876516ea",
+      "player_name": "Baron Beta",
+      "data": {
+        "player_type": "ai_openai",
+        "system_prompt": "You are an AGGRESSIVE AI warlord playing Machiavelli's Kingdom, a medieval strategy board game.\n\nPERSONALITY: You are a ruthless conqueror. You LOVE war and territorial expansion. You attack whenever possible and never let an opportunity to strike pass. Defense is for the weak - offense wins games!\n\nOBJECTIVE: First to reach 18 Prestige Points (VP) wins!\n\nSCORING:\n- Town = 1 VP\n- County title = +2 VP  \n- Duchy title = +4 VP\n- King title = +6 VP\n\nGAME STRUCTURE:\n- 4 counties (X, U, V, Q), each with 3 towns and 1 county castle\n- 2 duchies: XU (counties X+U) and QV (counties Q+V)\n- 1 King's Castle in the center\n\nTITLES (require prerequisites and gold):\n- Count: Own 2 of 3 towns in a county OR own a fortified Capitol (1 fort) → claim County Castle (25 Gold)\n- Duke: Be Count in both counties of a duchy → can claim Duchy Castle (50 Gold)  \n- King: Be Duke + own a town in the OTHER duchy → can claim King's Castle (75 Gold)\n\nCAPITOLS - STRATEGIC SHORTCUT TO COUNT:\n- Each county has a Capitol: X=Xythera, U=Umbrith, V=Valoria, Q=Quindara\n- Owning a Capitol with just 1 fortification lets you become Count!\n- This is faster than conquering 2 towns - fortify your Capitol ASAP!\n\nCLAIMS - CRITICAL RULE:\n- You CANNOT attack or capture ANY territory without a valid claim!\n- Get claims by: Playing claim cards from your hand, OR fabricating claims (35 Gold, TOWNS ONLY)\n- Cannot fabricate claims on County/Duchy/King castles - must use claim cards\n- With a claim on an UNOWNED town: pay 10 Gold to capture peacefully (claim_town)\n- With a claim on an ENEMY territory: attack with 200+ soldiers\n\nCOMBAT:\n- Must commit at least 200 soldiers\n- Strength = 2d6 + (soldiers/100) + modifiers\n- Winner loses HALF committed soldiers, loser loses ALL\n- Defender wins ties\n- Fortifications give +2 defense per fortification\n\nAGGRESSIVE STRATEGY - ACTIONS (in priority order):\n1. attack - ATTACK enemies whenever you have a claim and 200+ soldiers! WAR IS THE PATH TO VICTORY!\n2. claim_title - Claim title castles immediately (ALWAYS DO THIS!)\n3. claim_town - Capture unowned towns for 10 gold\n4. play_card - Play claim cards to enable MORE ATTACKS, play combat bonus cards aggressively\n5. fake_claim - Fabricate claims on enemy towns to enable attacks (35 Gold) - BE AGGRESSIVE!\n6. build_fortification - Fortify your CAPITOL first (gives Count title with just 1 fort!)\n7. recruit - Only if you need soldiers to attack\n8. end_turn - End your turn when no attack or expansion options remain\n\nMINDSET: Attack first, ask questions later. If you can attack, DO IT. Territory gained through war is territory your enemies lose. Every turn without an attack is a wasted opportunity!\n\nCARD TYPES:\n- Claim cards (claim_x, claim_u, claim_v, claim_q): Use to enable attacks on that county!\n- Bonus cards: Big War (double army cap), Adventurer (buy 500 soldiers for 25g), Excalibur (roll twice), etc.\n- Personal/Global events: Applied automatically when drawn\n\nRESPONSE FORMAT (IMPORTANT):\nYou must respond in this EXACT format:\nACTION: [number]\nTARGET: [holding_id or \"none\"]\nREASON: [brief explanation of your choice]\n\nExample responses:\nACTION: 3\nTARGET: none\nREASON: Claiming Count title to gain 2 VP and solidify control of County X.\n\nACTION: 5\nTARGET: xythera\nREASON: Playing claim card on Xythera because it's a CAPITOL - fortifying it later gives easy Count title.\n\nACTION: 7\nTARGET: none\nREASON: Building fortification on my capitol to unlock Count title next turn.\n\nFor claim cards (play_card), you MUST specify which holding to target from the CLAIMABLE TARGETS list shown.\nFor other actions, use \"none\" as the target.",
+        "user_prompt": "=== Machiavelli's Kingdom - Round 2 (Victory: 20 VP) ===\n\nYou are: Baron Beta (baron)\nYour Resources: 10 Gold, 400 Soldiers\nYour Prestige: 1 VP\nArmy Cap: 500\n\n=== Your Holdings ===\n  - Vardhelm (id=vardhelm), Type=Town, Income=5G/200S\n\nYour Claims (can attack/capture): xythera\n\n=== Other Players ===\n  You (BARON): 1 holdings, ~400S, 1VP\n  Baron Alpha (BARON): 2 holdings, ~400S, 2VP\n  Baron Gamma (BARON): 1 holdings, ~400S, 1VP\n\n=== All Holdings on Board ===\n\n  County X:\n    Xandoria (id=xandoria), Type=Town, Owner=NEUTRAL, Income=1G/400S, [+2 defense]\n    Xelphane (id=xelphane), Type=Town, Owner=You, Income=5G/200S\n    Xythera (id=xythera), Type=Town, Owner=NEUTRAL, Income=3G/300S, [+1 defense, CAPITOL]\n    Castle X (id=x_castle), Type=County Castle, Owner=NEUTRAL\n\n  County U:\n    Ulverin (id=ulverin), Type=Town, Owner=Baron Alpha, Income=5G/200S\n    Uldorwyn (id=uldorwyn), Type=Town, Owner=NEUTRAL, Income=4G/300S\n    Umbrith (id=umbrith), Type=Town, Owner=Baron Alpha, Income=2G/400S, [+1 attack, CAPITOL]\n    Castle U (id=u_castle), Type=County Castle, Owner=NEUTRAL\n\n  County V:\n    Valoria (id=valoria), Type=Town, Owner=NEUTRAL, Income=3G/300S, [+1 defense, CAPITOL]\n    Vardhelm (id=vardhelm), Type=Town, Owner=Baron Beta, Income=5G/200S\n    Velthar (id=velthar), Type=Town, Owner=NEUTRAL, Income=1G/500S, [+2 defense]\n    Castle V (id=v_castle), Type=County Castle, Owner=NEUTRAL\n\n  County Q:\n    Quindara (id=quindara), Type=Town, Owner=NEUTRAL, Income=10G/100S, [CAPITOL]\n    Qyrelis (id=qyrelis), Type=Town, Owner=NEUTRAL, Income=4G/300S\n    Quorwyn (id=quorwyn), Type=Town, Owner=Baron Gamma, Income=5G/200S\n    Castle Q (id=q_castle), Type=County Castle, Owner=NEUTRAL\n\n  Duchy Castles:\n    Duchy Castle XU (id=xu_castle): Owner=NEUTRAL, Duchy=XU\n    Duchy Castle QV (id=qv_castle): Owner=NEUTRAL, Duchy=QV\n\n  King's Castle:\n    King's Castle (id=king_castle): Owner=NEUTRAL\n\n=== Your Hand (1 cards) ===\n  - Claim: County X (id=card_44): Press a claim on any town in County X.\n\n=== Valid Actions ===\n1. recruit\n2. build_fortification -> xandoria\n3. build_fortification -> xelphane\n4. build_fortification -> xythera\n5. build_fortification -> ulverin\n6. build_fortification -> uldorwyn\n7. build_fortification -> umbrith\n8. build_fortification -> valoria\n9. build_fortification -> vardhelm\n10. build_fortification -> velthar\n11. build_fortification -> quindara\n12. build_fortification -> qyrelis\n13. build_fortification -> quorwyn\n14. claim_town -> xythera\n15. play_card [Claim: County X]\n      CLAIMABLE TARGETS:\n        - Xandoria (id=xandoria), Type=Town, Owner=NEUTRAL, Income=1G/400S, [+2 defense]\n        - Xelphane (id=xelphane), Type=Town, Owner=You, Income=5G/200S\n        - Castle X (id=x_castle), Type=County Castle, Owner=NEUTRAL\n16. end_turn\n\nChoose your action wisely! For claim cards (play_card), specify the TARGET holding from the CLAIMABLE TARGETS list.\n\nRespond in this format:\nACTION: [number 1-16]\nTARGET: [holding_id from claimable targets, or \"none\" if not applicable]\nREASON: [your strategic reasoning]",
+        "raw_response": "ACTION: 14  \nTARGET: none  \nREASON: Capturing Xythera is crucial for expansion and allows me to control a Capitol. With a fortification, I can claim the Count title for County X, gaining 2 VP and increasing my power in the region.",
+        "parsed_action": "claim_town",
+        "action_details": {
+          "action_type": "claim_town",
+          "target_holding_id": "xythera"
+        },
+        "decision_log": {
+          "player_name": "Baron Beta",
+          "timestamp": "2026-01-17T10:24:41.728145",
+          "valid_actions": [
+            "recruit",
+            "build_fortification",
+            "build_fortification",
+            "build_fortification",
+            "build_fortification",
+            "build_fortification",
+            "build_fortification",
+            "build_fortification",
+            "build_fortification",
+            "build_fortification",
+            "build_fortification",
+            "build_fortification",
+            "build_fortification",
+            "claim_town",
+            "play_card",
+            "end_turn"
+          ],
+          "considered": [
+            {
+              "action": "claim_town",
+              "status": "chosen",
+              "reason": "Capturing Xythera is crucial for expansion and allows me to control a Capitol. With a fortification, I can claim the Count title for County X, gaining 2 VP and increasing my power in the region."
+            }
+          ],
+          "chosen_action": "claim_town",
+          "reason": "Capturing Xythera is crucial for expansion and allows me to control a Capitol. With a fortification, I can claim the Count title for County X, gaining 2 VP and increasing my power in the region."
+        }
+      }
+    },
+    {
+      "timestamp": "2026-01-17T10:24:41.731862",
+      "event_type": "action",
+      "round": 2,
+      "player_id": "d9a9a5fc-9128-412a-aa1e-ebf6876516ea",
+      "player_name": "Baron Beta",
+      "data": {
+        "action_type": "claim_town",
+        "action_details": {
+          "action_type": "claim_town",
+          "target_holding_id": "xythera"
+        },
+        "success": true,
+        "result_message": "Captured Xythera!"
+      }
+    },
+    {
+      "timestamp": "2026-01-17T10:24:43.784237",
+      "event_type": "ai_decision",
+      "round": 2,
+      "player_id": "d9a9a5fc-9128-412a-aa1e-ebf6876516ea",
+      "player_name": "Baron Beta",
+      "data": {
+        "player_type": "ai_openai",
+        "system_prompt": "You are an AGGRESSIVE AI warlord playing Machiavelli's Kingdom, a medieval strategy board game.\n\nPERSONALITY: You are a ruthless conqueror. You LOVE war and territorial expansion. You attack whenever possible and never let an opportunity to strike pass. Defense is for the weak - offense wins games!\n\nOBJECTIVE: First to reach 18 Prestige Points (VP) wins!\n\nSCORING:\n- Town = 1 VP\n- County title = +2 VP  \n- Duchy title = +4 VP\n- King title = +6 VP\n\nGAME STRUCTURE:\n- 4 counties (X, U, V, Q), each with 3 towns and 1 county castle\n- 2 duchies: XU (counties X+U) and QV (counties Q+V)\n- 1 King's Castle in the center\n\nTITLES (require prerequisites and gold):\n- Count: Own 2 of 3 towns in a county OR own a fortified Capitol (1 fort) → claim County Castle (25 Gold)\n- Duke: Be Count in both counties of a duchy → can claim Duchy Castle (50 Gold)  \n- King: Be Duke + own a town in the OTHER duchy → can claim King's Castle (75 Gold)\n\nCAPITOLS - STRATEGIC SHORTCUT TO COUNT:\n- Each county has a Capitol: X=Xythera, U=Umbrith, V=Valoria, Q=Quindara\n- Owning a Capitol with just 1 fortification lets you become Count!\n- This is faster than conquering 2 towns - fortify your Capitol ASAP!\n\nCLAIMS - CRITICAL RULE:\n- You CANNOT attack or capture ANY territory without a valid claim!\n- Get claims by: Playing claim cards from your hand, OR fabricating claims (35 Gold, TOWNS ONLY)\n- Cannot fabricate claims on County/Duchy/King castles - must use claim cards\n- With a claim on an UNOWNED town: pay 10 Gold to capture peacefully (claim_town)\n- With a claim on an ENEMY territory: attack with 200+ soldiers\n\nCOMBAT:\n- Must commit at least 200 soldiers\n- Strength = 2d6 + (soldiers/100) + modifiers\n- Winner loses HALF committed soldiers, loser loses ALL\n- Defender wins ties\n- Fortifications give +2 defense per fortification\n\nAGGRESSIVE STRATEGY - ACTIONS (in priority order):\n1. attack - ATTACK enemies whenever you have a claim and 200+ soldiers! WAR IS THE PATH TO VICTORY!\n2. claim_title - Claim title castles immediately (ALWAYS DO THIS!)\n3. claim_town - Capture unowned towns for 10 gold\n4. play_card - Play claim cards to enable MORE ATTACKS, play combat bonus cards aggressively\n5. fake_claim - Fabricate claims on enemy towns to enable attacks (35 Gold) - BE AGGRESSIVE!\n6. build_fortification - Fortify your CAPITOL first (gives Count title with just 1 fort!)\n7. recruit - Only if you need soldiers to attack\n8. end_turn - End your turn when no attack or expansion options remain\n\nMINDSET: Attack first, ask questions later. If you can attack, DO IT. Territory gained through war is territory your enemies lose. Every turn without an attack is a wasted opportunity!\n\nCARD TYPES:\n- Claim cards (claim_x, claim_u, claim_v, claim_q): Use to enable attacks on that county!\n- Bonus cards: Big War (double army cap), Adventurer (buy 500 soldiers for 25g), Excalibur (roll twice), etc.\n- Personal/Global events: Applied automatically when drawn\n\nRESPONSE FORMAT (IMPORTANT):\nYou must respond in this EXACT format:\nACTION: [number]\nTARGET: [holding_id or \"none\"]\nREASON: [brief explanation of your choice]\n\nExample responses:\nACTION: 3\nTARGET: none\nREASON: Claiming Count title to gain 2 VP and solidify control of County X.\n\nACTION: 5\nTARGET: xythera\nREASON: Playing claim card on Xythera because it's a CAPITOL - fortifying it later gives easy Count title.\n\nACTION: 7\nTARGET: none\nREASON: Building fortification on my capitol to unlock Count title next turn.\n\nFor claim cards (play_card), you MUST specify which holding to target from the CLAIMABLE TARGETS list shown.\nFor other actions, use \"none\" as the target.",
+        "user_prompt": "=== Machiavelli's Kingdom - Round 2 (Victory: 20 VP) ===\n\nYou are: Baron Beta (baron)\nYour Resources: 0 Gold, 400 Soldiers\nYour Prestige: 2 VP\nArmy Cap: 500\n\n=== Your Holdings ===\n  - Vardhelm (id=vardhelm), Type=Town, Income=5G/200S\n  - Xythera (id=xythera), Type=Town, Income=3G/300S, [+1 defense, CAPITOL]\n\nYour Claims: NONE - you need claims to attack! Play claim cards or fabricate claims (35g, towns only)\n\n=== Other Players ===\n  You (BARON): 1 holdings, ~400S, 1VP\n  Baron Alpha (BARON): 2 holdings, ~400S, 2VP\n  Baron Gamma (BARON): 1 holdings, ~400S, 1VP\n\n=== All Holdings on Board ===\n\n  County X:\n    Xandoria (id=xandoria), Type=Town, Owner=NEUTRAL, Income=1G/400S, [+2 defense]\n    Xelphane (id=xelphane), Type=Town, Owner=You, Income=5G/200S\n    Xythera (id=xythera), Type=Town, Owner=Baron Beta, Income=3G/300S, [+1 defense, CAPITOL]\n    Castle X (id=x_castle), Type=County Castle, Owner=NEUTRAL\n\n  County U:\n    Ulverin (id=ulverin), Type=Town, Owner=Baron Alpha, Income=5G/200S\n    Uldorwyn (id=uldorwyn), Type=Town, Owner=NEUTRAL, Income=4G/300S\n    Umbrith (id=umbrith), Type=Town, Owner=Baron Alpha, Income=2G/400S, [+1 attack, CAPITOL]\n    Castle U (id=u_castle), Type=County Castle, Owner=NEUTRAL\n\n  County V:\n    Valoria (id=valoria), Type=Town, Owner=NEUTRAL, Income=3G/300S, [+1 defense, CAPITOL]\n    Vardhelm (id=vardhelm), Type=Town, Owner=Baron Beta, Income=5G/200S\n    Velthar (id=velthar), Type=Town, Owner=NEUTRAL, Income=1G/500S, [+2 defense]\n    Castle V (id=v_castle), Type=County Castle, Owner=NEUTRAL\n\n  County Q:\n    Quindara (id=quindara), Type=Town, Owner=NEUTRAL, Income=10G/100S, [CAPITOL]\n    Qyrelis (id=qyrelis), Type=Town, Owner=NEUTRAL, Income=4G/300S\n    Quorwyn (id=quorwyn), Type=Town, Owner=Baron Gamma, Income=5G/200S\n    Castle Q (id=q_castle), Type=County Castle, Owner=NEUTRAL\n\n  Duchy Castles:\n    Duchy Castle XU (id=xu_castle): Owner=NEUTRAL, Duchy=XU\n    Duchy Castle QV (id=qv_castle): Owner=NEUTRAL, Duchy=QV\n\n  King's Castle:\n    King's Castle (id=king_castle): Owner=NEUTRAL\n\n=== Your Hand (1 cards) ===\n  - Claim: County X (id=card_44): Press a claim on any town in County X.\n\n=== Valid Actions ===\n1. recruit\n2. play_card [Claim: County X]\n      CLAIMABLE TARGETS:\n        - Xandoria (id=xandoria), Type=Town, Owner=NEUTRAL, Income=1G/400S, [+2 defense]\n        - Xelphane (id=xelphane), Type=Town, Owner=You, Income=5G/200S\n        - Castle X (id=x_castle), Type=County Castle, Owner=NEUTRAL\n3. end_turn\n\nChoose your action wisely! For claim cards (play_card), specify the TARGET holding from the CLAIMABLE TARGETS list.\n\nRespond in this format:\nACTION: [number 1-3]\nTARGET: [holding_id from claimable targets, or \"none\" if not applicable]\nREASON: [your strategic reasoning]",
+        "raw_response": "ACTION: 2  \nTARGET: xandoria  \nREASON: Playing a claim card on Xandoria gives me the ability to attack and capture this town in County X, which will strengthen my hold on this county. Once I have 2 towns in County X, I can aim for the County Castle and claim the Count title for additional Prestige Points.",
+        "parsed_action": "play_card",
+        "action_details": {
+          "action_type": "play_card",
+          "target_holding_id": "xandoria",
+          "card_id": "card_44"
+        },
+        "decision_log": {
+          "player_name": "Baron Beta",
+          "timestamp": "2026-01-17T10:24:43.784115",
+          "valid_actions": [
+            "recruit",
+            "play_card",
+            "end_turn"
+          ],
+          "considered": [
+            {
+              "action": "play_card",
+              "status": "chosen",
+              "reason": "Playing a claim card on Xandoria gives me the ability to attack and capture this town in County X, which will strengthen my hold on this county. Once I have 2 towns in County X, I can aim for the County Castle and claim the Count title for additional Prestige Points."
+            }
+          ],
+          "chosen_action": "play_card",
+          "reason": "Playing a claim card on Xandoria gives me the ability to attack and capture this town in County X, which will strengthen my hold on this county. Once I have 2 towns in County X, I can aim for the County Castle and claim the Count title for additional Prestige Points."
+        }
+      }
+    },
+    {
+      "timestamp": "2026-01-17T10:24:43.792184",
+      "event_type": "action",
+      "round": 2,
+      "player_id": "d9a9a5fc-9128-412a-aa1e-ebf6876516ea",
+      "player_name": "Baron Beta",
+      "data": {
+        "action_type": "play_card",
+        "action_details": {
+          "action_type": "play_card",
+          "target_holding_id": "xandoria",
+          "card_id": "card_44"
+        },
+        "success": true,
+        "result_message": "Established claim on Xandoria! You can now attack or capture it."
+      }
+    },
+    {
+      "timestamp": "2026-01-17T10:24:46.136566",
+      "event_type": "ai_decision",
+      "round": 2,
+      "player_id": "d9a9a5fc-9128-412a-aa1e-ebf6876516ea",
+      "player_name": "Baron Beta",
+      "data": {
+        "player_type": "ai_openai",
+        "system_prompt": "You are an AGGRESSIVE AI warlord playing Machiavelli's Kingdom, a medieval strategy board game.\n\nPERSONALITY: You are a ruthless conqueror. You LOVE war and territorial expansion. You attack whenever possible and never let an opportunity to strike pass. Defense is for the weak - offense wins games!\n\nOBJECTIVE: First to reach 18 Prestige Points (VP) wins!\n\nSCORING:\n- Town = 1 VP\n- County title = +2 VP  \n- Duchy title = +4 VP\n- King title = +6 VP\n\nGAME STRUCTURE:\n- 4 counties (X, U, V, Q), each with 3 towns and 1 county castle\n- 2 duchies: XU (counties X+U) and QV (counties Q+V)\n- 1 King's Castle in the center\n\nTITLES (require prerequisites and gold):\n- Count: Own 2 of 3 towns in a county OR own a fortified Capitol (1 fort) → claim County Castle (25 Gold)\n- Duke: Be Count in both counties of a duchy → can claim Duchy Castle (50 Gold)  \n- King: Be Duke + own a town in the OTHER duchy → can claim King's Castle (75 Gold)\n\nCAPITOLS - STRATEGIC SHORTCUT TO COUNT:\n- Each county has a Capitol: X=Xythera, U=Umbrith, V=Valoria, Q=Quindara\n- Owning a Capitol with just 1 fortification lets you become Count!\n- This is faster than conquering 2 towns - fortify your Capitol ASAP!\n\nCLAIMS - CRITICAL RULE:\n- You CANNOT attack or capture ANY territory without a valid claim!\n- Get claims by: Playing claim cards from your hand, OR fabricating claims (35 Gold, TOWNS ONLY)\n- Cannot fabricate claims on County/Duchy/King castles - must use claim cards\n- With a claim on an UNOWNED town: pay 10 Gold to capture peacefully (claim_town)\n- With a claim on an ENEMY territory: attack with 200+ soldiers\n\nCOMBAT:\n- Must commit at least 200 soldiers\n- Strength = 2d6 + (soldiers/100) + modifiers\n- Winner loses HALF committed soldiers, loser loses ALL\n- Defender wins ties\n- Fortifications give +2 defense per fortification\n\nAGGRESSIVE STRATEGY - ACTIONS (in priority order):\n1. attack - ATTACK enemies whenever you have a claim and 200+ soldiers! WAR IS THE PATH TO VICTORY!\n2. claim_title - Claim title castles immediately (ALWAYS DO THIS!)\n3. claim_town - Capture unowned towns for 10 gold\n4. play_card - Play claim cards to enable MORE ATTACKS, play combat bonus cards aggressively\n5. fake_claim - Fabricate claims on enemy towns to enable attacks (35 Gold) - BE AGGRESSIVE!\n6. build_fortification - Fortify your CAPITOL first (gives Count title with just 1 fort!)\n7. recruit - Only if you need soldiers to attack\n8. end_turn - End your turn when no attack or expansion options remain\n\nMINDSET: Attack first, ask questions later. If you can attack, DO IT. Territory gained through war is territory your enemies lose. Every turn without an attack is a wasted opportunity!\n\nCARD TYPES:\n- Claim cards (claim_x, claim_u, claim_v, claim_q): Use to enable attacks on that county!\n- Bonus cards: Big War (double army cap), Adventurer (buy 500 soldiers for 25g), Excalibur (roll twice), etc.\n- Personal/Global events: Applied automatically when drawn\n\nRESPONSE FORMAT (IMPORTANT):\nYou must respond in this EXACT format:\nACTION: [number]\nTARGET: [holding_id or \"none\"]\nREASON: [brief explanation of your choice]\n\nExample responses:\nACTION: 3\nTARGET: none\nREASON: Claiming Count title to gain 2 VP and solidify control of County X.\n\nACTION: 5\nTARGET: xythera\nREASON: Playing claim card on Xythera because it's a CAPITOL - fortifying it later gives easy Count title.\n\nACTION: 7\nTARGET: none\nREASON: Building fortification on my capitol to unlock Count title next turn.\n\nFor claim cards (play_card), you MUST specify which holding to target from the CLAIMABLE TARGETS list shown.\nFor other actions, use \"none\" as the target.",
+        "user_prompt": "=== Machiavelli's Kingdom - Round 2 (Victory: 20 VP) ===\n\nYou are: Baron Beta (baron)\nYour Resources: 0 Gold, 400 Soldiers\nYour Prestige: 2 VP\nArmy Cap: 500\n\n=== Your Holdings ===\n  - Vardhelm (id=vardhelm), Type=Town, Income=5G/200S\n  - Xythera (id=xythera), Type=Town, Income=3G/300S, [+1 defense, CAPITOL]\n\nYour Claims (can attack/capture): xandoria\n\n=== Other Players ===\n  You (BARON): 1 holdings, ~400S, 1VP\n  Baron Alpha (BARON): 2 holdings, ~400S, 2VP\n  Baron Gamma (BARON): 1 holdings, ~400S, 1VP\n\n=== All Holdings on Board ===\n\n  County X:\n    Xandoria (id=xandoria), Type=Town, Owner=NEUTRAL, Income=1G/400S, [+2 defense]\n    Xelphane (id=xelphane), Type=Town, Owner=You, Income=5G/200S\n    Xythera (id=xythera), Type=Town, Owner=Baron Beta, Income=3G/300S, [+1 defense, CAPITOL]\n    Castle X (id=x_castle), Type=County Castle, Owner=NEUTRAL\n\n  County U:\n    Ulverin (id=ulverin), Type=Town, Owner=Baron Alpha, Income=5G/200S\n    Uldorwyn (id=uldorwyn), Type=Town, Owner=NEUTRAL, Income=4G/300S\n    Umbrith (id=umbrith), Type=Town, Owner=Baron Alpha, Income=2G/400S, [+1 attack, CAPITOL]\n    Castle U (id=u_castle), Type=County Castle, Owner=NEUTRAL\n\n  County V:\n    Valoria (id=valoria), Type=Town, Owner=NEUTRAL, Income=3G/300S, [+1 defense, CAPITOL]\n    Vardhelm (id=vardhelm), Type=Town, Owner=Baron Beta, Income=5G/200S\n    Velthar (id=velthar), Type=Town, Owner=NEUTRAL, Income=1G/500S, [+2 defense]\n    Castle V (id=v_castle), Type=County Castle, Owner=NEUTRAL\n\n  County Q:\n    Quindara (id=quindara), Type=Town, Owner=NEUTRAL, Income=10G/100S, [CAPITOL]\n    Qyrelis (id=qyrelis), Type=Town, Owner=NEUTRAL, Income=4G/300S\n    Quorwyn (id=quorwyn), Type=Town, Owner=Baron Gamma, Income=5G/200S\n    Castle Q (id=q_castle), Type=County Castle, Owner=NEUTRAL\n\n  Duchy Castles:\n    Duchy Castle XU (id=xu_castle): Owner=NEUTRAL, Duchy=XU\n    Duchy Castle QV (id=qv_castle): Owner=NEUTRAL, Duchy=QV\n\n  King's Castle:\n    King's Castle (id=king_castle): Owner=NEUTRAL\n\n=== Your Hand (0 cards) ===\n\n=== Valid Actions ===\n1. recruit\n2. end_turn\n\nChoose your action wisely! For claim cards (play_card), specify the TARGET holding from the CLAIMABLE TARGETS list.\n\nRespond in this format:\nACTION: [number 1-2]\nTARGET: [holding_id from claimable targets, or \"none\" if not applicable]\nREASON: [your strategic reasoning]",
+        "raw_response": "ACTION: 2  \nTARGET: none  \nREASON: With no gold to recruit soldiers and no cards to play, I cannot fabricate claims or attack this turn. Ending the turn is the only viable option while I await new opportunities to strike.",
+        "parsed_action": "end_turn",
+        "action_details": {
+          "action_type": "end_turn"
+        },
+        "decision_log": {
+          "player_name": "Baron Beta",
+          "timestamp": "2026-01-17T10:24:46.136408",
+          "valid_actions": [
+            "recruit",
+            "end_turn"
+          ],
+          "considered": [
+            {
+              "action": "end_turn",
+              "status": "chosen",
+              "reason": "With no gold to recruit soldiers and no cards to play, I cannot fabricate claims or attack this turn. Ending the turn is the only viable option while I await new opportunities to strike."
+            }
+          ],
+          "chosen_action": "end_turn",
+          "reason": "With no gold to recruit soldiers and no cards to play, I cannot fabricate claims or attack this turn. Ending the turn is the only viable option while I await new opportunities to strike."
+        }
+      }
+    },
+    {
+      "timestamp": "2026-01-17T10:24:46.142307",
+      "event_type": "turn_end",
+      "round": 2,
+      "player_id": "d9a9a5fc-9128-412a-aa1e-ebf6876516ea",
+      "player_name": "Baron Beta",
+      "data": {
+        "player_state": {
+          "gold": 0,
+          "soldiers": 400,
+          "prestige": 2,
+          "title": "baron",
+          "holdings": [
+            "vardhelm",
+            "xythera"
+          ],
+          "counties": [],
+          "duchies": [],
+          "is_king": false,
+          "hand_size": 0,
+          "claims": [
+            "xandoria"
+          ],
+          "army_cap": 500
+        }
+      }
+    },
+    {
+      "timestamp": "2026-01-17T10:24:46.147773",
+      "event_type": "turn_start",
+      "round": 2,
+      "player_id": "98913b46-3a9a-4e2c-be12-beb2f5b80fbd",
+      "player_name": "Baron Gamma",
+      "data": {
+        "player_state": {
+          "gold": 10,
+          "soldiers": 400,
+          "prestige": 1,
+          "title": "baron",
+          "holdings": [
+            "quorwyn"
+          ],
+          "counties": [],
+          "duchies": [],
+          "is_king": false,
+          "hand_size": 0,
+          "claims": [],
+          "army_cap": 1000
+        }
+      }
+    },
+    {
+      "timestamp": "2026-01-17T10:24:46.153722",
+      "event_type": "card_draw",
+      "round": 2,
+      "player_id": "98913b46-3a9a-4e2c-be12-beb2f5b80fbd",
+      "player_name": "Baron Gamma",
+      "data": {
+        "card_id": "card_48",
+        "card_name": "Claim: County U",
+        "card_type": "claim",
+        "is_instant": false,
+        "effect_applied": null
+      }
+    },
+    {
+      "timestamp": "2026-01-17T10:24:46.160458",
+      "event_type": "action",
+      "round": 2,
+      "player_id": "d9a9a5fc-9128-412a-aa1e-ebf6876516ea",
+      "player_name": "Baron Beta",
+      "data": {
+        "action_type": "end_turn",
+        "action_details": {
+          "action_type": "end_turn"
+        },
+        "success": true,
+        "result_message": "Turn ended"
+      }
+    },
+    {
+      "timestamp": "2026-01-17T10:24:51.513229",
+      "event_type": "ai_decision",
+      "round": 2,
+      "player_id": "98913b46-3a9a-4e2c-be12-beb2f5b80fbd",
+      "player_name": "Baron Gamma",
+      "data": {
+        "player_type": "ai_openai",
+        "system_prompt": "You are an AGGRESSIVE AI warlord playing Machiavelli's Kingdom, a medieval strategy board game.\n\nPERSONALITY: You are a ruthless conqueror. You LOVE war and territorial expansion. You attack whenever possible and never let an opportunity to strike pass. Defense is for the weak - offense wins games!\n\nOBJECTIVE: First to reach 18 Prestige Points (VP) wins!\n\nSCORING:\n- Town = 1 VP\n- County title = +2 VP  \n- Duchy title = +4 VP\n- King title = +6 VP\n\nGAME STRUCTURE:\n- 4 counties (X, U, V, Q), each with 3 towns and 1 county castle\n- 2 duchies: XU (counties X+U) and QV (counties Q+V)\n- 1 King's Castle in the center\n\nTITLES (require prerequisites and gold):\n- Count: Own 2 of 3 towns in a county OR own a fortified Capitol (1 fort) → claim County Castle (25 Gold)\n- Duke: Be Count in both counties of a duchy → can claim Duchy Castle (50 Gold)  \n- King: Be Duke + own a town in the OTHER duchy → can claim King's Castle (75 Gold)\n\nCAPITOLS - STRATEGIC SHORTCUT TO COUNT:\n- Each county has a Capitol: X=Xythera, U=Umbrith, V=Valoria, Q=Quindara\n- Owning a Capitol with just 1 fortification lets you become Count!\n- This is faster than conquering 2 towns - fortify your Capitol ASAP!\n\nCLAIMS - CRITICAL RULE:\n- You CANNOT attack or capture ANY territory without a valid claim!\n- Get claims by: Playing claim cards from your hand, OR fabricating claims (35 Gold, TOWNS ONLY)\n- Cannot fabricate claims on County/Duchy/King castles - must use claim cards\n- With a claim on an UNOWNED town: pay 10 Gold to capture peacefully (claim_town)\n- With a claim on an ENEMY territory: attack with 200+ soldiers\n\nCOMBAT:\n- Must commit at least 200 soldiers\n- Strength = 2d6 + (soldiers/100) + modifiers\n- Winner loses HALF committed soldiers, loser loses ALL\n- Defender wins ties\n- Fortifications give +2 defense per fortification\n\nAGGRESSIVE STRATEGY - ACTIONS (in priority order):\n1. attack - ATTACK enemies whenever you have a claim and 200+ soldiers! WAR IS THE PATH TO VICTORY!\n2. claim_title - Claim title castles immediately (ALWAYS DO THIS!)\n3. claim_town - Capture unowned towns for 10 gold\n4. play_card - Play claim cards to enable MORE ATTACKS, play combat bonus cards aggressively\n5. fake_claim - Fabricate claims on enemy towns to enable attacks (35 Gold) - BE AGGRESSIVE!\n6. build_fortification - Fortify your CAPITOL first (gives Count title with just 1 fort!)\n7. recruit - Only if you need soldiers to attack\n8. end_turn - End your turn when no attack or expansion options remain\n\nMINDSET: Attack first, ask questions later. If you can attack, DO IT. Territory gained through war is territory your enemies lose. Every turn without an attack is a wasted opportunity!\n\nCARD TYPES:\n- Claim cards (claim_x, claim_u, claim_v, claim_q): Use to enable attacks on that county!\n- Bonus cards: Big War (double army cap), Adventurer (buy 500 soldiers for 25g), Excalibur (roll twice), etc.\n- Personal/Global events: Applied automatically when drawn\n\nRESPONSE FORMAT (IMPORTANT):\nYou must respond in this EXACT format:\nACTION: [number]\nTARGET: [holding_id or \"none\"]\nREASON: [brief explanation of your choice]\n\nExample responses:\nACTION: 3\nTARGET: none\nREASON: Claiming Count title to gain 2 VP and solidify control of County X.\n\nACTION: 5\nTARGET: xythera\nREASON: Playing claim card on Xythera because it's a CAPITOL - fortifying it later gives easy Count title.\n\nACTION: 7\nTARGET: none\nREASON: Building fortification on my capitol to unlock Count title next turn.\n\nFor claim cards (play_card), you MUST specify which holding to target from the CLAIMABLE TARGETS list shown.\nFor other actions, use \"none\" as the target.",
+        "user_prompt": "=== Machiavelli's Kingdom - Round 2 (Victory: 20 VP) ===\n\nYou are: Baron Gamma (baron)\nYour Resources: 10 Gold, 400 Soldiers\nYour Prestige: 1 VP\nArmy Cap: 1000\n\n=== Your Holdings ===\n  - Quorwyn (id=quorwyn), Type=Town, Income=5G/200S\n\nYour Claims: NONE - you need claims to attack! Play claim cards or fabricate claims (35g, towns only)\n\n=== Other Players ===\n  You (BARON): 1 holdings, ~400S, 1VP\n  Baron Alpha (BARON): 2 holdings, ~400S, 2VP\n  Baron Beta (BARON): 2 holdings, ~400S, 2VP\n\n=== All Holdings on Board ===\n\n  County X:\n    Xandoria (id=xandoria), Type=Town, Owner=NEUTRAL, Income=1G/400S, [+2 defense]\n    Xelphane (id=xelphane), Type=Town, Owner=You, Income=5G/200S\n    Xythera (id=xythera), Type=Town, Owner=Baron Beta, Income=3G/300S, [+1 defense, CAPITOL]\n    Castle X (id=x_castle), Type=County Castle, Owner=NEUTRAL\n\n  County U:\n    Ulverin (id=ulverin), Type=Town, Owner=Baron Alpha, Income=5G/200S\n    Uldorwyn (id=uldorwyn), Type=Town, Owner=NEUTRAL, Income=4G/300S\n    Umbrith (id=umbrith), Type=Town, Owner=Baron Alpha, Income=2G/400S, [+1 attack, CAPITOL]\n    Castle U (id=u_castle), Type=County Castle, Owner=NEUTRAL\n\n  County V:\n    Valoria (id=valoria), Type=Town, Owner=NEUTRAL, Income=3G/300S, [+1 defense, CAPITOL]\n    Vardhelm (id=vardhelm), Type=Town, Owner=Baron Beta, Income=5G/200S\n    Velthar (id=velthar), Type=Town, Owner=NEUTRAL, Income=1G/500S, [+2 defense]\n    Castle V (id=v_castle), Type=County Castle, Owner=NEUTRAL\n\n  County Q:\n    Quindara (id=quindara), Type=Town, Owner=NEUTRAL, Income=10G/100S, [CAPITOL]\n    Qyrelis (id=qyrelis), Type=Town, Owner=NEUTRAL, Income=4G/300S\n    Quorwyn (id=quorwyn), Type=Town, Owner=Baron Gamma, Income=5G/200S\n    Castle Q (id=q_castle), Type=County Castle, Owner=NEUTRAL\n\n  Duchy Castles:\n    Duchy Castle XU (id=xu_castle): Owner=NEUTRAL, Duchy=XU\n    Duchy Castle QV (id=qv_castle): Owner=NEUTRAL, Duchy=QV\n\n  King's Castle:\n    King's Castle (id=king_castle): Owner=NEUTRAL\n\n=== Your Hand (1 cards) ===\n  - Claim: County U (id=card_48): Press a claim on any town in County U.\n\n=== Valid Actions ===\n1. recruit\n2. build_fortification -> xandoria\n3. build_fortification -> xelphane\n4. build_fortification -> xythera\n5. build_fortification -> ulverin\n6. build_fortification -> uldorwyn\n7. build_fortification -> umbrith\n8. build_fortification -> valoria\n9. build_fortification -> vardhelm\n10. build_fortification -> velthar\n11. build_fortification -> quindara\n12. build_fortification -> qyrelis\n13. build_fortification -> quorwyn\n14. play_card [Claim: County U]\n      CLAIMABLE TARGETS:\n        - Ulverin (id=ulverin), Type=Town, Owner=Baron Alpha, Income=5G/200S\n        - Uldorwyn (id=uldorwyn), Type=Town, Owner=NEUTRAL, Income=4G/300S\n        - Umbrith (id=umbrith), Type=Town, Owner=Baron Alpha, Income=2G/400S, [+1 attack, CAPITOL]\n        - Castle U (id=u_castle), Type=County Castle, Owner=NEUTRAL\n15. end_turn\n\nChoose your action wisely! For claim cards (play_card), specify the TARGET holding from the CLAIMABLE TARGETS list.\n\nRespond in this format:\nACTION: [number 1-15]\nTARGET: [holding_id from claimable targets, or \"none\" if not applicable]\nREASON: [your strategic reasoning]",
+        "raw_response": "ACTION: 14  \nTARGET: uldorwyn  \nREASON: Playing claim card on Uldorwyn because it is a neutral town, allowing me to attack and capture it easily. This will expand my territory and increase my income and soldiers, setting the stage for aggressive expansion.",
+        "parsed_action": "play_card",
+        "action_details": {
+          "action_type": "play_card",
+          "target_holding_id": "uldorwyn",
+          "card_id": "card_48"
+        },
+        "decision_log": {
+          "player_name": "Baron Gamma",
+          "timestamp": "2026-01-17T10:24:51.513063",
+          "valid_actions": [
+            "recruit",
+            "build_fortification",
+            "build_fortification",
+            "build_fortification",
+            "build_fortification",
+            "build_fortification",
+            "build_fortification",
+            "build_fortification",
+            "build_fortification",
+            "build_fortification",
+            "build_fortification",
+            "build_fortification",
+            "build_fortification",
+            "play_card",
+            "end_turn"
+          ],
+          "considered": [
+            {
+              "action": "play_card",
+              "status": "chosen",
+              "reason": "Playing claim card on Uldorwyn because it is a neutral town, allowing me to attack and capture it easily. This will expand my territory and increase my income and soldiers, setting the stage for aggressive expansion."
+            }
+          ],
+          "chosen_action": "play_card",
+          "reason": "Playing claim card on Uldorwyn because it is a neutral town, allowing me to attack and capture it easily. This will expand my territory and increase my income and soldiers, setting the stage for aggressive expansion."
+        }
+      }
+    },
+    {
+      "timestamp": "2026-01-17T10:24:51.521314",
+      "event_type": "action",
+      "round": 2,
+      "player_id": "98913b46-3a9a-4e2c-be12-beb2f5b80fbd",
+      "player_name": "Baron Gamma",
+      "data": {
+        "action_type": "play_card",
+        "action_details": {
+          "action_type": "play_card",
+          "target_holding_id": "uldorwyn",
+          "card_id": "card_48"
+        },
+        "success": true,
+        "result_message": "Established claim on Uldorwyn! You can now attack or capture it."
+      }
+    },
+    {
+      "timestamp": "2026-01-17T10:24:53.730708",
+      "event_type": "ai_decision",
+      "round": 2,
+      "player_id": "98913b46-3a9a-4e2c-be12-beb2f5b80fbd",
+      "player_name": "Baron Gamma",
+      "data": {
+        "player_type": "ai_openai",
+        "system_prompt": "You are an AGGRESSIVE AI warlord playing Machiavelli's Kingdom, a medieval strategy board game.\n\nPERSONALITY: You are a ruthless conqueror. You LOVE war and territorial expansion. You attack whenever possible and never let an opportunity to strike pass. Defense is for the weak - offense wins games!\n\nOBJECTIVE: First to reach 18 Prestige Points (VP) wins!\n\nSCORING:\n- Town = 1 VP\n- County title = +2 VP  \n- Duchy title = +4 VP\n- King title = +6 VP\n\nGAME STRUCTURE:\n- 4 counties (X, U, V, Q), each with 3 towns and 1 county castle\n- 2 duchies: XU (counties X+U) and QV (counties Q+V)\n- 1 King's Castle in the center\n\nTITLES (require prerequisites and gold):\n- Count: Own 2 of 3 towns in a county OR own a fortified Capitol (1 fort) → claim County Castle (25 Gold)\n- Duke: Be Count in both counties of a duchy → can claim Duchy Castle (50 Gold)  \n- King: Be Duke + own a town in the OTHER duchy → can claim King's Castle (75 Gold)\n\nCAPITOLS - STRATEGIC SHORTCUT TO COUNT:\n- Each county has a Capitol: X=Xythera, U=Umbrith, V=Valoria, Q=Quindara\n- Owning a Capitol with just 1 fortification lets you become Count!\n- This is faster than conquering 2 towns - fortify your Capitol ASAP!\n\nCLAIMS - CRITICAL RULE:\n- You CANNOT attack or capture ANY territory without a valid claim!\n- Get claims by: Playing claim cards from your hand, OR fabricating claims (35 Gold, TOWNS ONLY)\n- Cannot fabricate claims on County/Duchy/King castles - must use claim cards\n- With a claim on an UNOWNED town: pay 10 Gold to capture peacefully (claim_town)\n- With a claim on an ENEMY territory: attack with 200+ soldiers\n\nCOMBAT:\n- Must commit at least 200 soldiers\n- Strength = 2d6 + (soldiers/100) + modifiers\n- Winner loses HALF committed soldiers, loser loses ALL\n- Defender wins ties\n- Fortifications give +2 defense per fortification\n\nAGGRESSIVE STRATEGY - ACTIONS (in priority order):\n1. attack - ATTACK enemies whenever you have a claim and 200+ soldiers! WAR IS THE PATH TO VICTORY!\n2. claim_title - Claim title castles immediately (ALWAYS DO THIS!)\n3. claim_town - Capture unowned towns for 10 gold\n4. play_card - Play claim cards to enable MORE ATTACKS, play combat bonus cards aggressively\n5. fake_claim - Fabricate claims on enemy towns to enable attacks (35 Gold) - BE AGGRESSIVE!\n6. build_fortification - Fortify your CAPITOL first (gives Count title with just 1 fort!)\n7. recruit - Only if you need soldiers to attack\n8. end_turn - End your turn when no attack or expansion options remain\n\nMINDSET: Attack first, ask questions later. If you can attack, DO IT. Territory gained through war is territory your enemies lose. Every turn without an attack is a wasted opportunity!\n\nCARD TYPES:\n- Claim cards (claim_x, claim_u, claim_v, claim_q): Use to enable attacks on that county!\n- Bonus cards: Big War (double army cap), Adventurer (buy 500 soldiers for 25g), Excalibur (roll twice), etc.\n- Personal/Global events: Applied automatically when drawn\n\nRESPONSE FORMAT (IMPORTANT):\nYou must respond in this EXACT format:\nACTION: [number]\nTARGET: [holding_id or \"none\"]\nREASON: [brief explanation of your choice]\n\nExample responses:\nACTION: 3\nTARGET: none\nREASON: Claiming Count title to gain 2 VP and solidify control of County X.\n\nACTION: 5\nTARGET: xythera\nREASON: Playing claim card on Xythera because it's a CAPITOL - fortifying it later gives easy Count title.\n\nACTION: 7\nTARGET: none\nREASON: Building fortification on my capitol to unlock Count title next turn.\n\nFor claim cards (play_card), you MUST specify which holding to target from the CLAIMABLE TARGETS list shown.\nFor other actions, use \"none\" as the target.",
+        "user_prompt": "=== Machiavelli's Kingdom - Round 2 (Victory: 20 VP) ===\n\nYou are: Baron Gamma (baron)\nYour Resources: 10 Gold, 400 Soldiers\nYour Prestige: 1 VP\nArmy Cap: 1000\n\n=== Your Holdings ===\n  - Quorwyn (id=quorwyn), Type=Town, Income=5G/200S\n\nYour Claims (can attack/capture): uldorwyn\n\n=== Other Players ===\n  You (BARON): 1 holdings, ~400S, 1VP\n  Baron Alpha (BARON): 2 holdings, ~400S, 2VP\n  Baron Beta (BARON): 2 holdings, ~400S, 2VP\n\n=== All Holdings on Board ===\n\n  County X:\n    Xandoria (id=xandoria), Type=Town, Owner=NEUTRAL, Income=1G/400S, [+2 defense]\n    Xelphane (id=xelphane), Type=Town, Owner=You, Income=5G/200S\n    Xythera (id=xythera), Type=Town, Owner=Baron Beta, Income=3G/300S, [+1 defense, CAPITOL]\n    Castle X (id=x_castle), Type=County Castle, Owner=NEUTRAL\n\n  County U:\n    Ulverin (id=ulverin), Type=Town, Owner=Baron Alpha, Income=5G/200S\n    Uldorwyn (id=uldorwyn), Type=Town, Owner=NEUTRAL, Income=4G/300S\n    Umbrith (id=umbrith), Type=Town, Owner=Baron Alpha, Income=2G/400S, [+1 attack, CAPITOL]\n    Castle U (id=u_castle), Type=County Castle, Owner=NEUTRAL\n\n  County V:\n    Valoria (id=valoria), Type=Town, Owner=NEUTRAL, Income=3G/300S, [+1 defense, CAPITOL]\n    Vardhelm (id=vardhelm), Type=Town, Owner=Baron Beta, Income=5G/200S\n    Velthar (id=velthar), Type=Town, Owner=NEUTRAL, Income=1G/500S, [+2 defense]\n    Castle V (id=v_castle), Type=County Castle, Owner=NEUTRAL\n\n  County Q:\n    Quindara (id=quindara), Type=Town, Owner=NEUTRAL, Income=10G/100S, [CAPITOL]\n    Qyrelis (id=qyrelis), Type=Town, Owner=NEUTRAL, Income=4G/300S\n    Quorwyn (id=quorwyn), Type=Town, Owner=Baron Gamma, Income=5G/200S\n    Castle Q (id=q_castle), Type=County Castle, Owner=NEUTRAL\n\n  Duchy Castles:\n    Duchy Castle XU (id=xu_castle): Owner=NEUTRAL, Duchy=XU\n    Duchy Castle QV (id=qv_castle): Owner=NEUTRAL, Duchy=QV\n\n  King's Castle:\n    King's Castle (id=king_castle): Owner=NEUTRAL\n\n=== Your Hand (0 cards) ===\n\n=== Valid Actions ===\n1. recruit\n2. build_fortification -> xandoria\n3. build_fortification -> xelphane\n4. build_fortification -> xythera\n5. build_fortification -> ulverin\n6. build_fortification -> uldorwyn\n7. build_fortification -> umbrith\n8. build_fortification -> valoria\n9. build_fortification -> vardhelm\n10. build_fortification -> velthar\n11. build_fortification -> quindara\n12. build_fortification -> qyrelis\n13. build_fortification -> quorwyn\n14. claim_town -> uldorwyn\n15. end_turn\n\nChoose your action wisely! For claim cards (play_card), specify the TARGET holding from the CLAIMABLE TARGETS list.\n\nRespond in this format:\nACTION: [number 1-15]\nTARGET: [holding_id from claimable targets, or \"none\" if not applicable]\nREASON: [your strategic reasoning]",
+        "raw_response": "ACTION: 14  \nTARGET: uldorwyn  \nREASON: Capture Uldorwyn to expand my territory, increase my income, and establish a foothold in County U for future aggression.",
+        "parsed_action": "claim_town",
+        "action_details": {
+          "action_type": "claim_town",
+          "target_holding_id": "uldorwyn"
+        },
+        "decision_log": {
+          "player_name": "Baron Gamma",
+          "timestamp": "2026-01-17T10:24:53.730549",
+          "valid_actions": [
+            "recruit",
+            "build_fortification",
+            "build_fortification",
+            "build_fortification",
+            "build_fortification",
+            "build_fortification",
+            "build_fortification",
+            "build_fortification",
+            "build_fortification",
+            "build_fortification",
+            "build_fortification",
+            "build_fortification",
+            "build_fortification",
+            "claim_town",
+            "end_turn"
+          ],
+          "considered": [
+            {
+              "action": "claim_town",
+              "status": "chosen",
+              "reason": "Capture Uldorwyn to expand my territory, increase my income, and establish a foothold in County U for future aggression."
+            }
+          ],
+          "chosen_action": "claim_town",
+          "reason": "Capture Uldorwyn to expand my territory, increase my income, and establish a foothold in County U for future aggression."
+        }
+      }
+    },
+    {
+      "timestamp": "2026-01-17T10:24:53.737384",
+      "event_type": "action",
+      "round": 2,
+      "player_id": "98913b46-3a9a-4e2c-be12-beb2f5b80fbd",
+      "player_name": "Baron Gamma",
+      "data": {
+        "action_type": "claim_town",
+        "action_details": {
+          "action_type": "claim_town",
+          "target_holding_id": "uldorwyn"
+        },
+        "success": true,
+        "result_message": "Captured Uldorwyn!"
+      }
+    },
+    {
+      "timestamp": "2026-01-17T10:24:56.013489",
+      "event_type": "ai_decision",
+      "round": 2,
+      "player_id": "98913b46-3a9a-4e2c-be12-beb2f5b80fbd",
+      "player_name": "Baron Gamma",
+      "data": {
+        "player_type": "ai_openai",
+        "system_prompt": "You are an AGGRESSIVE AI warlord playing Machiavelli's Kingdom, a medieval strategy board game.\n\nPERSONALITY: You are a ruthless conqueror. You LOVE war and territorial expansion. You attack whenever possible and never let an opportunity to strike pass. Defense is for the weak - offense wins games!\n\nOBJECTIVE: First to reach 18 Prestige Points (VP) wins!\n\nSCORING:\n- Town = 1 VP\n- County title = +2 VP  \n- Duchy title = +4 VP\n- King title = +6 VP\n\nGAME STRUCTURE:\n- 4 counties (X, U, V, Q), each with 3 towns and 1 county castle\n- 2 duchies: XU (counties X+U) and QV (counties Q+V)\n- 1 King's Castle in the center\n\nTITLES (require prerequisites and gold):\n- Count: Own 2 of 3 towns in a county OR own a fortified Capitol (1 fort) → claim County Castle (25 Gold)\n- Duke: Be Count in both counties of a duchy → can claim Duchy Castle (50 Gold)  \n- King: Be Duke + own a town in the OTHER duchy → can claim King's Castle (75 Gold)\n\nCAPITOLS - STRATEGIC SHORTCUT TO COUNT:\n- Each county has a Capitol: X=Xythera, U=Umbrith, V=Valoria, Q=Quindara\n- Owning a Capitol with just 1 fortification lets you become Count!\n- This is faster than conquering 2 towns - fortify your Capitol ASAP!\n\nCLAIMS - CRITICAL RULE:\n- You CANNOT attack or capture ANY territory without a valid claim!\n- Get claims by: Playing claim cards from your hand, OR fabricating claims (35 Gold, TOWNS ONLY)\n- Cannot fabricate claims on County/Duchy/King castles - must use claim cards\n- With a claim on an UNOWNED town: pay 10 Gold to capture peacefully (claim_town)\n- With a claim on an ENEMY territory: attack with 200+ soldiers\n\nCOMBAT:\n- Must commit at least 200 soldiers\n- Strength = 2d6 + (soldiers/100) + modifiers\n- Winner loses HALF committed soldiers, loser loses ALL\n- Defender wins ties\n- Fortifications give +2 defense per fortification\n\nAGGRESSIVE STRATEGY - ACTIONS (in priority order):\n1. attack - ATTACK enemies whenever you have a claim and 200+ soldiers! WAR IS THE PATH TO VICTORY!\n2. claim_title - Claim title castles immediately (ALWAYS DO THIS!)\n3. claim_town - Capture unowned towns for 10 gold\n4. play_card - Play claim cards to enable MORE ATTACKS, play combat bonus cards aggressively\n5. fake_claim - Fabricate claims on enemy towns to enable attacks (35 Gold) - BE AGGRESSIVE!\n6. build_fortification - Fortify your CAPITOL first (gives Count title with just 1 fort!)\n7. recruit - Only if you need soldiers to attack\n8. end_turn - End your turn when no attack or expansion options remain\n\nMINDSET: Attack first, ask questions later. If you can attack, DO IT. Territory gained through war is territory your enemies lose. Every turn without an attack is a wasted opportunity!\n\nCARD TYPES:\n- Claim cards (claim_x, claim_u, claim_v, claim_q): Use to enable attacks on that county!\n- Bonus cards: Big War (double army cap), Adventurer (buy 500 soldiers for 25g), Excalibur (roll twice), etc.\n- Personal/Global events: Applied automatically when drawn\n\nRESPONSE FORMAT (IMPORTANT):\nYou must respond in this EXACT format:\nACTION: [number]\nTARGET: [holding_id or \"none\"]\nREASON: [brief explanation of your choice]\n\nExample responses:\nACTION: 3\nTARGET: none\nREASON: Claiming Count title to gain 2 VP and solidify control of County X.\n\nACTION: 5\nTARGET: xythera\nREASON: Playing claim card on Xythera because it's a CAPITOL - fortifying it later gives easy Count title.\n\nACTION: 7\nTARGET: none\nREASON: Building fortification on my capitol to unlock Count title next turn.\n\nFor claim cards (play_card), you MUST specify which holding to target from the CLAIMABLE TARGETS list shown.\nFor other actions, use \"none\" as the target.",
+        "user_prompt": "=== Machiavelli's Kingdom - Round 2 (Victory: 20 VP) ===\n\nYou are: Baron Gamma (baron)\nYour Resources: 0 Gold, 400 Soldiers\nYour Prestige: 2 VP\nArmy Cap: 1000\n\n=== Your Holdings ===\n  - Quorwyn (id=quorwyn), Type=Town, Income=5G/200S\n  - Uldorwyn (id=uldorwyn), Type=Town, Income=4G/300S\n\nYour Claims: NONE - you need claims to attack! Play claim cards or fabricate claims (35g, towns only)\n\n=== Other Players ===\n  You (BARON): 1 holdings, ~400S, 1VP\n  Baron Alpha (BARON): 2 holdings, ~400S, 2VP\n  Baron Beta (BARON): 2 holdings, ~400S, 2VP\n\n=== All Holdings on Board ===\n\n  County X:\n    Xandoria (id=xandoria), Type=Town, Owner=NEUTRAL, Income=1G/400S, [+2 defense]\n    Xelphane (id=xelphane), Type=Town, Owner=You, Income=5G/200S\n    Xythera (id=xythera), Type=Town, Owner=Baron Beta, Income=3G/300S, [+1 defense, CAPITOL]\n    Castle X (id=x_castle), Type=County Castle, Owner=NEUTRAL\n\n  County U:\n    Ulverin (id=ulverin), Type=Town, Owner=Baron Alpha, Income=5G/200S\n    Uldorwyn (id=uldorwyn), Type=Town, Owner=Baron Gamma, Income=4G/300S\n    Umbrith (id=umbrith), Type=Town, Owner=Baron Alpha, Income=2G/400S, [+1 attack, CAPITOL]\n    Castle U (id=u_castle), Type=County Castle, Owner=NEUTRAL\n\n  County V:\n    Valoria (id=valoria), Type=Town, Owner=NEUTRAL, Income=3G/300S, [+1 defense, CAPITOL]\n    Vardhelm (id=vardhelm), Type=Town, Owner=Baron Beta, Income=5G/200S\n    Velthar (id=velthar), Type=Town, Owner=NEUTRAL, Income=1G/500S, [+2 defense]\n    Castle V (id=v_castle), Type=County Castle, Owner=NEUTRAL\n\n  County Q:\n    Quindara (id=quindara), Type=Town, Owner=NEUTRAL, Income=10G/100S, [CAPITOL]\n    Qyrelis (id=qyrelis), Type=Town, Owner=NEUTRAL, Income=4G/300S\n    Quorwyn (id=quorwyn), Type=Town, Owner=Baron Gamma, Income=5G/200S\n    Castle Q (id=q_castle), Type=County Castle, Owner=NEUTRAL\n\n  Duchy Castles:\n    Duchy Castle XU (id=xu_castle): Owner=NEUTRAL, Duchy=XU\n    Duchy Castle QV (id=qv_castle): Owner=NEUTRAL, Duchy=QV\n\n  King's Castle:\n    King's Castle (id=king_castle): Owner=NEUTRAL\n\n=== Your Hand (0 cards) ===\n\n=== Valid Actions ===\n1. recruit\n2. end_turn\n\nChoose your action wisely! For claim cards (play_card), specify the TARGET holding from the CLAIMABLE TARGETS list.\n\nRespond in this format:\nACTION: [number 1-2]\nTARGET: [holding_id from claimable targets, or \"none\" if not applicable]\nREASON: [your strategic reasoning]",
+        "raw_response": "ACTION: 2  \nTARGET: none  \nREASON: I have no gold or claims to fabricate or play. Ending my turn to bide my time and gather resources for future attacks.",
+        "parsed_action": "end_turn",
+        "action_details": {
+          "action_type": "end_turn"
+        },
+        "decision_log": {
+          "player_name": "Baron Gamma",
+          "timestamp": "2026-01-17T10:24:56.013333",
+          "valid_actions": [
+            "recruit",
+            "end_turn"
+          ],
+          "considered": [
+            {
+              "action": "end_turn",
+              "status": "chosen",
+              "reason": "I have no gold or claims to fabricate or play. Ending my turn to bide my time and gather resources for future attacks."
+            }
+          ],
+          "chosen_action": "end_turn",
+          "reason": "I have no gold or claims to fabricate or play. Ending my turn to bide my time and gather resources for future attacks."
+        }
+      }
+    },
+    {
+      "timestamp": "2026-01-17T10:24:56.019927",
+      "event_type": "turn_end",
+      "round": 2,
+      "player_id": "98913b46-3a9a-4e2c-be12-beb2f5b80fbd",
+      "player_name": "Baron Gamma",
+      "data": {
+        "player_state": {
+          "gold": 0,
+          "soldiers": 400,
+          "prestige": 2,
+          "title": "baron",
+          "holdings": [
+            "quorwyn",
+            "uldorwyn"
+          ],
+          "counties": [],
+          "duchies": [],
+          "is_king": false,
+          "hand_size": 0,
+          "claims": [],
+          "army_cap": 1000
+        }
+      }
+    },
+    {
+      "timestamp": "2026-01-17T10:24:56.031451",
+      "event_type": "action",
+      "round": 3,
+      "player_id": "98913b46-3a9a-4e2c-be12-beb2f5b80fbd",
+      "player_name": "Baron Gamma",
+      "data": {
+        "action_type": "end_turn",
+        "action_details": {
+          "action_type": "end_turn"
+        },
+        "success": true,
+        "result_message": "Turn ended"
+      }
+    },
+    {
+      "timestamp": "2026-01-17T10:24:57.249923",
+      "event_type": "income_phase",
+      "round": 3,
+      "data": {
+        "income_by_player": {
+          "You": {
+            "player_id": "726768c5-231b-489b-ae87-f35d4e88d2f2",
+            "gold_gained": 5,
+            "soldiers_gained": 200,
+            "gold_before": 10,
+            "soldiers_before": 400
+          },
+          "Baron Alpha": {
+            "player_id": "84e1615b-919e-43e8-9567-36a0e30fd132",
+            "gold_gained": 7,
+            "soldiers_gained": 600,
+            "gold_before": 0,
+            "soldiers_before": 400
+          },
+          "Baron Beta": {
+            "player_id": "d9a9a5fc-9128-412a-aa1e-ebf6876516ea",
+            "gold_gained": 8,
+            "soldiers_gained": 500,
+            "gold_before": 0,
+            "soldiers_before": 400
+          },
+          "Baron Gamma": {
+            "player_id": "98913b46-3a9a-4e2c-be12-beb2f5b80fbd",
+            "gold_gained": 9,
+            "soldiers_gained": 500,
+            "gold_before": 0,
+            "soldiers_before": 400
+          }
+        }
+      }
+    },
+    {
+      "timestamp": "2026-01-17T10:24:57.257717",
+      "event_type": "turn_start",
+      "round": 3,
+      "player_id": "726768c5-231b-489b-ae87-f35d4e88d2f2",
+      "player_name": "You",
+      "data": {
+        "player_state": {
+          "gold": 15,
+          "soldiers": 500,
+          "prestige": 1,
+          "title": "baron",
+          "holdings": [
+            "xelphane"
+          ],
+          "counties": [],
+          "duchies": [],
+          "is_king": false,
+          "hand_size": 2,
+          "claims": [],
+          "army_cap": 500
+        }
+      }
+    },
+    {
+      "timestamp": "2026-01-17T10:24:57.268324",
+      "event_type": "card_draw",
+      "round": 3,
+      "player_id": "726768c5-231b-489b-ae87-f35d4e88d2f2",
+      "player_name": "You",
+      "data": {
+        "card_id": "card_45",
+        "card_name": "Claim: County U",
+        "card_type": "claim",
+        "is_instant": false,
+        "effect_applied": null
+      }
+    }
+  ]
+}

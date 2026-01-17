@@ -141,46 +141,45 @@ class SimpleAIPlayer(AIPlayer):
         chosen_action: Optional[Action] = None
         chosen_reason = ""
         
-        # AGGRESSIVE Priority order (cards are auto-drawn at turn start):
-        # 1. ATTACK enemy targets with claims - WAR FIRST!
-        # 2. Claim title if possible (Count/Duke/King)
-        # 3. Capture unowned towns with claims (10 gold)
-        # 4. Play claim cards to establish claims (with valid target) - enables more attacks!
-        # 5. Fabricate claims if we have gold - enables more attacks!
-        # 6. Build fortifications (only if nothing to attack)
-        # 7. End turn
+        # TITLE-FOCUSED Priority order:
+        # 1. Claim title if possible (Count/Duke/King) - MASSIVE VP!
+        # 2. IF HAVE CLAIMS: Attack or capture towns
+        # 3. IF NO CLAIMS: Get claims (cards or fabricate) - this is URGENT!
+        # 4. Build fortification on capitol (fast path to Count)
+        # 5. Recruit if low on soldiers
+        # 6. End turn
         
-        # 1. ATTACK FIRST - We are aggressive warlords!
-        if not chosen_action:
-            attack_actions = [a for a in valid_actions if a.action_type == ActionType.ATTACK]
-            if attack_actions and player.soldiers >= 200:
-                # Sort by weakest target first (prefer attacking towns with fewer fortifications)
-                chosen_action = attack_actions[0]
-                # Commit 70% of soldiers for aggressive attacks (minimum 300), rounded down to 100s
-                raw_soldiers = max(300, int(player.soldiers * 0.7))
-                rounded_soldiers = (raw_soldiers // 100) * 100  # Round down to nearest 100
-                chosen_action.soldiers_count = rounded_soldiers
-                chosen_reason = f"ATTACKING {chosen_action.target_holding_id} with {chosen_action.soldiers_count} soldiers! War is the path to victory!"
-                considered.append(AIDecisionLogEntry(action="attack", status="chosen", reason=chosen_reason))
-            elif attack_actions:
-                considered.append(AIDecisionLogEntry(action="attack", status="skipped", reason=f"Have claims but not enough soldiers (have {player.soldiers}, need 200+)"))
-            else:
-                considered.append(AIDecisionLogEntry(action="attack", status="unavailable", reason="No valid attack targets (need claim on enemy territory)"))
+        # Check if player has any active claims for expansion
+        attack_actions = [a for a in valid_actions if a.action_type == ActionType.ATTACK]
+        claim_town_actions = [a for a in valid_actions if a.action_type == ActionType.CLAIM_TOWN]
+        has_expansion_claims = len(attack_actions) > 0 or len(claim_town_actions) > 0
         
-        # 2. Claim title if possible (gives VP immediately)
+        # 1. CLAIM TITLE FIRST - This gives huge VP! (Count +2, Duke +4, King +6)
         if not chosen_action:
             title_actions = [a for a in valid_actions if a.action_type == ActionType.CLAIM_TITLE]
             if title_actions:
                 chosen_action = title_actions[0]
                 target_id = chosen_action.target_holding_id
-                chosen_reason = f"Claiming title at {target_id} (prerequisites met, have enough gold)"
+                chosen_reason = f"Claiming title at {target_id} for huge VP boost! (Count +2, Duke +4, King +6)"
                 considered.append(AIDecisionLogEntry(action="claim_title", status="chosen", reason=chosen_reason))
             else:
                 considered.append(AIDecisionLogEntry(action="claim_title", status="unavailable", reason="Prerequisites not met or not enough gold (Count: 2 towns OR fortified capitol + 25g, Duke: 2 counties + 50g, King: 1 duchy + town in other duchy + 75g)"))
         
-        # 3. Capture unowned towns (costs 10 gold, requires claim)
-        if not chosen_action:
-            claim_town_actions = [a for a in valid_actions if a.action_type == ActionType.CLAIM_TOWN]
+        # 2. IF HAVE CLAIMS: Attack enemies
+        if not chosen_action and has_expansion_claims:
+            if attack_actions and player.soldiers >= 200:
+                chosen_action = attack_actions[0]
+                # Commit 70% of soldiers for aggressive attacks (minimum 300), rounded down to 100s
+                raw_soldiers = max(300, int(player.soldiers * 0.7))
+                rounded_soldiers = (raw_soldiers // 100) * 100
+                chosen_action.soldiers_count = rounded_soldiers
+                chosen_reason = f"ATTACKING {chosen_action.target_holding_id} with {chosen_action.soldiers_count} soldiers! Have claim, using it!"
+                considered.append(AIDecisionLogEntry(action="attack", status="chosen", reason=chosen_reason))
+            elif attack_actions:
+                considered.append(AIDecisionLogEntry(action="attack", status="skipped", reason=f"Have claims but not enough soldiers (have {player.soldiers}, need 200+)"))
+        
+        # 2b. IF HAVE CLAIMS: Capture unowned towns (costs 10 gold)
+        if not chosen_action and has_expansion_claims:
             if claim_town_actions:
                 chosen_action = claim_town_actions[0]
                 chosen_reason = f"Capturing unowned town {chosen_action.target_holding_id} for 10 gold (have valid claim)"
@@ -188,7 +187,39 @@ class SimpleAIPlayer(AIPlayer):
             else:
                 considered.append(AIDecisionLogEntry(action="claim_town", status="unavailable", reason="No unowned towns with valid claims, or not enough gold (10g)"))
         
-        # 4. Play claim cards (to enable more attacks!)
+        # 3. IF NO CLAIMS: Get claims urgently! This blocks all expansion!
+        if not chosen_action and not has_expansion_claims:
+            considered.append(AIDecisionLogEntry(action="expansion", status="blocked", reason="NO CLAIMS! Must get claims to expand - this is urgent!"))
+            
+            # 3a. Play claim cards IMMEDIATELY - highest priority when no claims!
+            play_card_actions = [a for a in valid_actions if a.action_type == ActionType.PLAY_CARD]
+            if play_card_actions:
+                for action in play_card_actions:
+                    card = game_state.cards.get(action.card_id)
+                    if card and card.card_type.value == "claim":
+                        target = self._find_claim_target(game_state, player, card)
+                        if target:
+                            action.target_holding_id = target.id
+                            chosen_action = action
+                            chosen_reason = f"URGENT: Playing claim card '{card.name}' targeting {target.name} - need claims to expand!"
+                            considered.append(AIDecisionLogEntry(action="play_card", status="chosen", reason=chosen_reason))
+                            break
+                        else:
+                            considered.append(AIDecisionLogEntry(action="play_card", status="skipped", reason=f"Claim card '{card.name}' has no valid target"))
+            
+            # 3b. Fabricate claims if no claim cards available
+            if not chosen_action:
+                fake_claim_actions = [a for a in valid_actions if a.action_type == ActionType.FAKE_CLAIM]
+                if fake_claim_actions and player.gold >= 35:
+                    chosen_action = fake_claim_actions[0]
+                    chosen_reason = f"URGENT: Fabricating claim on {chosen_action.target_holding_id} for 35 gold - need claims to expand!"
+                    considered.append(AIDecisionLogEntry(action="fake_claim", status="chosen", reason=chosen_reason))
+                elif fake_claim_actions:
+                    considered.append(AIDecisionLogEntry(action="fake_claim", status="skipped", reason=f"Not enough gold ({player.gold}/35)"))
+                else:
+                    considered.append(AIDecisionLogEntry(action="fake_claim", status="unavailable", reason="No targets available for fake claims"))
+        
+        # 4. Play remaining cards (bonus cards, or claim cards if we have claims but want more)
         if not chosen_action:
             play_card_actions = [a for a in valid_actions if a.action_type == ActionType.PLAY_CARD]
             if play_card_actions:
@@ -199,11 +230,11 @@ class SimpleAIPlayer(AIPlayer):
                         if target:
                             action.target_holding_id = target.id
                             chosen_action = action
-                            chosen_reason = f"Playing claim card '{card.name}' targeting {target.name} to enable future attacks!"
+                            chosen_reason = f"Playing claim card '{card.name}' targeting {target.name} to enable more attacks!"
                             considered.append(AIDecisionLogEntry(action="play_card", status="chosen", reason=chosen_reason))
                             break
                         else:
-                            considered.append(AIDecisionLogEntry(action="play_card", status="skipped", reason=f"Claim card '{card.name}' has no valid target (already own all towns in that county)"))
+                            considered.append(AIDecisionLogEntry(action="play_card", status="skipped", reason=f"Claim card '{card.name}' has no valid target"))
                     elif card and card.card_type.value == "bonus":
                         if self._can_play_bonus_card(player, card):
                             chosen_action = action
@@ -211,17 +242,16 @@ class SimpleAIPlayer(AIPlayer):
                             considered.append(AIDecisionLogEntry(action="play_card", status="chosen", reason=chosen_reason))
                             break
                         else:
-                            considered.append(AIDecisionLogEntry(action="play_card", status="skipped", reason=f"Bonus card '{card.name}' requirements not met (e.g., not enough gold)"))
+                            considered.append(AIDecisionLogEntry(action="play_card", status="skipped", reason=f"Bonus card '{card.name}' requirements not met"))
                 if not chosen_action and play_card_actions:
                     considered.append(AIDecisionLogEntry(action="play_card", status="skipped", reason="No playable cards with valid targets"))
             else:
                 if ActionType.PLAY_CARD.value in action_types:
                     considered.append(AIDecisionLogEntry(action="play_card", status="skipped", reason="No cards in hand"))
         
-        # 5. Fabricate claims aggressively - enables attacks!
+        # 5. Fabricate more claims if we have gold (even if we already have some)
         if not chosen_action:
             fake_claim_actions = [a for a in valid_actions if a.action_type == ActionType.FAKE_CLAIM]
-            # Be aggressive - fabricate claims even if we have some, as long as we have gold
             if fake_claim_actions and player.gold >= 35:
                 chosen_action = fake_claim_actions[0]
                 chosen_reason = f"Fabricating claim on {chosen_action.target_holding_id} for 35 gold to enable future attack!"
@@ -231,12 +261,19 @@ class SimpleAIPlayer(AIPlayer):
             else:
                 considered.append(AIDecisionLogEntry(action="fake_claim", status="unavailable", reason="No targets available for fake claims"))
         
-        # 6. Build fortification only if nothing to attack
+        # 6. Build fortification - prioritize CAPITOL for fast Count title!
         if not chosen_action:
             fort_actions = [a for a in valid_actions if a.action_type == ActionType.BUILD_FORTIFICATION]
             if fort_actions:
-                chosen_action = fort_actions[0]
-                chosen_reason = f"Building fortification at {chosen_action.target_holding_id} for 10 gold (no attack options)"
+                # Prioritize capitol holdings (xythera, umbrith, valoria, quindara)
+                capitol_ids = {"xythera", "umbrith", "valoria", "quindara"}
+                capitol_forts = [a for a in fort_actions if a.target_holding_id in capitol_ids]
+                if capitol_forts:
+                    chosen_action = capitol_forts[0]
+                    chosen_reason = f"Building fortification at CAPITOL {chosen_action.target_holding_id} - unlocks Count title with just 1 fort!"
+                else:
+                    chosen_action = fort_actions[0]
+                    chosen_reason = f"Building fortification at {chosen_action.target_holding_id} for defense"
                 considered.append(AIDecisionLogEntry(action="build_fortification", status="chosen", reason=chosen_reason))
             else:
                 considered.append(AIDecisionLogEntry(action="build_fortification", status="unavailable", reason="No valid locations or not enough gold (10g)"))

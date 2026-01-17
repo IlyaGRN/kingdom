@@ -1,0 +1,144 @@
+{
+  "game_id": "b717aa13-8081-49ef-92f9-409cb0e83dba",
+  "log_file": "game_b717aa13_20260117_182700.json",
+  "entries": [
+    {
+      "timestamp": "2026-01-17T18:27:00.471128",
+      "event_type": "game_start",
+      "data": {
+        "player_configs": [
+          {
+            "name": "You",
+            "player_type": "human",
+            "color": "#DC2626",
+            "crest": "/crest_player_0.png"
+          },
+          {
+            "name": "Baron Alpha",
+            "player_type": "ai_openai",
+            "color": "#2563EB",
+            "crest": "/crest_openai.png"
+          },
+          {
+            "name": "Baron Beta",
+            "player_type": "ai_openai",
+            "color": "#16A34A",
+            "crest": "/crest_openai.png"
+          },
+          {
+            "name": "Baron Gamma",
+            "player_type": "ai_openai",
+            "color": "#9333EA",
+            "crest": "/crest_openai.png"
+          }
+        ],
+        "players": [
+          {
+            "id": "6cafcd2b-394d-4e7c-98b8-1135ca8759f5",
+            "name": "You",
+            "player_type": "human",
+            "color": "#DC2626"
+          },
+          {
+            "id": "0b3df172-f2a7-4404-8f9a-d64b2f92eb28",
+            "name": "Baron Alpha",
+            "player_type": "ai_openai",
+            "color": "#2563EB"
+          },
+          {
+            "id": "94af7e63-470c-4c2b-b965-b9b82d6b151c",
+            "name": "Baron Beta",
+            "player_type": "ai_openai",
+            "color": "#16A34A"
+          },
+          {
+            "id": "080156f7-df64-4102-9571-8c85a3c6a058",
+            "name": "Baron Gamma",
+            "player_type": "ai_openai",
+            "color": "#9333EA"
+          }
+        ],
+        "settings": {
+          "victory_threshold": 20,
+          "player_count": 4,
+          "starting_town_mode": "fixed"
+        }
+      }
+    },
+    {
+      "timestamp": "2026-01-17T18:27:01.569475",
+      "event_type": "income_phase",
+      "round": 1,
+      "data": {
+        "income_by_player": {
+          "You": {
+            "player_id": "6cafcd2b-394d-4e7c-98b8-1135ca8759f5",
+            "gold_gained": 5,
+            "soldiers_gained": 200,
+            "gold_before": 0,
+            "soldiers_before": 0
+          },
+          "Baron Alpha": {
+            "player_id": "0b3df172-f2a7-4404-8f9a-d64b2f92eb28",
+            "gold_gained": 5,
+            "soldiers_gained": 200,
+            "gold_before": 0,
+            "soldiers_before": 0
+          },
+          "Baron Beta": {
+            "player_id": "94af7e63-470c-4c2b-b965-b9b82d6b151c",
+            "gold_gained": 5,
+            "soldiers_gained": 200,
+            "gold_before": 0,
+            "soldiers_before": 0
+          },
+          "Baron Gamma": {
+            "player_id": "080156f7-df64-4102-9571-8c85a3c6a058",
+            "gold_gained": 5,
+            "soldiers_gained": 200,
+            "gold_before": 0,
+            "soldiers_before": 0
+          }
+        }
+      }
+    },
+    {
+      "timestamp": "2026-01-17T18:27:01.570530",
+      "event_type": "turn_start",
+      "round": 1,
+      "player_id": "6cafcd2b-394d-4e7c-98b8-1135ca8759f5",
+      "player_name": "You",
+      "data": {
+        "player_state": {
+          "gold": 5,
+          "soldiers": 200,
+          "prestige": 1,
+          "title": "baron",
+          "holdings": [
+            "xelphane"
+          ],
+          "counties": [],
+          "duchies": [],
+          "is_king": false,
+          "hand_size": 0,
+          "claims": [],
+          "army_cap": 500
+        }
+      }
+    },
+    {
+      "timestamp": "2026-01-17T18:27:01.572096",
+      "event_type": "card_draw",
+      "round": 1,
+      "player_id": "6cafcd2b-394d-4e7c-98b8-1135ca8759f5",
+      "player_name": "You",
+      "data": {
+        "card_id": "card_9",
+        "card_name": "Gold Chest (15)",
+        "card_type": "personal_event",
+        "is_instant": true,
+        "effect_applied": "gold_15 applied"
+      }
+    }
+  ]
+}

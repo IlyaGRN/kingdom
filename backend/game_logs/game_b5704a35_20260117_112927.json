@@ -1,0 +1,144 @@
+{
+  "game_id": "b5704a35-be54-4d0c-bb58-272e4593b967",
+  "log_file": "game_b5704a35_20260117_112927.json",
+  "entries": [
+    {
+      "timestamp": "2026-01-17T11:29:27.302463",
+      "event_type": "game_start",
+      "data": {
+        "player_configs": [
+          {
+            "name": "You",
+            "player_type": "human",
+            "color": "#DC2626",
+            "crest": "/crest_player_0.png"
+          },
+          {
+            "name": "Baron Alpha",
+            "player_type": "ai_openai",
+            "color": "#2563EB",
+            "crest": "/crest_openai.png"
+          },
+          {
+            "name": "Baron Beta",
+            "player_type": "ai_openai",
+            "color": "#16A34A",
+            "crest": "/crest_openai.png"
+          },
+          {
+            "name": "Baron Gamma",
+            "player_type": "ai_openai",
+            "color": "#9333EA",
+            "crest": "/crest_openai.png"
+          }
+        ],
+        "players": [
+          {
+            "id": "d30ee319-ca74-4d10-93bd-c8a70d4fd758",
+            "name": "You",
+            "player_type": "human",
+            "color": "#DC2626"
+          },
+          {
+            "id": "73766cec-6dd3-4b61-bc08-e4c911600537",
+            "name": "Baron Alpha",
+            "player_type": "ai_openai",
+            "color": "#2563EB"
+          },
+          {
+            "id": "ab23cebc-b5d4-4025-be48-9f147dc948d9",
+            "name": "Baron Beta",
+            "player_type": "ai_openai",
+            "color": "#16A34A"
+          },
+          {
+            "id": "9cfab0ff-bbc3-4f7a-a7f5-432ac767ced9",
+            "name": "Baron Gamma",
+            "player_type": "ai_openai",
+            "color": "#9333EA"
+          }
+        ],
+        "settings": {
+          "victory_threshold": 20,
+          "player_count": 4,
+          "starting_town_mode": "fixed"
+        }
+      }
+    },
+    {
+      "timestamp": "2026-01-17T11:29:28.483688",
+      "event_type": "income_phase",
+      "round": 1,
+      "data": {
+        "income_by_player": {
+          "You": {
+            "player_id": "d30ee319-ca74-4d10-93bd-c8a70d4fd758",
+            "gold_gained": 5,
+            "soldiers_gained": 200,
+            "gold_before": 0,
+            "soldiers_before": 0
+          },
+          "Baron Alpha": {
+            "player_id": "73766cec-6dd3-4b61-bc08-e4c911600537",
+            "gold_gained": 5,
+            "soldiers_gained": 200,
+            "gold_before": 0,
+            "soldiers_before": 0
+          },
+          "Baron Beta": {
+            "player_id": "ab23cebc-b5d4-4025-be48-9f147dc948d9",
+            "gold_gained": 5,
+            "soldiers_gained": 200,
+            "gold_before": 0,
+            "soldiers_before": 0
+          },
+          "Baron Gamma": {
+            "player_id": "9cfab0ff-bbc3-4f7a-a7f5-432ac767ced9",
+            "gold_gained": 5,
+            "soldiers_gained": 200,
+            "gold_before": 0,
+            "soldiers_before": 0
+          }
+        }
+      }
+    },
+    {
+      "timestamp": "2026-01-17T11:29:28.484586",
+      "event_type": "turn_start",
+      "round": 1,
+      "player_id": "d30ee319-ca74-4d10-93bd-c8a70d4fd758",
+      "player_name": "You",
+      "data": {
+        "player_state": {
+          "gold": 5,
+          "soldiers": 200,
+          "prestige": 1,
+          "title": "baron",
+          "holdings": [
+            "xelphane"
+          ],
+          "counties": [],
+          "duchies": [],
+          "is_king": false,
+          "hand_size": 0,
+          "claims": [],
+          "army_cap": 500
+        }
+      }
+    },
+    {
+      "timestamp": "2026-01-17T11:29:28.487915",
+      "event_type": "card_draw",
+      "round": 1,
+      "player_id": "d30ee319-ca74-4d10-93bd-c8a70d4fd758",
+      "player_name": "You",
+      "data": {
+        "card_id": "card_32",
+        "card_name": "Vassal Revolt",
+        "card_type": "bonus",
+        "is_instant": false,
+        "effect_applied": null
+      }
+    }
+  ]
+}

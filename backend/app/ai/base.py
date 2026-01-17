@@ -111,8 +111,8 @@ class AIPlayer(ABC):
         for holding_id in player.holdings:
             holding = next((h for h in game_state.holdings if h.id == holding_id), None)
             if holding:
-                fort = f" [FORT x{holding.fortification_count}]" if holding.fortification_count > 0 else ""
-                lines.append(f"  - {holding.name}: {holding.gold_value}G, {holding.soldier_value}S{fort}")
+                holding_info = self._format_holding_details(holding)
+                lines.append(f"  - {holding_info}")
         
         if player.counties:
             lines.append(f"\nCounties held: {', '.join(player.counties)}")
@@ -132,25 +132,85 @@ class AIPlayer(ABC):
                 title = "KING" if p.is_king else p.title.value.upper()
                 lines.append(f"  {p.name} ({title}): {len(p.holdings)} holdings, ~{p.soldiers}S, {p.prestige}VP")
         
-        lines.append("\n=== Board State ===")
+        lines.append("\n=== All Holdings on Board ===")
+        # Group holdings by county for clarity
+        for county in ["X", "U", "V", "Q"]:
+            lines.append(f"\n  County {county}:")
+            county_holdings = [h for h in game_state.holdings if h.county == county]
+            for holding in county_holdings:
+                owner = "NEUTRAL"
+                if holding.owner_id:
+                    owner_player = next((p for p in game_state.players if p.id == holding.owner_id), None)
+                    owner = owner_player.name if owner_player else "Unknown"
+                holding_info = self._format_holding_details(holding, owner)
+                lines.append(f"    {holding_info}")
+        
+        # Duchy and King castles
+        lines.append("\n  Duchy Castles:")
         for holding in game_state.holdings:
-            owner = "NEUTRAL"
-            if holding.owner_id:
-                owner_player = next((p for p in game_state.players if p.id == holding.owner_id), None)
-                owner = owner_player.name if owner_player else "Unknown"
-            fort = f" [FORT x{holding.fortification_count}]" if holding.fortification_count > 0 else ""
-            lines.append(f"  {holding.name}: Owner={owner}{fort}")
+            if holding.holding_type == HoldingType.DUCHY_CASTLE:
+                owner = "NEUTRAL"
+                if holding.owner_id:
+                    owner_player = next((p for p in game_state.players if p.id == holding.owner_id), None)
+                    owner = owner_player.name if owner_player else "Unknown"
+                lines.append(f"    {holding.name} (id={holding.id}): Owner={owner}, Duchy={holding.duchy}")
+        
+        lines.append("\n  King's Castle:")
+        for holding in game_state.holdings:
+            if holding.holding_type == HoldingType.KING_CASTLE:
+                owner = "NEUTRAL"
+                if holding.owner_id:
+                    owner_player = next((p for p in game_state.players if p.id == holding.owner_id), None)
+                    owner = owner_player.name if owner_player else "Unknown"
+                lines.append(f"    {holding.name} (id={holding.id}): Owner={owner}")
         
         lines.append(f"\n=== Your Hand ({len(player.hand)} cards) ===")
         for card_id in player.hand:
             card = game_state.cards.get(card_id)
             if card:
-                lines.append(f"  - {card.name}: {card.description}")
+                lines.append(f"  - {card.name} (id={card_id}): {card.description}")
         
         return "\n".join(lines)
     
-    def _format_valid_actions(self, actions: list[Action]) -> str:
-        """Format valid actions as a string for the AI prompt."""
+    def _format_holding_details(self, holding: Holding, owner: Optional[str] = None) -> str:
+        """Format a holding with detailed information."""
+        # Holding type
+        type_labels = {
+            HoldingType.TOWN: "Town",
+            HoldingType.COUNTY_CASTLE: "County Castle",
+            HoldingType.DUCHY_CASTLE: "Duchy Castle",
+            HoldingType.KING_CASTLE: "King's Castle",
+        }
+        type_label = type_labels.get(holding.holding_type, "Unknown")
+        
+        parts = [f"{holding.name} (id={holding.id})"]
+        parts.append(f"Type={type_label}")
+        
+        if owner:
+            parts.append(f"Owner={owner}")
+        
+        # Resources
+        if holding.gold_value > 0 or holding.soldier_value > 0:
+            parts.append(f"Income={holding.gold_value}G/{holding.soldier_value}S")
+        
+        # Bonuses
+        bonuses = []
+        if holding.fortification_count > 0:
+            bonuses.append(f"FORT x{holding.fortification_count} (+{holding.fortification_count * 2} def)")
+        if holding.defense_modifier > 0:
+            bonuses.append(f"+{holding.defense_modifier} defense")
+        if holding.attack_modifier > 0:
+            bonuses.append(f"+{holding.attack_modifier} attack")
+        if holding.is_capitol:
+            bonuses.append("CAPITOL")
+        
+        if bonuses:
+            parts.append(f"[{', '.join(bonuses)}]")
+        
+        return ", ".join(parts)
+    
+    def _format_valid_actions(self, actions: list[Action], game_state: GameState, player: Player) -> str:
+        """Format valid actions as a string for the AI prompt, including claim targets."""
         lines = ["=== Valid Actions ==="]
         
         for i, action in enumerate(actions):
@@ -162,10 +222,62 @@ class AIPlayer(ABC):
             if action.target_player_id:
                 action_desc += f" with player {action.target_player_id}"
             if action.card_id:
-                action_desc += f" card {action.card_id}"
+                card = game_state.cards.get(action.card_id)
+                if card:
+                    action_desc += f" [{card.name}]"
+                    # For claim cards, show available targets
+                    if card.card_type == CardType.CLAIM:
+                        targets = self._get_valid_claim_targets(game_state, player, card)
+                        if targets:
+                            action_desc += "\n      CLAIMABLE TARGETS:"
+                            for t in targets:
+                                owner = "NEUTRAL"
+                                if t.owner_id:
+                                    owner_player = next((p for p in game_state.players if p.id == t.owner_id), None)
+                                    owner = owner_player.name if owner_player else "Unknown"
+                                target_info = self._format_holding_details(t, owner)
+                                action_desc += f"\n        - {target_info}"
             lines.append(action_desc)
         
         return "\n".join(lines)
+    
+    def _get_valid_claim_targets(self, game_state: GameState, player: Player, card) -> list[Holding]:
+        """Get all valid targets for a claim card.
+        
+        Returns a list of holdings that can be claimed with this card.
+        """
+        from app.models.schemas import CardEffect
+        
+        effect = card.effect
+        targets = []
+        
+        # County claim cards (CLAIM_X, CLAIM_U, CLAIM_V, CLAIM_Q)
+        if effect in [CardEffect.CLAIM_X, CardEffect.CLAIM_U, CardEffect.CLAIM_V, CardEffect.CLAIM_Q]:
+            effect_str = effect.value if hasattr(effect, 'value') else str(effect)
+            target_county = effect_str.replace("claim_", "").upper()
+            
+            # Find all holdings in the target county that we don't own and haven't claimed
+            for holding in game_state.holdings:
+                if holding.county == target_county and holding.owner_id != player.id:
+                    if holding.id not in (player.claims or []):
+                        # County claim cards work on towns and county castles
+                        if holding.holding_type in [HoldingType.TOWN, HoldingType.COUNTY_CASTLE]:
+                            targets.append(holding)
+        
+        # Duchy claim - can claim any town or Duke+ title
+        elif effect == CardEffect.DUCHY_CLAIM:
+            for holding in game_state.holdings:
+                if holding.owner_id != player.id and holding.id not in (player.claims or []):
+                    if holding.holding_type in [HoldingType.TOWN, HoldingType.DUCHY_CASTLE, HoldingType.KING_CASTLE]:
+                        targets.append(holding)
+        
+        # Ultimate claim - can claim anything
+        elif effect == CardEffect.ULTIMATE_CLAIM:
+            for holding in game_state.holdings:
+                if holding.owner_id != player.id and holding.id not in (player.claims or []):
+                    targets.append(holding)
+        
+        return targets
     
     def _find_claim_target(self, game_state: GameState, player: Player, card) -> Optional[Holding]:
         """Find a valid target for a claim card.
@@ -192,11 +304,80 @@ class AIPlayer(ABC):
         
         return None
     
-    def _complete_action(self, action: Action, game_state: GameState, player: Player) -> Optional[Action]:
+    def _parse_ai_response(self, response: str) -> tuple[Optional[int], Optional[str], Optional[int], str]:
+        """Parse the structured AI response.
+        
+        Expected format:
+        ACTION: [number]
+        TARGET: [holding_id or "none"]
+        SOLDIERS: [number or "none"] (for attack actions)
+        REASON: [explanation]
+        
+        Returns:
+            Tuple of (action_number, target_id, soldiers_count, reason)
+            action_number is 1-indexed, or None if not found
+            target_id is the holding ID, or None if "none" or not found
+            soldiers_count is the number of soldiers to commit, or None
+            reason is the explanation text
+        """
+        import re
+        
+        action_num = None
+        target_id = None
+        soldiers_count = None
+        reason = ""
+        
+        # Parse ACTION line
+        action_match = re.search(r'ACTION:\s*(\d+)', response, re.IGNORECASE)
+        if action_match:
+            action_num = int(action_match.group(1))
+        else:
+            # Fallback: try to find any number at the start
+            numbers = re.findall(r'\d+', response)
+            if numbers:
+                action_num = int(numbers[0])
+        
+        # Parse TARGET line
+        target_match = re.search(r'TARGET:\s*(\S+)', response, re.IGNORECASE)
+        if target_match:
+            target_value = target_match.group(1).strip().lower()
+            if target_value != "none" and target_value != "n/a":
+                target_id = target_value
+        
+        # Parse SOLDIERS line
+        soldiers_match = re.search(r'SOLDIERS:\s*(\d+)', response, re.IGNORECASE)
+        if soldiers_match:
+            soldiers_count = int(soldiers_match.group(1))
+        
+        # Parse REASON line - capture everything after REASON:
+        reason_match = re.search(r'REASON:\s*(.+?)(?:\n|$)', response, re.IGNORECASE | re.DOTALL)
+        if reason_match:
+            reason = reason_match.group(1).strip()
+        else:
+            # Use entire response as reason if format not followed
+            reason = response.strip()[:200]
+        
+        return action_num, target_id, soldiers_count, reason
+    
+    def _complete_action(
+        self, 
+        action: Action, 
+        game_state: GameState, 
+        player: Player,
+        target_id: Optional[str] = None,
+        soldiers_count: Optional[int] = None
+    ) -> Optional[Action]:
         """Complete an action with missing fields.
         
         Some actions (like PLAY_CARD for claim cards) require additional fields
         that are not populated by get_valid_actions(). This method fills them in.
+        
+        Args:
+            action: The action to complete
+            game_state: Current game state
+            player: The player taking the action
+            target_id: Optional target holding ID from AI response
+            soldiers_count: Optional soldier count from AI response (for attacks)
         
         Returns None if the action cannot be completed (e.g., no valid target).
         """
@@ -205,6 +386,16 @@ class AIPlayer(ABC):
             if card and card.card_type == CardType.CLAIM:
                 # Claim cards require a target_holding_id
                 if not action.target_holding_id:
+                    # First, try to use the target_id from AI response
+                    if target_id:
+                        # Validate that the target is valid for this claim card
+                        valid_targets = self._get_valid_claim_targets(game_state, player, card)
+                        valid_target_ids = [t.id for t in valid_targets]
+                        if target_id in valid_target_ids:
+                            action.target_holding_id = target_id
+                            return action
+                    
+                    # Fallback: auto-select first valid target
                     target = self._find_claim_target(game_state, player, card)
                     if target:
                         action.target_holding_id = target.id
@@ -217,10 +408,17 @@ class AIPlayer(ABC):
         
         elif action.action_type == ActionType.ATTACK:
             # Attack requires soldiers_count - must be multiples of 100
-            if not action.soldiers_count or action.soldiers_count < 200:
-                raw_count = min(player.soldiers // 2, max(200, player.soldiers))
-                rounded_count = (raw_count // 100) * 100  # Round down to nearest 100
+            if soldiers_count and soldiers_count >= 200:
+                # Use AI-specified soldier count
+                rounded_count = (soldiers_count // 100) * 100
+                rounded_count = min(rounded_count, player.soldiers)  # Can't exceed available
                 rounded_count = max(200, rounded_count)  # Ensure minimum 200
+                action.soldiers_count = rounded_count
+            elif not action.soldiers_count or action.soldiers_count < 200:
+                # Fallback: commit 50% of soldiers
+                raw_count = min(player.soldiers // 2, max(200, player.soldiers))
+                rounded_count = (raw_count // 100) * 100
+                rounded_count = max(200, rounded_count)
                 action.soldiers_count = rounded_count
             else:
                 # Ensure existing soldiers_count is also rounded to 100s
@@ -238,33 +436,43 @@ PERSONALITY: You are a ruthless conqueror. You LOVE war and territorial expansio
 
 OBJECTIVE: First to reach 18 Prestige Points (VP) wins!
 
-SCORING:
-- Town = 1 VP
-- County title = +2 VP  
-- Duchy title = +4 VP
-- King title = +6 VP
-
 GAME STRUCTURE:
 - 4 counties (X, U, V, Q), each with 3 towns and 1 county castle
 - 2 duchies: XU (counties X+U) and QV (counties Q+V)
 - 1 King's Castle in the center
 
-TITLES (require prerequisites and gold):
-- Count: Own 2 of 3 towns in a county OR own a fortified Capitol (1 fort) → claim County Castle (25 Gold)
-- Duke: Be Count in both counties of a duchy → can claim Duchy Castle (50 Gold)  
-- King: Be Duke + own a town in the OTHER duchy → can claim King's Castle (75 Gold)
+=== TITLE PROGRESSION - YOUR PATH TO VICTORY ===
+Titles give MASSIVE VP bonuses. Pursue them aggressively!
 
-CAPITOLS - STRATEGIC SHORTCUT TO COUNT:
-- Each county has a Capitol: X=Xythera, U=Umbrith, V=Valoria, Q=Quindara
-- Owning a Capitol with just 1 fortification lets you become Count!
-- This is faster than conquering 2 towns - fortify your Capitol ASAP!
+SCORING:
+- Town = 1 VP
+- Count title = +2 VP (total: 3 VP for town + county castle)
+- Duke title = +4 VP (controls 2 counties!)
+- King title = +6 VP (GAME WINNING!)
 
-CLAIMS - CRITICAL RULE:
-- You CANNOT attack or capture ANY territory without a valid claim!
-- Get claims by: Playing claim cards from your hand, OR fabricating claims (35 Gold, TOWNS ONLY)
-- Cannot fabricate claims on County/Duchy/King castles - must use claim cards
-- With a claim on an UNOWNED town: pay 10 Gold to capture peacefully (claim_town)
-- With a claim on an ENEMY territory: attack with 200+ soldiers
+HOW TO BECOME COUNT (Choose ONE path):
+  Path A: Own 2 of 3 towns in a county → pay 25 Gold for County Castle
+  Path B (FASTER!): Own a CAPITOL with 1+ fortification → pay 25 Gold for County Castle
+  CAPITOLS: X=Xythera, U=Umbrith, V=Valoria, Q=Quindara
+
+HOW TO BECOME DUKE:
+  Be Count in BOTH counties of a duchy (XU or QV) → pay 50 Gold for Duchy Castle
+
+HOW TO BECOME KING:
+  Be Duke + own any town in the OTHER duchy → pay 75 Gold for King's Castle
+
+=== CLAIMS - THE FOUNDATION OF CONQUEST ===
+CRITICAL: You CANNOT attack or capture ANY territory without a valid claim!
+
+How to get claims:
+1. Play claim cards from your hand (claim_x, claim_u, claim_v, claim_q)
+2. Fabricate claims: 35 Gold, TOWNS ONLY (cannot fabricate on castles!)
+
+With a claim you can:
+- Capture UNOWNED town: pay 10 Gold (claim_town action)
+- Attack ENEMY territory: commit 200+ soldiers
+
+NO CLAIMS = NO EXPANSION. If you have no claims, getting claims is your TOP priority!
 
 COMBAT:
 - Must commit at least 200 soldiers
@@ -273,24 +481,64 @@ COMBAT:
 - Defender wins ties
 - Fortifications give +2 defense per fortification
 
-AGGRESSIVE STRATEGY - ACTIONS (in priority order):
-1. attack - ATTACK enemies whenever you have a claim and 200+ soldiers! WAR IS THE PATH TO VICTORY!
-2. claim_title - Claim title castles immediately (ALWAYS DO THIS!)
-3. claim_town - Capture unowned towns for 10 gold
-4. play_card - Play claim cards to enable MORE ATTACKS, play combat bonus cards aggressively
-5. fake_claim - Fabricate claims on enemy towns to enable attacks (35 Gold) - BE AGGRESSIVE!
-6. build_fortification - Fortify your CAPITOL first (gives Count title with just 1 fort!)
-7. recruit - Only if you need soldiers to attack
-8. end_turn - End your turn when no attack or expansion options remain
+=== STRATEGIC PRIORITY ORDER ===
 
-MINDSET: Attack first, ask questions later. If you can attack, DO IT. Territory gained through war is territory your enemies lose. Every turn without an attack is a wasted opportunity!
+1. claim_title - ALWAYS claim titles when available! They give huge VP!
+   Count=+2VP, Duke=+4VP, King=+6VP. This is how you WIN.
+
+2. IF YOU HAVE CLAIMS:
+   - attack - Attack enemy territories to expand!
+   - claim_town - Capture unowned towns for 10 gold
+
+3. IF YOU HAVE NO CLAIMS (this blocks all expansion!):
+   - play_card - Play claim cards IMMEDIATELY to enable conquest
+   - fake_claim - Fabricate claims (35 Gold) on enemy towns - DO THIS!
+   Getting claims is URGENT - you cannot expand without them!
+
+4. build_fortification - Fortify your CAPITOL! This unlocks Count title fast!
+   Only need 1 fort on capitol to qualify for Count (vs conquering 2 towns)
+
+5. recruit - Get soldiers if below 300 for attacking
+
+6. end_turn - Only when no productive actions remain
+
+MINDSET: Titles win games! Focus on becoming Count → Duke → King. 
+Claims enable everything - if you can't attack, get claims FIRST!
 
 CARD TYPES:
 - Claim cards (claim_x, claim_u, claim_v, claim_q): Use to enable attacks on that county!
 - Bonus cards: Big War (double army cap), Adventurer (buy 500 soldiers for 25g), Excalibur (roll twice), etc.
 - Personal/Global events: Applied automatically when drawn
 
-Always respond with just the NUMBER of your chosen action. Nothing else."""
+RESPONSE FORMAT (IMPORTANT):
+You must respond in this EXACT format:
+ACTION: [number]
+TARGET: [holding_id or "none"]
+SOLDIERS: [number or "none"] (REQUIRED for attack actions)
+REASON: [brief explanation of your choice]
+
+Example responses:
+ACTION: 3
+TARGET: none
+SOLDIERS: none
+REASON: Claiming Count title to gain 2 VP and solidify control of County X.
+
+ACTION: 5
+TARGET: xythera
+SOLDIERS: none
+REASON: Playing claim card on Xythera because it's a CAPITOL - fortifying it later gives easy Count title.
+
+ACTION: 2
+TARGET: none
+SOLDIERS: 400
+REASON: Attacking enemy town with 400 soldiers - enough to win but preserving reserves.
+
+For claim cards (play_card), you MUST specify which holding to target from the CLAIMABLE TARGETS list shown.
+For attack actions, you MUST specify SOLDIERS (minimum 200, in multiples of 100). Consider:
+- More soldiers = higher chance of winning
+- Winner loses 50% of committed soldiers, loser loses 100%
+- Don't overcommit if you need reserves for future battles
+For other actions, use "none" for both TARGET and SOLDIERS."""
 
 
 

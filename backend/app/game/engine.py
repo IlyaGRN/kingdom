@@ -827,13 +827,15 @@ class GameEngine:
             return True, "Awaiting defender response", None
         
         # Defender is AI or unowned - resolve combat immediately
-        # For AI defender, let them select cards
+        # For AI defender, let them select cards and decide soldier commitment
         defender_cards: list[str] = []
         defender_soldiers = 0
         if defender and defender.player_type != PlayerType.HUMAN:
             defender_cards = self._ai_select_combat_cards(defender)
-            # AI commits all available soldiers up to what they have
-            defender_soldiers = defender.soldiers
+            # AI decides how many soldiers to commit based on situation
+            defender_soldiers = self._ai_calculate_defender_commitment(
+                defender, soldiers, target
+            )
         
         # Consume the claim (regardless of combat outcome)
         self._consume_claim(player, target)
@@ -908,6 +910,68 @@ class GameEngine:
             if card and card.card_type == CardType.BONUS and card.effect in combat_effects:
                 selected.append(card_id)
         return selected
+    
+    def _ai_calculate_defender_commitment(
+        self, 
+        defender, 
+        attacker_soldiers: int,
+        target_holding
+    ) -> int:
+        """AI calculates how many soldiers to commit for defense.
+        
+        Strategy:
+        - If we have fortifications, we have an advantage - commit less
+        - If attacker is committing heavily, we need to match
+        - Always keep some reserves if possible
+        - Commit enough to have a good chance of winning
+        
+        Combat formula: Strength = 2d6 + (soldiers/100) + modifiers
+        """
+        if defender.soldiers == 0:
+            return 0
+        
+        # Calculate our defensive advantage
+        fort_bonus = target_holding.fortification_count * 2 if target_holding else 0
+        defense_bonus = target_holding.defense_modifier if target_holding else 0
+        total_defense_bonus = fort_bonus + defense_bonus
+        
+        # Attacker's soldier bonus
+        attacker_bonus = attacker_soldiers // 100
+        
+        # We need to match or exceed attacker strength
+        # Base dice average is 7 (2d6)
+        # We want: our_soldiers/100 + our_bonuses >= attacker_soldiers/100
+        # So: our_soldiers >= (attacker_bonus - total_defense_bonus) * 100
+        
+        # Calculate minimum soldiers needed to match attacker
+        min_needed = max(0, (attacker_bonus - total_defense_bonus) * 100)
+        
+        # Add buffer for dice variance (about 200 extra for safety)
+        recommended = min_needed + 200
+        
+        # But also consider committing proportionally to threat
+        # If attacker is committing a lot, we might need to match more aggressively
+        proportional = int(attacker_soldiers * 0.8)  # Match 80% of attacker
+        
+        # Take the higher of the two strategies
+        target_commitment = max(recommended, proportional)
+        
+        # Round to nearest 100
+        target_commitment = (target_commitment // 100) * 100
+        
+        # Cap at available soldiers
+        target_commitment = min(target_commitment, defender.soldiers)
+        
+        # If we'd commit more than 80% of our army, just commit all
+        # (no point keeping tiny reserves)
+        if target_commitment >= defender.soldiers * 0.8:
+            target_commitment = defender.soldiers
+        
+        # Minimum commitment (if we have any soldiers, commit at least some)
+        if defender.soldiers > 0 and target_commitment == 0:
+            target_commitment = min(200, defender.soldiers)
+        
+        return target_commitment
     
     def _discard_combat_cards(self, player, card_ids: list[str]) -> None:
         """Remove combat cards from player's hand and add to discard."""
