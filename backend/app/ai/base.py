@@ -1,7 +1,10 @@
 """Abstract base class for AI players."""
 from abc import ABC, abstractmethod
-from typing import Optional
+from typing import Optional, TYPE_CHECKING
 from app.models.schemas import GameState, Player, Action, Holding, ActionType, CardType, HoldingType
+
+if TYPE_CHECKING:
+    from app.game.logger import GameLogger
 
 
 class AIPlayer(ABC):
@@ -26,7 +29,8 @@ class AIPlayer(ABC):
         self, 
         game_state: GameState, 
         player: Player,
-        valid_actions: list[Action]
+        valid_actions: list[Action],
+        logger: Optional["GameLogger"] = None
     ) -> Action:
         """Given the current game state and valid actions, choose one.
         
@@ -34,6 +38,7 @@ class AIPlayer(ABC):
             game_state: Current state of the game
             player: The player this AI is controlling
             valid_actions: List of actions the player can take
+            logger: Optional game logger for recording AI decisions
             
         Returns:
             The chosen action

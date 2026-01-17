@@ -2,11 +2,14 @@
 import json
 import re
 from datetime import datetime
-from typing import Optional, Tuple
+from typing import Optional, Tuple, TYPE_CHECKING
 from openai import AsyncOpenAI
 
 from app.ai.base import AIPlayer
 from app.models.schemas import GameState, Player, Action, Holding, ActionType, AIDecisionLog, AIDecisionLogEntry
+
+if TYPE_CHECKING:
+    from app.game.logger import GameLogger
 
 
 class OpenAIPlayer(AIPlayer):
@@ -35,27 +38,21 @@ class OpenAIPlayer(AIPlayer):
         self,
         game_state: GameState,
         player: Player,
-        valid_actions: list[Action]
+        valid_actions: list[Action],
+        logger: Optional["GameLogger"] = None
     ) -> Tuple[Action, AIDecisionLog]:
         """Choose an action using GPT."""
         action_types = [a.action_type.value for a in valid_actions]
         
         if not valid_actions:
-            log = AIDecisionLog(
-                player_name=player.name,
-                timestamp=datetime.now().isoformat(),
-                valid_actions=[],
-                considered=[],
-                chosen_action="none",
-                reason="No valid actions available"
-            )
             raise ValueError("No valid actions available")
         
         # Format the game state and actions for the AI
         state_text = self._format_game_state(game_state, player)
         actions_text = self._format_valid_actions(valid_actions)
         
-        prompt = f"""{state_text}
+        system_prompt = self._get_system_prompt()
+        user_prompt = f"""{state_text}
 
 {actions_text}
 
@@ -75,8 +72,35 @@ If you can attack, DO IT. Expansion through conquest is the path to victory!
 
 Respond with ONLY the number of your chosen action (1-{len(valid_actions)})."""
         
+        def make_log(action: Action, reason: str) -> AIDecisionLog:
+            return AIDecisionLog(
+                player_name=player.name,
+                timestamp=datetime.now().isoformat(),
+                valid_actions=action_types,
+                considered=[AIDecisionLogEntry(action=action.action_type.value, status="chosen", reason=reason)],
+                chosen_action=action.action_type.value,
+                reason=reason
+            )
+        
+        def log_ai_decision(response: str, chosen_action: Action, decision_log: AIDecisionLog):
+            """Log the AI decision if logger is available."""
+            if logger:
+                action_details = logger.get_action_details(chosen_action)
+                logger.log_ai_decision(
+                    round_num=game_state.current_round,
+                    player_id=player.id,
+                    player_name=player.name,
+                    player_type=player.player_type.value,
+                    system_prompt=system_prompt,
+                    user_prompt=user_prompt,
+                    raw_response=response,
+                    parsed_action=chosen_action.action_type.value,
+                    action_details=action_details,
+                    decision_log=decision_log.model_dump() if decision_log else None
+                )
+        
         try:
-            response = await self._get_completion(self._get_system_prompt(), prompt)
+            response = await self._get_completion(system_prompt, user_prompt)
             
             # Parse the response to get action number
             # Extract first number from response
@@ -88,76 +112,41 @@ Respond with ONLY the number of your chosen action (1-{len(valid_actions)})."""
                     # Complete the action with any missing fields
                     completed = self._complete_action(chosen, game_state, player)
                     if completed:
-                        log = AIDecisionLog(
-                            player_name=player.name,
-                            timestamp=datetime.now().isoformat(),
-                            valid_actions=action_types,
-                            considered=[AIDecisionLogEntry(action=completed.action_type.value, status="chosen", reason=f"GPT selected action #{action_idx+1}")],
-                            chosen_action=completed.action_type.value,
-                            reason=f"GPT response: {response[:50]}"
-                        )
-                        return completed, log
+                        decision_log = make_log(completed, f"GPT selected action #{action_idx+1}: {response[:50]}")
+                        log_ai_decision(response, completed, decision_log)
+                        return completed, decision_log
                     # If action couldn't be completed, fallback to END_TURN
                     for action in valid_actions:
                         if action.action_type == ActionType.END_TURN:
-                            log = AIDecisionLog(
-                                player_name=player.name,
-                                timestamp=datetime.now().isoformat(),
-                                valid_actions=action_types,
-                                considered=[AIDecisionLogEntry(action="end_turn", status="chosen", reason="Selected action couldn't be completed, falling back to end_turn")],
-                                chosen_action="end_turn",
-                                reason="Fallback after incomplete action"
-                            )
-                            return action, log
+                            decision_log = make_log(action, "Fallback after incomplete action")
+                            log_ai_decision(response, action, decision_log)
+                            return action, decision_log
             
             # Fallback: return end_turn or first valid action
             for action in valid_actions:
                 if action.action_type == ActionType.END_TURN:
-                    log = AIDecisionLog(
-                        player_name=player.name,
-                        timestamp=datetime.now().isoformat(),
-                        valid_actions=action_types,
-                        considered=[AIDecisionLogEntry(action="end_turn", status="chosen", reason="Fallback to end_turn")],
-                        chosen_action="end_turn",
-                        reason="GPT response parsing failed, defaulting to end_turn"
-                    )
-                    return action, log
+                    decision_log = make_log(action, "GPT response parsing failed, defaulting to end_turn")
+                    log_ai_decision(response, action, decision_log)
+                    return action, decision_log
             
             fallback = valid_actions[0]
-            log = AIDecisionLog(
-                player_name=player.name,
-                timestamp=datetime.now().isoformat(),
-                valid_actions=action_types,
-                considered=[AIDecisionLogEntry(action=fallback.action_type.value, status="chosen", reason="Last resort fallback")],
-                chosen_action=fallback.action_type.value,
-                reason="All fallbacks exhausted"
-            )
-            return fallback, log
+            decision_log = make_log(fallback, "All fallbacks exhausted")
+            log_ai_decision(response, fallback, decision_log)
+            return fallback, decision_log
             
         except Exception as e:
+            error_response = f"Error: {str(e)}"
             # On any error, return a safe default action
             # Prefer end_turn if available, otherwise first action
             for action in valid_actions:
                 if action.action_type == ActionType.END_TURN:
-                    log = AIDecisionLog(
-                        player_name=player.name,
-                        timestamp=datetime.now().isoformat(),
-                        valid_actions=action_types,
-                        considered=[AIDecisionLogEntry(action="end_turn", status="chosen", reason=f"Exception occurred: {str(e)[:50]}")],
-                        chosen_action="end_turn",
-                        reason=f"Error: {str(e)[:100]}"
-                    )
-                    return action, log
+                    decision_log = make_log(action, f"Error: {str(e)[:100]}")
+                    log_ai_decision(error_response, action, decision_log)
+                    return action, decision_log
             fallback = valid_actions[0]
-            log = AIDecisionLog(
-                player_name=player.name,
-                timestamp=datetime.now().isoformat(),
-                valid_actions=action_types,
-                considered=[AIDecisionLogEntry(action=fallback.action_type.value, status="chosen", reason=f"Exception fallback: {str(e)[:50]}")],
-                chosen_action=fallback.action_type.value,
-                reason=f"Error fallback: {str(e)[:100]}"
-            )
-            return fallback, log
+            decision_log = make_log(fallback, f"Error fallback: {str(e)[:100]}")
+            log_ai_decision(error_response, fallback, decision_log)
+            return fallback, decision_log
     
     async def decide_combat_commitment(
         self,

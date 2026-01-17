@@ -1,5 +1,5 @@
 """AI Player Manager - handles AI player creation and action execution."""
-from typing import Optional, Tuple
+from typing import Optional, Tuple, TYPE_CHECKING
 from datetime import datetime
 from app.config import get_settings
 from app.models.schemas import (
@@ -12,6 +12,10 @@ from app.ai.anthropic_player import AnthropicPlayer
 from app.ai.gemini_player import GeminiPlayer
 from app.ai.grok_player import GrokPlayer
 from app.game.engine import GameEngine
+from app.game.logger import get_logger
+
+if TYPE_CHECKING:
+    from app.game.logger import GameLogger
 
 
 class AIManager:
@@ -85,8 +89,11 @@ class AIManager:
         if not valid_actions:
             return None, None
         
-        # Have AI decide - SimpleAIPlayer returns (action, log), others just return action
-        result = await ai_player.decide_action(state, player, valid_actions)
+        # Get the game logger for this game
+        logger = get_logger(state.id)
+        
+        # Have AI decide - pass the logger for detailed logging
+        result = await ai_player.decide_action(state, player, valid_actions, logger=logger)
         
         if isinstance(result, tuple):
             return result
@@ -121,7 +128,8 @@ class SimpleAIPlayer(AIPlayer):
         self,
         game_state: GameState,
         player: Player,
-        valid_actions: list[Action]
+        valid_actions: list[Action],
+        logger: Optional["GameLogger"] = None
     ) -> Tuple[Action, AIDecisionLog]:
         """Choose an action using simple heuristics, with full decision logging."""
         if not valid_actions:
@@ -255,6 +263,22 @@ class SimpleAIPlayer(AIPlayer):
             chosen_action=chosen_action.action_type.value,
             reason=chosen_reason
         )
+        
+        # Log the AI decision if logger is available
+        if logger:
+            action_details = logger.get_action_details(chosen_action)
+            logger.log_ai_decision(
+                round_num=game_state.current_round,
+                player_id=player.id,
+                player_name=player.name,
+                player_type=player.player_type.value,
+                system_prompt="SimpleAI (rule-based, no LLM prompt)",
+                user_prompt="N/A - rule-based decision",
+                raw_response="N/A - rule-based decision",
+                parsed_action=chosen_action.action_type.value,
+                action_details=action_details,
+                decision_log=decision_log.model_dump()
+            )
         
         return chosen_action, decision_log
     

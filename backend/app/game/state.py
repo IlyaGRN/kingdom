@@ -8,6 +8,7 @@ from app.models.schemas import (
 )
 from app.game.board import create_board, get_towns_in_county
 from app.game.cards import create_deck, shuffle_deck, is_instant_card
+from app.game.logger import create_logger, get_logger, remove_logger, GameLogger
 
 
 # In-memory game storage
@@ -55,16 +56,48 @@ def auto_draw_card(state: GameState, player: Player) -> Optional[str]:
         is_hidden=is_hidden,
     )
     
+    # Log the card draw
+    logger = get_logger(state.id)
+    effect_applied = None
+    
     # Check if instant card (personal/global events)
     if is_instant:
         # Apply instant effect
         _apply_instant_card_effect(state, player, card)
         state.discard_pile.append(card_id)
+        effect_applied = f"{card.effect.value if card.effect else 'unknown'} applied"
+        
+        # Log the card draw with effect
+        if logger:
+            logger.log_card_draw(
+                round_num=state.current_round,
+                player_id=player.id,
+                player_name=player.name,
+                card_id=card_id,
+                card_name=card.name,
+                card_type=card.card_type.value,
+                is_instant=True,
+                effect_applied=effect_applied
+            )
+        
         return f"{card.name} (instant effect applied)"
     
     # Non-instant cards go to hand
     player.hand.append(card_id)
     state.card_drawn_this_turn = True
+    
+    # Log the card draw
+    if logger:
+        logger.log_card_draw(
+            round_num=state.current_round,
+            player_id=player.id,
+            player_name=player.name,
+            card_id=card_id,
+            card_name=card.name,
+            card_type=card.card_type.value,
+            is_instant=False,
+            effect_applied=None
+        )
     
     return card.name
 
@@ -181,6 +214,16 @@ def create_game(player_configs: list[dict]) -> GameState:
     # Store game
     _games[game_id] = state
     
+    # Initialize game logger
+    logger = create_logger(game_id)
+    if logger:
+        settings_snapshot = {
+            "victory_threshold": state.victory_threshold,
+            "player_count": player_count,
+            "starting_town_mode": settings.starting_town_mode,
+        }
+        logger.log_game_start(player_configs, players, settings_snapshot)
+    
     return state
 
 
@@ -226,6 +269,8 @@ def save_game(state: GameState) -> None:
 def delete_game(game_id: str) -> bool:
     """Delete a game."""
     if game_id in _games:
+        # Clean up logger
+        remove_logger(game_id)
         del _games[game_id]
         return True
     return False
@@ -436,6 +481,21 @@ def apply_income(state: GameState) -> GameState:
     
     income = calculate_income(state)
     
+    # Log income phase
+    logger = get_logger(state.id)
+    if logger:
+        income_details = {}
+        for player in state.players:
+            player_income = income.get(player.id, {"gold": 0, "soldiers": 0})
+            income_details[player.name] = {
+                "player_id": player.id,
+                "gold_gained": player_income["gold"],
+                "soldiers_gained": player_income["soldiers"],
+                "gold_before": player.gold,
+                "soldiers_before": player.soldiers,
+            }
+        logger.log_income_phase(state.current_round, income_details)
+    
     for player in state.players:
         player_income = income.get(player.id, {"gold": 0, "soldiers": 0})
         player.gold += player_income["gold"]
@@ -455,6 +515,16 @@ def apply_income(state: GameState) -> GameState:
     
     # Auto-draw card for first player at start of round
     first_player = state.players[0]
+    
+    # Log turn start for first player
+    if logger:
+        logger.log_turn_start(
+            round_num=state.current_round,
+            player_id=first_player.id,
+            player_name=first_player.name,
+            player_state=logger.get_player_state_snapshot(first_player)
+        )
+    
     auto_draw_card(state, first_player)
     
     save_game(state)
@@ -463,6 +533,19 @@ def apply_income(state: GameState) -> GameState:
 
 def next_player_turn(state: GameState) -> GameState:
     """Advance to the next player's turn."""
+    logger = get_logger(state.id)
+    
+    # Log turn end for current player before advancing
+    if state.current_player_idx < len(state.players):
+        ending_player = state.players[state.current_player_idx]
+        if logger:
+            logger.log_turn_end(
+                round_num=state.current_round,
+                player_id=ending_player.id,
+                player_name=ending_player.name,
+                player_state=logger.get_player_state_snapshot(ending_player)
+            )
+    
     state.current_player_idx += 1
     
     # Check if all players have taken their turn
@@ -477,6 +560,16 @@ def next_player_turn(state: GameState) -> GameState:
         
         # Auto-draw card for the new current player
         current_player = state.players[state.current_player_idx]
+        
+        # Log turn start for new player
+        if logger:
+            logger.log_turn_start(
+                round_num=state.current_round,
+                player_id=current_player.id,
+                player_name=current_player.name,
+                player_state=logger.get_player_state_snapshot(current_player)
+            )
+        
         auto_draw_card(state, current_player)
     
     save_game(state)
@@ -521,6 +614,33 @@ def check_victory(state: GameState) -> Optional[Player]:
     prestige = calculate_prestige(state)
     for player in state.players:
         if prestige[player.id] >= state.victory_threshold:
+            # Log game end
+            logger = get_logger(state.id)
+            if logger:
+                final_standings = []
+                sorted_players = sorted(
+                    state.players,
+                    key=lambda p: prestige[p.id],
+                    reverse=True
+                )
+                for i, p in enumerate(sorted_players):
+                    final_standings.append({
+                        "rank": i + 1,
+                        "player_id": p.id,
+                        "player_name": p.name,
+                        "player_type": p.player_type.value,
+                        "prestige": prestige[p.id],
+                        "title": p.title.value,
+                        "gold": p.gold,
+                        "soldiers": p.soldiers,
+                        "holdings": list(p.holdings),
+                    })
+                logger.log_game_end(
+                    round_num=state.current_round,
+                    winner_id=player.id,
+                    winner_name=player.name,
+                    final_standings=final_standings
+                )
             return player
     return None
 

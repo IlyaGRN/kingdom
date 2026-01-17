@@ -1,11 +1,14 @@
 """Google Gemini-based AI player."""
 import re
 from datetime import datetime
-from typing import Optional, Tuple
+from typing import Optional, Tuple, TYPE_CHECKING
 import google.generativeai as genai
 
 from app.ai.base import AIPlayer
 from app.models.schemas import GameState, Player, Action, Holding, ActionType, AIDecisionLog, AIDecisionLogEntry
+
+if TYPE_CHECKING:
+    from app.game.logger import GameLogger
 
 
 class GeminiPlayer(AIPlayer):
@@ -36,7 +39,8 @@ class GeminiPlayer(AIPlayer):
         self,
         game_state: GameState,
         player: Player,
-        valid_actions: list[Action]
+        valid_actions: list[Action],
+        logger: Optional["GameLogger"] = None
     ) -> Tuple[Action, AIDecisionLog]:
         """Choose an action using Gemini."""
         action_types = [a.action_type.value for a in valid_actions]
@@ -47,7 +51,8 @@ class GeminiPlayer(AIPlayer):
         state_text = self._format_game_state(game_state, player)
         actions_text = self._format_valid_actions(valid_actions)
         
-        prompt = f"""{state_text}
+        system_prompt = self._get_system_prompt()
+        user_prompt = f"""{state_text}
 
 {actions_text}
 
@@ -77,8 +82,25 @@ Respond with ONLY the number of your chosen action (1-{len(valid_actions)})."""
                 reason=reason
             )
         
+        def log_ai_decision(response: str, chosen_action: Action, decision_log: AIDecisionLog):
+            """Log the AI decision if logger is available."""
+            if logger:
+                action_details = logger.get_action_details(chosen_action)
+                logger.log_ai_decision(
+                    round_num=game_state.current_round,
+                    player_id=player.id,
+                    player_name=player.name,
+                    player_type=player.player_type.value,
+                    system_prompt=system_prompt,
+                    user_prompt=user_prompt,
+                    raw_response=response,
+                    parsed_action=chosen_action.action_type.value,
+                    action_details=action_details,
+                    decision_log=decision_log.model_dump() if decision_log else None
+                )
+        
         try:
-            response = await self._get_completion(self._get_system_prompt(), prompt)
+            response = await self._get_completion(system_prompt, user_prompt)
             
             numbers = re.findall(r'\d+', response)
             if numbers:
@@ -87,23 +109,36 @@ Respond with ONLY the number of your chosen action (1-{len(valid_actions)})."""
                     chosen = valid_actions[action_idx]
                     completed = self._complete_action(chosen, game_state, player)
                     if completed:
-                        return completed, make_log(completed, f"Gemini selected #{action_idx+1}: {response[:50]}")
+                        decision_log = make_log(completed, f"Gemini selected #{action_idx+1}: {response[:50]}")
+                        log_ai_decision(response, completed, decision_log)
+                        return completed, decision_log
                     for action in valid_actions:
                         if action.action_type == ActionType.END_TURN:
-                            return action, make_log(action, "Fallback after incomplete action")
+                            decision_log = make_log(action, "Fallback after incomplete action")
+                            log_ai_decision(response, action, decision_log)
+                            return action, decision_log
             
             for action in valid_actions:
                 if action.action_type == ActionType.END_TURN:
-                    return action, make_log(action, "Parse failed, defaulting to end_turn")
+                    decision_log = make_log(action, "Parse failed, defaulting to end_turn")
+                    log_ai_decision(response, action, decision_log)
+                    return action, decision_log
             fallback = valid_actions[0]
-            return fallback, make_log(fallback, "All fallbacks exhausted")
+            decision_log = make_log(fallback, "All fallbacks exhausted")
+            log_ai_decision(response, fallback, decision_log)
+            return fallback, decision_log
             
         except Exception as e:
+            error_response = f"Error: {str(e)}"
             for action in valid_actions:
                 if action.action_type == ActionType.END_TURN:
-                    return action, make_log(action, f"Error: {str(e)[:50]}")
+                    decision_log = make_log(action, f"Error: {str(e)[:50]}")
+                    log_ai_decision(error_response, action, decision_log)
+                    return action, decision_log
             fallback = valid_actions[0]
-            return fallback, make_log(fallback, f"Error fallback: {str(e)[:50]}")
+            decision_log = make_log(fallback, f"Error fallback: {str(e)[:50]}")
+            log_ai_decision(error_response, fallback, decision_log)
+            return fallback, decision_log
     
     async def decide_combat_commitment(
         self,

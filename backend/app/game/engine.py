@@ -17,6 +17,7 @@ from app.game.board import (
     get_towns_in_county, get_all_towns
 )
 from app.game.cards import is_instant_card, is_bonus_card, is_claim_card, get_card_county
+from app.game.logger import get_logger
 
 
 class GameEngine:
@@ -411,6 +412,23 @@ class GameEngine:
             return False, f"Unknown action type: {action.action_type}", None
         
         result = handler(action)
+        
+        # Log the action
+        logger = get_logger(self.game_id)
+        if logger:
+            player = next((p for p in self.state.players if p.id == action.player_id), None)
+            player_name = player.name if player else "Unknown"
+            
+            action_details = logger.get_action_details(action)
+            logger.log_action(
+                round_num=self.state.current_round,
+                player_id=action.player_id,
+                player_name=player_name,
+                action_type=action.action_type.value,
+                action_details=action_details,
+                success=result[0],
+                result_message=result[1]
+            )
         
         # Check for victory after each action
         winner = check_victory(self.state)
@@ -835,6 +853,34 @@ class GameEngine:
         # Apply result
         state = apply_combat_result(state, result)
         
+        # Log the combat
+        logger = get_logger(self.game_id)
+        if logger:
+            defender_name = defender.name if defender else "Neutral"
+            combat_details = {
+                "attacker_soldiers_committed": result.attacker_soldiers_committed,
+                "defender_soldiers_committed": result.defender_soldiers_committed,
+                "attacker_roll": result.attacker_roll,
+                "defender_roll": result.defender_roll,
+                "attacker_strength": result.attacker_strength,
+                "defender_strength": result.defender_strength,
+                "attacker_won": result.attacker_won,
+                "attacker_losses": result.attacker_losses,
+                "defender_losses": result.defender_losses,
+                "attacker_cards_used": action.attack_cards or [],
+                "defender_cards_used": defender_cards,
+            }
+            logger.log_combat(
+                round_num=state.current_round,
+                attacker_id=action.player_id,
+                attacker_name=player.name,
+                defender_id=defender.id if defender else None,
+                defender_name=defender_name,
+                target_holding_id=action.target_holding_id,
+                target_holding_name=target.name,
+                combat_details=combat_details
+            )
+        
         # Discard used combat cards
         self._discard_combat_cards(player, action.attack_cards or [])
         if defender:
@@ -911,6 +957,33 @@ class GameEngine:
         
         # Apply result
         state = apply_combat_result(state, result)
+        
+        # Log the combat
+        logger = get_logger(self.game_id)
+        if logger:
+            combat_details = {
+                "attacker_soldiers_committed": result.attacker_soldiers_committed,
+                "defender_soldiers_committed": result.defender_soldiers_committed,
+                "attacker_roll": result.attacker_roll,
+                "defender_roll": result.defender_roll,
+                "attacker_strength": result.attacker_strength,
+                "defender_strength": result.defender_strength,
+                "attacker_won": result.attacker_won,
+                "attacker_losses": result.attacker_losses,
+                "defender_losses": result.defender_losses,
+                "attacker_cards_used": pending.attacker_cards,
+                "defender_cards_used": action.defense_cards or [],
+            }
+            logger.log_combat(
+                round_num=state.current_round,
+                attacker_id=pending.attacker_id,
+                attacker_name=attacker.name,
+                defender_id=defender.id,
+                defender_name=defender.name,
+                target_holding_id=pending.target_holding_id,
+                target_holding_name=target.name,
+                combat_details=combat_details
+            )
         
         # Discard used combat cards
         self._discard_combat_cards(attacker, pending.attacker_cards)

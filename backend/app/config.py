@@ -25,6 +25,10 @@ class Settings(BaseSettings):
     # CORS
     cors_origins: list[str] = ["http://localhost:5173", "http://localhost:3000"]
     
+    # Game Logging
+    game_logging_enabled: bool = True
+    game_logs_directory: str = "./game_logs"
+    
     # Game Settings
     # Starting town selection mode:
     # - "random": Players get random towns (original behavior)
