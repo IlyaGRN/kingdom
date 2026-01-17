@@ -143,7 +143,10 @@ class GameEngine:
         if player.gold >= 35:
             for holding in state.holdings:
                 # Can only fabricate claim on TOWNS, not castles
-                if holding.holding_type == HoldingType.TOWN and holding.id not in player.claims:
+                # Skip if player already owns this holding or already has a claim on it
+                if (holding.holding_type == HoldingType.TOWN 
+                    and holding.owner_id != player_id 
+                    and holding.id not in player.claims):
                     actions.append(Action(
                         action_type=ActionType.FAKE_CLAIM,
                         player_id=player_id,

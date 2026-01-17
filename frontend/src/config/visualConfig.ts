@@ -77,7 +77,7 @@ export const visualConfig = {
       vardhelm: 15,
       velthar: 15,
       quindara: 15,
-      qyrelis: 15,
+      qyrelis: 9,
       quorwyn: 15,
       // County castles
       x_castle: 15,
