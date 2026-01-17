@@ -11,6 +11,36 @@ export default function CombatModal({ combat, players, holdings, onClose }: Comb
   const attacker = players.find(p => p.id === combat.attacker_id)
   const defender = combat.defender_id ? players.find(p => p.id === combat.defender_id) : null
   const holding = holdings.find(h => h.id === combat.target_holding_id)
+  
+  // Determine if human player was involved and their role
+  const humanIsAttacker = attacker?.player_type === 'human'
+  const humanIsDefender = defender?.player_type === 'human'
+  const humanWon = (humanIsAttacker && combat.attacker_won) || (humanIsDefender && !combat.attacker_won)
+  const humanLost = (humanIsAttacker && !combat.attacker_won) || (humanIsDefender && combat.attacker_won)
+  
+  // Generate result message from human perspective
+  const getResultMessage = () => {
+    if (humanIsAttacker) {
+      if (combat.attacker_won) {
+        return `You have conquered ${holding?.name}!`
+      } else {
+        return `Your attack on ${holding?.name} was repelled!`
+      }
+    } else if (humanIsDefender) {
+      if (!combat.attacker_won) {
+        return `You successfully defended ${holding?.name}!`
+      } else {
+        return `You have lost ${holding?.name} to ${attacker?.name}!`
+      }
+    } else {
+      // AI vs AI - third person
+      if (combat.attacker_won) {
+        return `${attacker?.name} conquers ${holding?.name}!`
+      } else {
+        return `${defender?.name || 'The defenders'} hold their ground!`
+      }
+    }
+  }
 
   return (
     <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50">
@@ -23,15 +53,20 @@ export default function CombatModal({ combat, players, holdings, onClose }: Comb
         <div className="flex items-center justify-between mb-6">
           {/* Attacker */}
           <div className="text-center flex-1">
-            <div 
-              className="w-16 h-16 rounded-full mx-auto mb-2 flex items-center justify-center border-4"
-              style={{ 
-                backgroundColor: attacker?.color,
-                borderColor: combat.attacker_won ? '#c9a227' : 'transparent'
-              }}
-            >
-              <span className="text-white text-2xl">⚔️</span>
-            </div>
+            {attacker?.crest ? (
+              <img 
+                src={attacker.crest} 
+                alt={attacker.name}
+                className={`w-16 h-16 mx-auto mb-2 object-contain ${combat.attacker_won ? 'drop-shadow-[0_0_8px_rgba(234,179,8,0.8)]' : ''}`}
+              />
+            ) : (
+              <div 
+                className="w-16 h-16 mx-auto mb-2 rounded-full flex items-center justify-center"
+                style={{ backgroundColor: attacker?.color }}
+              >
+                <span className="text-white text-2xl">⚔️</span>
+              </div>
+            )}
             <h3 className="font-medieval text-lg text-medieval-bronze">
               {attacker?.name}
             </h3>
@@ -45,15 +80,20 @@ export default function CombatModal({ combat, players, holdings, onClose }: Comb
 
           {/* Defender */}
           <div className="text-center flex-1">
-            <div 
-              className="w-16 h-16 rounded-full mx-auto mb-2 flex items-center justify-center border-4"
-              style={{ 
-                backgroundColor: defender?.color || '#666',
-                borderColor: !combat.attacker_won ? '#c9a227' : 'transparent'
-              }}
-            >
-              <span className="text-white text-2xl">🛡️</span>
-            </div>
+            {defender?.crest ? (
+              <img 
+                src={defender.crest} 
+                alt={defender.name}
+                className={`w-16 h-16 mx-auto mb-2 object-contain ${!combat.attacker_won ? 'drop-shadow-[0_0_8px_rgba(234,179,8,0.8)]' : ''}`}
+              />
+            ) : (
+              <div 
+                className="w-16 h-16 mx-auto mb-2 rounded-full flex items-center justify-center"
+                style={{ backgroundColor: defender?.color || '#666' }}
+              >
+                <span className="text-white text-2xl">🛡️</span>
+              </div>
+            )}
             <h3 className="font-medieval text-lg text-medieval-bronze">
               {defender?.name || 'Neutral'}
             </h3>
@@ -122,20 +162,21 @@ export default function CombatModal({ combat, players, holdings, onClose }: Comb
 
         {/* Result */}
         <div className={`text-center p-4 rounded mb-6 ${
-          combat.attacker_won ? 'bg-green-100' : 'bg-red-100'
+          humanWon ? 'bg-green-100' : humanLost ? 'bg-red-100' : combat.attacker_won ? 'bg-green-100' : 'bg-red-100'
         }`}>
           <h3 className="font-medieval text-2xl mb-2">
-            {combat.attacker_won ? (
+            {humanWon ? (
               <span className="text-green-700">⚔️ Victory! ⚔️</span>
+            ) : humanLost ? (
+              <span className="text-red-700">💀 Defeat! 💀</span>
+            ) : combat.attacker_won ? (
+              <span className="text-green-700">⚔️ Attacker Wins! ⚔️</span>
             ) : (
-              <span className="text-red-700">🛡️ Repelled! 🛡️</span>
+              <span className="text-red-700">🛡️ Defender Wins! 🛡️</span>
             )}
           </h3>
           <p className="text-medieval-stone">
-            {combat.attacker_won 
-              ? `${attacker?.name} conquers ${holding?.name}!`
-              : `${defender?.name || 'The defenders'} hold their ground!`
-            }
+            {getResultMessage()}
           </p>
         </div>
 

@@ -61,13 +61,38 @@ export default function DefenseModal({
     <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50">
       <div className="card-parchment rounded-lg p-6 max-w-lg w-full mx-4 shadow-2xl border-4 border-red-600">
         {/* Header */}
-        <div className="text-center mb-6">
-          <h2 className="font-medieval text-2xl text-medieval-crimson mb-2">
+        <div className="text-center mb-4">
+          <h2 className="font-medieval text-2xl text-medieval-crimson mb-3">
             🛡️ Under Attack!
           </h2>
-          <p className="text-medieval-stone">
-            <span className="font-bold text-red-600">{attacker.name}</span> is attacking your{' '}
-            <span className="font-bold text-medieval-bronze">{targetHolding.name}</span>!
+          
+          {/* Combatants with crests */}
+          <div className="flex items-center justify-center gap-4">
+            {/* Attacker */}
+            <div className="flex items-center gap-2">
+              <img 
+                src={attacker.crest} 
+                alt={attacker.name}
+                className="w-10 h-10 object-contain"
+              />
+              <span className="font-medieval text-red-600">{attacker.name}</span>
+            </div>
+            
+            <span className="text-2xl font-medieval text-medieval-stone">→</span>
+            
+            {/* Defender (you) */}
+            <div className="flex items-center gap-2">
+              <img 
+                src={defender.crest} 
+                alt={defender.name}
+                className="w-10 h-10 object-contain"
+              />
+              <span className="font-medieval text-medieval-bronze">{defender.name}</span>
+            </div>
+          </div>
+          
+          <p className="text-sm text-medieval-stone mt-2">
+            Target: <span className="font-bold text-medieval-bronze">{targetHolding.name}</span>
           </p>
         </div>
 

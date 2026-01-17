@@ -48,15 +48,49 @@ export default function CombatPrepModal({
     <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50">
       <div className="card-parchment rounded-lg p-6 max-w-lg w-full mx-4 shadow-2xl">
         {/* Header */}
-        <div className="text-center mb-6">
-          <h2 className="font-medieval text-2xl text-medieval-crimson mb-2">
+        <div className="text-center mb-4">
+          <h2 className="font-medieval text-2xl text-medieval-crimson mb-3">
             ⚔️ Prepare for Battle
           </h2>
-          <p className="text-medieval-stone">
-            Attacking <span className="font-bold text-medieval-bronze">{targetHolding.name}</span>
-            {defender && (
-              <span> owned by <span className="font-bold">{defender.name}</span></span>
-            )}
+          
+          {/* Combatants with crests */}
+          <div className="flex items-center justify-center gap-4">
+            {/* Attacker */}
+            <div className="flex items-center gap-2">
+              <img 
+                src={currentPlayer.crest} 
+                alt={currentPlayer.name}
+                className="w-10 h-10 object-contain"
+              />
+              <span className="font-medieval text-medieval-bronze">{currentPlayer.name}</span>
+            </div>
+            
+            <span className="text-2xl font-medieval text-medieval-stone">⚔️</span>
+            
+            {/* Defender */}
+            <div className="flex items-center gap-2">
+              {defender ? (
+                <>
+                  <img 
+                    src={defender.crest} 
+                    alt={defender.name}
+                    className="w-10 h-10 object-contain"
+                  />
+                  <span className="font-medieval text-medieval-bronze">{defender.name}</span>
+                </>
+              ) : (
+                <>
+                  <div className="w-10 h-10 bg-gray-300 rounded-full flex items-center justify-center">
+                    <span className="text-gray-600">🏰</span>
+                  </div>
+                  <span className="font-medieval text-medieval-stone">Neutral</span>
+                </>
+              )}
+            </div>
+          </div>
+          
+          <p className="text-sm text-medieval-stone mt-2">
+            Target: <span className="font-bold text-medieval-bronze">{targetHolding.name}</span>
           </p>
         </div>
 
