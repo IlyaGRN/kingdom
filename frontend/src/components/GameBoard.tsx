@@ -79,8 +79,10 @@ export default function GameBoard({ onBack }: GameBoardProps) {
   }, [gameState?.phase, gameState?.current_player_idx, fetchValidActions])
 
   // Handle income phase
+  // Block income processing while combat modal is showing
   useEffect(() => {
     const handleIncome = async () => {
+      if (showCombat) return  // Wait for combat modal to be closed
       if (!gameState || gameState.phase !== 'income') return
       
       try {
@@ -93,7 +95,7 @@ export default function GameBoard({ onBack }: GameBoardProps) {
     
     const timer = setTimeout(handleIncome, 1000)
     return () => clearTimeout(timer)
-  }, [gameState?.phase, gameState?.id, setGameState])
+  }, [gameState?.phase, gameState?.id, setGameState, showCombat])
 
   // Check for game over
   useEffect(() => {
@@ -141,11 +143,14 @@ export default function GameBoard({ onBack }: GameBoardProps) {
   }, [gameState?.last_drawn_card, gameState?.current_round, gameState?.current_player_idx, gameState?.players])
 
   // AI turn handling - loop until AI ends turn (with max actions limit)
+  // IMPORTANT: Don't run AI turns while combat modal is showing
   useEffect(() => {
     let isActive = true
     const MAX_ACTIONS_PER_TURN = 15 // Prevent runaway AI turns
     
     const runAITurn = async () => {
+      // Block AI progression while combat modal is visible
+      if (showCombat) return
       if (!gameState || gameState.phase !== 'player_turn') return
       
       let currentPlayerIdx = gameState.current_player_idx
@@ -249,7 +254,7 @@ export default function GameBoard({ onBack }: GameBoardProps) {
       isActive = false
       clearTimeout(timer)
     }
-  }, [gameState?.phase, gameState?.current_player_idx, gameState?.id, setGameState])
+  }, [gameState?.phase, gameState?.current_player_idx, gameState?.id, setGameState, showCombat])
 
   const handleHoldingClick = (holding: Holding) => {
     if (selectedHolding?.id === holding.id) {

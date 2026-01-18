@@ -8,7 +8,7 @@ export const visualConfig = {
     // Background image filename (in /public folder)
     backgroundImage: '/menu_background_dark.png',
     // Dark overlay opacity (0.0 - 1.0)
-    overlayOpacity: 0.3,
+    overlayOpacity: 0.25,
   },
 
   // Game setup screen settings

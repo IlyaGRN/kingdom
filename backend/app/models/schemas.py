@@ -8,6 +8,7 @@ from pydantic import BaseModel, Field
 
 class TitleType(str, Enum):
     """Title hierarchy levels."""
+    BANDIT = "bandit"  # Player with no holdings
     BARON = "baron"
     COUNT = "count"
     DUKE = "duke"
@@ -188,6 +189,7 @@ class Player(BaseModel):
     def army_cap(self) -> int:
         """Maximum soldiers before supply costs apply."""
         caps = {
+            TitleType.BANDIT: 700,
             TitleType.BARON: 500,
             TitleType.COUNT: 800,
             TitleType.DUKE: 1200,

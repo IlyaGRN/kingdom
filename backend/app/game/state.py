@@ -439,12 +439,21 @@ def calculate_income(state: GameState) -> dict[str, dict]:
     Note: Gold bonus from fortifications only comes from the player's OWN 
     fortifications on their OWN towns. Fortifications on other players' towns
     only provide combat bonuses.
+    
+    Bandits (players with no holdings) get fixed income: 3 gold + 200 soldiers.
     """
     income = {}
     
     for player in state.players:
         gold = 0
         soldiers = 0
+        
+        # Bandits get fixed income (no holdings)
+        if player.title == TitleType.BANDIT:
+            gold = 3
+            soldiers = 200
+            income[player.id] = {"gold": gold, "soldiers": soldiers}
+            continue
         
         # Income from holdings
         for holding_id in player.holdings:
@@ -807,7 +816,7 @@ def get_winner(state: GameState) -> Optional[Player]:
     
     # Sort players by prestige, then tier, then gold, then soldiers
     def sort_key(p: Player):
-        tier_order = {TitleType.BARON: 0, TitleType.COUNT: 1, 
+        tier_order = {TitleType.BANDIT: -1, TitleType.BARON: 0, TitleType.COUNT: 1, 
                       TitleType.DUKE: 2, TitleType.KING: 3}
         return (
             -prestige[p.id],  # Higher is better

@@ -1,6 +1,6 @@
 // Game type definitions matching backend schemas
 
-export type TitleType = 'baron' | 'count' | 'duke' | 'king'
+export type TitleType = 'bandit' | 'baron' | 'count' | 'duke' | 'king'
 
 export type HoldingType = 'town' | 'county_castle' | 'duchy_castle' | 'king_castle'
 
@@ -246,6 +246,7 @@ export const AI_TYPES: { value: PlayerType; label: string }[] = [
 // Helper: Get army cap for a title
 export function getArmyCap(title: TitleType, hasBigWarEffect: boolean = false): number {
   const caps: Record<TitleType, number> = {
+    bandit: 700,
     baron: 500,
     count: 800,
     duke: 1200,

@@ -315,6 +315,10 @@ def apply_combat_result(state: GameState, result: CombatResult) -> GameState:
         if result.target_holding_id not in attacker.holdings:
             attacker.holdings.append(result.target_holding_id)
         
+        # BANDIT -> BARON promotion: If attacker was a bandit and captured a town
+        if attacker.title == TitleType.BANDIT and holding.holding_type == HoldingType.TOWN:
+            attacker.title = TitleType.BARON
+        
         # Handle title transfer for castles
         if holding.holding_type == HoldingType.COUNTY_CASTLE:
             county = result.target_holding_id[0].upper()  # e.g., "x_castle" -> "X"
@@ -327,7 +331,7 @@ def apply_combat_result(state: GameState, result: CombatResult) -> GameState:
             # Add county to attacker
             if county not in attacker.counties:
                 attacker.counties.append(county)
-            if attacker.title == TitleType.BARON:
+            if attacker.title in [TitleType.BANDIT, TitleType.BARON]:
                 attacker.title = TitleType.COUNT
                 
         elif holding.holding_type == HoldingType.DUCHY_CASTLE:
@@ -341,7 +345,7 @@ def apply_combat_result(state: GameState, result: CombatResult) -> GameState:
             # Add duchy to attacker
             if duchy not in attacker.duchies:
                 attacker.duchies.append(duchy)
-            if attacker.title in [TitleType.BARON, TitleType.COUNT]:
+            if attacker.title in [TitleType.BANDIT, TitleType.BARON, TitleType.COUNT]:
                 attacker.title = TitleType.DUKE
                 
         elif holding.holding_type == HoldingType.KING_CASTLE:
@@ -355,6 +359,14 @@ def apply_combat_result(state: GameState, result: CombatResult) -> GameState:
             attacker.is_king = True
             attacker.title = TitleType.KING
             # Note: 6 VP for being king is calculated dynamically in calculate_prestige
+        
+        # BARON -> BANDIT demotion: If defender lost their last holding
+        if defender and len(defender.holdings) == 0:
+            # Clear any titles they may have (shouldn't have any if no holdings, but just in case)
+            defender.counties = []
+            defender.duchies = []
+            defender.is_king = False
+            defender.title = TitleType.BANDIT
     
     # Remove all fortifications from the town after combat
     if holding.holding_type == HoldingType.TOWN and holding.fortification_count > 0:

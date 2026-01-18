@@ -217,9 +217,27 @@ class GameEngine:
         Player can attack ANY holding they have a claim on (not just adjacent).
         
         IMPORTANT: Cannot attack vassals (holdings in your domain) without VASSAL_REVOLT card.
+        
+        BANDITS: Can attack any town without claims, but cannot attack castles.
+        Bandits have no holdings, so source_holding_id is None.
         """
         player_holdings = [h.id for h in state.holdings if h.owner_id == player.id]
         added_targets = set()  # Track to avoid duplicates
+        
+        # Special case: BANDITS can attack any town (no claims needed, no holdings needed)
+        if player.title == TitleType.BANDIT:
+            for holding in state.holdings:
+                # Bandits can only attack TOWNS owned by other players
+                if (holding.holding_type == HoldingType.TOWN and 
+                    holding.owner_id is not None and 
+                    holding.owner_id != player.id):
+                    actions.append(Action(
+                        action_type=ActionType.ATTACK,
+                        player_id=player.id,
+                        source_holding_id=None,  # Bandits have no holdings
+                        target_holding_id=holding.id,
+                    ))
+            return  # Bandits use simplified attack logic
         
         # First, add attacks for adjacent holdings (if player has claim)
         # Only attack holdings owned by OTHER players (not unowned, not own)
@@ -269,23 +287,45 @@ class GameEngine:
         - Played claim cards (stored in player.claims list)
         - Fabricated claims (also in player.claims list)
         - AUTOMATIC: Meeting Count/Duke/King prerequisites gives a claim on that castle
+        - BANDITS: Automatic claim on all towns (but not castles)
         
         IMPORTANT: Without any claims, you cannot attack anyone!
         """
+        # #region agent log
+        import json; open('/home/ilya/dev/kingdom/.cursor/debug.log', 'a').write(json.dumps({"location": "engine.py:_has_valid_claim:entry", "message": "Checking claim", "data": {"player_name": player.name, "player_claims": player.claims, "holding_id": holding.id, "holding_type": str(holding.holding_type), "holding_county": holding.county}, "timestamp": __import__('time').time()*1000, "sessionId": "debug-session", "hypothesisId": "H1-H5"}) + '\n')
+        # #endregion
+        
+        # BANDITS have implicit claims on all TOWNS (but not castles)
+        if player.title == TitleType.BANDIT:
+            if holding.holding_type == HoldingType.TOWN:
+                return True
+            else:
+                # Bandits cannot attack castles
+                return False
+        
         # FIRST: Check for automatic claims based on title prerequisites
         # If player meets Count prerequisites for a county, they have a claim on that county castle
         if holding.holding_type == HoldingType.COUNTY_CASTLE and holding.county:
             if can_claim_count(self.state, player.id, holding.county):
+                # #region agent log
+                import json; open('/home/ilya/dev/kingdom/.cursor/debug.log', 'a').write(json.dumps({"location": "engine.py:_has_valid_claim:auto_count", "message": "AUTO CLAIM via Count prereqs", "data": {"player_name": player.name, "county": holding.county}, "timestamp": __import__('time').time()*1000, "sessionId": "debug-session", "hypothesisId": "H3"}) + '\n')
+                # #endregion
                 return True
         
         # If player meets Duke prerequisites for a duchy, they have a claim on that duchy castle
         if holding.holding_type == HoldingType.DUCHY_CASTLE and holding.duchy:
             if can_claim_duke(self.state, player.id, holding.duchy):
+                # #region agent log
+                import json; open('/home/ilya/dev/kingdom/.cursor/debug.log', 'a').write(json.dumps({"location": "engine.py:_has_valid_claim:auto_duke", "message": "AUTO CLAIM via Duke prereqs", "data": {"player_name": player.name, "duchy": holding.duchy}, "timestamp": __import__('time').time()*1000, "sessionId": "debug-session", "hypothesisId": "H3"}) + '\n')
+                # #endregion
                 return True
         
         # If player meets King prerequisites, they have a claim on the king castle
         if holding.id == "king_castle":
             if can_claim_king(self.state, player.id):
+                # #region agent log
+                import json; open('/home/ilya/dev/kingdom/.cursor/debug.log', 'a').write(json.dumps({"location": "engine.py:_has_valid_claim:auto_king", "message": "AUTO CLAIM via King prereqs", "data": {"player_name": player.name}, "timestamp": __import__('time').time()*1000, "sessionId": "debug-session", "hypothesisId": "H3"}) + '\n')
+                # #endregion
                 return True
         
         # If player has no explicit claims at all, return False for non-castle holdings
@@ -294,17 +334,29 @@ class GameEngine:
         
         # Check if holding ID is in player's claims list
         if holding.id in player.claims:
+            # #region agent log
+            import json; open('/home/ilya/dev/kingdom/.cursor/debug.log', 'a').write(json.dumps({"location": "engine.py:_has_valid_claim:direct_claim", "message": "DIRECT CLAIM on holding ID", "data": {"player_name": player.name, "holding_id": holding.id}, "timestamp": __import__('time').time()*1000, "sessionId": "debug-session", "hypothesisId": "H2"}) + '\n')
+            # #endregion
             return True
         
         # Check if player has a claim for the holding's county (for towns)
         county_claim_key = f"county_{holding.county}"
         if holding.county and county_claim_key in player.claims:
+            # #region agent log
+            import json; open('/home/ilya/dev/kingdom/.cursor/debug.log', 'a').write(json.dumps({"location": "engine.py:_has_valid_claim:county_claim", "message": "COUNTY CLAIM matched", "data": {"player_name": player.name, "county_claim_key": county_claim_key, "holding_id": holding.id, "holding_type": str(holding.holding_type)}, "timestamp": __import__('time').time()*1000, "sessionId": "debug-session", "hypothesisId": "H1"}) + '\n')
+            # #endregion
             return True
         
         # Check for "all" claims (ultimate/duchy)
         if "all" in player.claims:
+            # #region agent log
+            import json; open('/home/ilya/dev/kingdom/.cursor/debug.log', 'a').write(json.dumps({"location": "engine.py:_has_valid_claim:all_claim", "message": "ALL CLAIM (ultimate/duchy)", "data": {"player_name": player.name}, "timestamp": __import__('time').time()*1000, "sessionId": "debug-session", "hypothesisId": "H4"}) + '\n')
+            # #endregion
             return True
         
+        # #region agent log
+        import json; open('/home/ilya/dev/kingdom/.cursor/debug.log', 'a').write(json.dumps({"location": "engine.py:_has_valid_claim:no_claim", "message": "NO VALID CLAIM FOUND", "data": {"player_name": player.name, "holding_id": holding.id}, "timestamp": __import__('time').time()*1000, "sessionId": "debug-session", "hypothesisId": "H1-H5"}) + '\n')
+        # #endregion
         return False
     
     def _is_holding_in_domain(self, player, holding) -> bool:
@@ -1175,9 +1227,10 @@ class GameEngine:
             required_county = get_card_county(card)
             if holding.county != required_county:
                 return False, f"This claim only works in County {required_county}", None
-            # County claim cards can target TOWNS or the COUNTY CASTLE
-            if holding.holding_type not in [HoldingType.TOWN, HoldingType.COUNTY_CASTLE]:
-                return False, "County claim cards only work on towns or county castles", None
+            # County claim cards can ONLY target TOWNS, NOT castles
+            # To claim a castle, you must meet Count prerequisites (2 towns or fortified capitol)
+            if holding.holding_type != HoldingType.TOWN:
+                return False, "County claim cards only work on towns. To claim a castle, meet Count prerequisites.", None
         
         elif effect == CardEffect.DUCHY_CLAIM:
             # Can claim any town or Duke+ title
