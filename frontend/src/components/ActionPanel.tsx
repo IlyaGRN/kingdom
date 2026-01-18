@@ -1,10 +1,65 @@
-import { Action, Holding, COMBAT_CARD_EFFECTS } from '../types/game'
+import { Action, Holding, COMBAT_CARD_EFFECTS, Player, CardEffect } from '../types/game'
 import { useGameStore } from '../store/gameStore'
 
 interface ActionPanelProps {
   onPerformAction: (action: Action) => void
   selectedHolding: Holding | null
   onOpenCombatPrep: (holding: Holding) => void
+}
+
+/**
+ * Check if a holding is within the player's domain (making its owner a vassal).
+ * Players cannot attack/claim holdings in their domain without VASSAL_REVOLT.
+ */
+function isHoldingInDomain(player: Player, holding: Holding): boolean {
+  // King controls the entire realm
+  if (player.is_king) {
+    return true
+  }
+  
+  // Duke controls their duchy (both counties)
+  for (const duchy of player.duchies || []) {
+    let duchyCounties: string[] = []
+    if (duchy === 'XU') {
+      duchyCounties = ['X', 'U']
+    } else if (duchy === 'QV') {
+      duchyCounties = ['Q', 'V']
+    }
+    
+    if (holding.county && duchyCounties.includes(holding.county)) {
+      return true
+    }
+    if (holding.duchy === duchy) {
+      return true
+    }
+  }
+  
+  // Count controls their county
+  if (holding.county && (player.counties || []).includes(holding.county)) {
+    return true
+  }
+  
+  return false
+}
+
+/**
+ * Check if player can attack a holding (considering vassal protection).
+ */
+function canAttackHolding(player: Player, holding: Holding): boolean {
+  // Can't attack your own holdings
+  if (holding.owner_id === player.id) {
+    return false
+  }
+  
+  // If holding is in player's domain, need Vassal Revolt to attack
+  if (isHoldingInDomain(player, holding)) {
+    const hasVassalRevolt = (player.active_effects || []).includes('vassal_revolt' as CardEffect)
+    if (!hasVassalRevolt) {
+      return false
+    }
+  }
+  
+  return true
 }
 
 export default function ActionPanel({ onPerformAction, selectedHolding, onOpenCombatPrep }: ActionPanelProps) {
@@ -17,6 +72,10 @@ export default function ActionPanel({ onPerformAction, selectedHolding, onOpenCo
 
   const isHumanTurn = currentPlayer.player_type === 'human'
   const isPlayerTurn = gameState.phase === 'player_turn'
+  
+  // Check if selected holding is in player's domain (vassal protection)
+  const selectedIsInDomain = selectedHolding ? isHoldingInDomain(currentPlayer, selectedHolding) : false
+  const canAttackSelected = selectedHolding ? canAttackHolding(currentPlayer, selectedHolding) : false
 
   // Group actions by type
   const groupedActions = validActions.reduce((acc, action) => {
@@ -46,11 +105,12 @@ export default function ActionPanel({ onPerformAction, selectedHolding, onOpenCo
     : []
   
   // Check if player can fabricate claim on this holding (show disabled button if not enough gold)
-  // Don't show for holdings player already owns or already has a claim on
+  // Don't show for holdings player already owns, already has a claim on, or in their domain (vassal)
   const canFabricateClaimOnSelected = selectedHolding && 
     selectedHolding.holding_type === 'town' && 
     selectedHolding.owner_id !== currentPlayer.id &&
-    !(currentPlayer.claims ?? []).includes(selectedHolding.id)
+    !(currentPlayer.claims ?? []).includes(selectedHolding.id) &&
+    canAttackSelected  // Don't show for vassal holdings
   
   // Get build fortification action for selected holding
   const buildFortForSelected = selectedHolding
@@ -89,7 +149,8 @@ export default function ActionPanel({ onPerformAction, selectedHolding, onOpenCo
     : []
 
   // Get claim cards that can be played on the selected holding
-  const claimCardsForSelected = selectedHolding
+  // Don't show claim cards for holdings in player's domain (vassal protection)
+  const claimCardsForSelected = selectedHolding && canAttackSelected
     ? (groupedActions.play_card || []).filter(action => {
         const card = gameState.cards[action.card_id || '']
         if (!card || card.card_type !== 'claim') return false
